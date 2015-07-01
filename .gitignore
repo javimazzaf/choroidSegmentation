@@ -1,4 +1,4 @@
 *.m~
 *.mat
-Directories/*.*
+*.DS_Store
 
