@@ -1,4 +1,4 @@
-function [messedup2,error2,runtime2] = ChoroidPostProcess(varargin)
+function [messedup2,error2,runtime2,exception] = ChoroidPostProcess(varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -28,10 +28,12 @@ else
     dirlist=dirlist(FirstProcess&Rigidity);
 end
 
-c=parcluster('local');
-if isempty(gcp('nocreate'))
-    pool=parpool(c,12);
-end
+% c=parcluster('local');
+% if isempty(gcp('nocreate'))
+%     pool=parpool(c,12);
+% end
+
+finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
 
 clock=tic;
 messedup2=[];
@@ -39,6 +41,7 @@ error2=cell(length(dirlist),1);
 for iter=1:length(dirlist)
     try
         directory=dirlist{iter};
+        
         numframes=length(dir(fullfile(directory,'Processed Images','*.png')));
         
         savedir=fullfile(directory,'Results');
@@ -50,6 +53,7 @@ for iter=1:length(dirlist)
         traces=traces;
         noCSI=~cell2mat(cellfun(@isempty,cellfun(@find,cellfun(@isnan,cellfun(@min,{traces.CSI},'uniformoutput',0),'uniformoutput',0),'uniformoutput',0),'uniformoutput',0));
         allframes=1:numframes;
+        
         %% CALCULATE MEAN CSI & Correllation
         meanCSI=round(mean([traces(~noCSI).CSI],2));
         correl=zeros(numframes,1);
@@ -59,16 +63,17 @@ for iter=1:length(dirlist)
             end
             correl(i)=max(xcorr(traces(i).CSI,meanCSI,5));
         end
-        badcorrel=allframes(correl<mean(correl(correl~=0)));
+        badcorrel = allframes(correl<mean(correl(correl~=0)));
         
         %% Apply Exclusion Criteria to Determine frames to rerun
-        Vframecheck=zeros(numframes,1);
-        for frame=1:numframes
+        Vframecheck = zeros(numframes,1);
+        
+        for frame = 1:numframes
             if ismember(frame,skippedind) || ismember(frame,allframes(noCSI))
                 continue
             end
             % Choroid Volume Calculation
-            Vframecheck(frame)=sum(traces(frame).CSI-traces(frame).BM);
+            Vframecheck(frame) = sum(traces(frame).CSI-traces(frame).BM);
             %                 Vframe{frame} = ChoroidVolumeCalc(traces(frame).usedCSI,traces(frame).BM);
         end
         [~,~,Endcheck,~,Vcheck,~,~]=ChoroidUsableFramesCheck(numframes,Vframecheck,EndHeights,EndHeights,EndHeights,{traces.CSI});
@@ -76,6 +81,7 @@ for iter=1:length(dirlist)
         
         %% Rerun Using Endheight Trends if Required
         Vframe=zeros(numframes,1);
+        
         if any(error)%var(EndHeights(~isnan(EndHeights(:,1)),1))>20 || var(EndHeights(~isnan(EndHeights(:,2)),2))>20
             load(fullfile(directory,'Data Files','OrientedGradient.mat'));
             [newEndHeights,traces] = ChoroidEndheightRerun(EndHeights,error,numframes,skippedind,nodes,OG,other,traces,meanCSI);
@@ -102,6 +108,7 @@ for iter=1:length(dirlist)
             [traces.usedCSI]=traces.CSI;
             disp(['Done Rerun, Iteration ',num2str(iter)])
         end
+        
         for frame=1:numframes
             if ismember(frame,skippedind) || isempty(traces(frame).usedCSI)
                 continue
@@ -110,26 +117,46 @@ for iter=1:length(dirlist)
             Vframe(frame)=sum(traces(frame).usedCSI-traces(frame).BM);
             %                 Vframe{frame} = ChoroidVolumeCalc(traces(frame).usedCSI,traces(frame).BM);
         end
-        save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe');
-           
         
+        save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe');
+        
+        disp(logit(directory,['Correct ChoroidPostProcess:' savedir]))
         %%
         clearvars -except iter dirlist rerun messedup2 mostrecent clock error2
+        
         close all
+        
+        exception = [];
+        
     catch exception
-        error2{iter}=exception;
-        messedup2=[messedup2;iter];
+        
+        exception.stack(1)
+        exception.stack(2)
+        exception.stack(3)
+        
+        disp(logit(directory,['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory]))
+        
+        error2{iter} = exception;
+        
+        messedup2 = [messedup2; iter];
+        
         clearvars -except iter dirlist rerun messedup2 mostrecent clock error2
+        
         close all
-        if iter==length(dirlist) && ~isempty(gcp('nocreate'))
-            delete(pool)
-        end
+        
+%         if iter==length(dirlist) && ~isempty(gcp('nocreate'))
+%             delete(pool)
+%         end
+
         continue
     end
 end
-runtime2=toc(clock);
-if ~isempty(gcp('nocreate'))
-    delete(gcp('nocreate'))
-end
+
+runtime2 = toc(clock);
+
+% if ~isempty(gcp('nocreate'))
+%     delete(gcp('nocreate'))
+% end
+
 end
 
