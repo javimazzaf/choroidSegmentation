@@ -1,4 +1,4 @@
-function [messedup2,error2,runtime2,exception] = ChoroidPostProcess(varargin)
+function [messedup2,error2,runtime2,exception] = ChoroidPostProcessTest(varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -33,7 +33,7 @@ end
 %     pool=parpool(c,12);
 % end
 
-finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
+% finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
 
 clock=tic;
 messedup2=[];
@@ -69,15 +69,18 @@ for iter=1:length(dirlist)
         Vframecheck = zeros(numframes,1);
         
         for frame = 1:numframes
-            if ismember(frame,skippedind) || ismember(frame,allframes(noCSI))
+            if ismember(frame,skippedind) || ismember(frame,allframes(noCSI)) || any(isempty(traces(frame).CSI)) || any(isnan(traces(frame).CSI))
                 continue
             end
             % Choroid Volume Calculation
+            
             Vframecheck(frame) = sum(traces(frame).CSI-traces(frame).BM);
             %                 Vframe{frame} = ChoroidVolumeCalc(traces(frame).usedCSI,traces(frame).BM);
         end
-        [~,~,Endcheck,~,Vcheck,~,~]=ChoroidUsableFramesCheck(numframes,Vframecheck,EndHeights,EndHeights,EndHeights,{traces.CSI});
-        error=setdiff(unique([badcorrel setdiff(allframes(~Endcheck | ~Vcheck),allframes(noCSI))]),skippedind);
+        
+        [~,~,Endcheck,~,Vcheck,~,~] = ChoroidUsableFramesCheck(numframes,Vframecheck,EndHeights,EndHeights,EndHeights,{traces.CSI});
+        
+        error = setdiff(unique([badcorrel setdiff(allframes(~Endcheck | ~Vcheck),allframes(noCSI))]),skippedind);
         
         %% Rerun Using Endheight Trends if Required
         Vframe=zeros(numframes,1);
@@ -130,11 +133,16 @@ for iter=1:length(dirlist)
         
     catch exception
         
-        exception.stack(1)
-        exception.stack(2)
-        exception.stack(3)
+        errorString = ['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory];
         
-        disp(logit(directory,['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory]))
+        if ismember('stack',fieldnames(exception))
+            for s = 1:numel(exception.stack)
+                text = ['Function: ' exception.stack(s).name ' (at: ' num2str(exception.stack(s).line) '). '];
+                errorString = [errorString, text];
+            end
+        end
+        
+        disp(logit(directory,errorString))
         
         error2{iter} = exception;
         
