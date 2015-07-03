@@ -1,6 +1,7 @@
 function listToolboxDependencies(baseDir)
 
 folders = genpath(baseDir);
+
 folders = regexp(folders,['[^' pathsep ']*'],'match')';
 
 % Get rid of git files
