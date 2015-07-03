@@ -58,8 +58,12 @@ for indx=2:num-1
     connected=elementIdx(abs(col(indx)-col)<=delColmax & col>col(indx) & abs(row(indx)-row)<=delRowmax & col<=n);
     
     if isempty(connected) && ~any(any(C(1:indx-1,indx+1:end)))
-        nextcol=min(col((col>col(indx) & abs(row(indx)-row)<=delRowmax)));
-        connected=elementIdx(col==nextcol & abs(row(indx)-row)<=delRowmax);
+        nextcol = min(col((col>col(indx) & abs(row(indx)-row)<=delRowmax)));
+        
+        if isempty(nextcol), continue, end % JM: There aren't any nodes connected to the current one
+        
+        connected = elementIdx(col==nextcol & abs(row(indx)-row)<=delRowmax);
+
     end
     
     dely=abs(row(indx)-row(connected));

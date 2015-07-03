@@ -1,6 +1,9 @@
-function [messedup2,error2,runtime2,exception] = ChoroidPostProcess(varargin)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+function [messedup2,error2,runtime2] = ChoroidPostProcess(varargin)
+
+% Uses the whole set of segmented CSI to correct for specific frames with
+% very different segmentation traces (possibly errors). It assigns a new
+% weight for the graph search, accounting for the distance to the mean CSI
+% trace.
 
 if length(varargin)==1
     if ispc
@@ -28,11 +31,6 @@ else
     dirlist=dirlist(FirstProcess&Rigidity);
 end
 
-% c=parcluster('local');
-% if isempty(gcp('nocreate'))
-%     pool=parpool(c,12);
-% end
-
 finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
 
 clock=tic;
@@ -40,53 +38,63 @@ messedup2=[];
 error2=cell(length(dirlist),1);
 for iter=1:length(dirlist)
     try
-        directory=dirlist{iter};
+        directory = dirlist{iter};
         
-        numframes=length(dir(fullfile(directory,'Processed Images','*.png')));
+        numframes = length(dir(fullfile(directory,'Processed Images','*.png')));
         
         savedir=fullfile(directory,'Results');
         load(fullfile(savedir,'FirstProcessData.mat'));
         load(fullfile(directory,'Data Files','RegisteredImages.mat'));
         smallsize=vertcat(other.smallsize);
-        skippedind=skippedind;
-        notskipped=setdiff(1:numframes,skippedind);
+        skippedind = skippedind; % It fixes a bug in parallel mode, where it does not find the variable loaded from file.
+        notskipped = setdiff(1:numframes,skippedind);
         traces=traces;
-        noCSI=~cell2mat(cellfun(@isempty,cellfun(@find,cellfun(@isnan,cellfun(@min,{traces.CSI},'uniformoutput',0),'uniformoutput',0),'uniformoutput',0),'uniformoutput',0));
+%         hasCSI = cell2mat(cellfun(@isempty,cellfun(@find,cellfun(@isnan,cellfun(@min,{traces.CSI},'uniformoutput',0),'uniformoutput',0),'uniformoutput',0),'uniformoutput',0));
+
+        hasCSI = ~logical(cellfun(@(x) any(isnan(x)),{traces.CSI}));
+        
         allframes=1:numframes;
         
-        %% CALCULATE MEAN CSI & Correllation
-        meanCSI=round(mean([traces(~noCSI).CSI],2));
-        correl=zeros(numframes,1);
-        for i=1:numframes
+        % CALCULATE MEAN CSI & Correlation
+        meanCSI = round(mean([traces(hasCSI).CSI],2));
+        
+        correl = zeros(numframes,1);
+        
+        for i = 1:numframes
             if ismember(i,skippedind)
                 continue
             end
-            correl(i)=max(xcorr(traces(i).CSI,meanCSI,5));
+            correl(i) = max(xcorr(traces(i).CSI,meanCSI,5));
         end
-        badcorrel = allframes(correl<mean(correl(correl~=0)));
         
-        %% Apply Exclusion Criteria to Determine frames to rerun
+        meanCorrel = mean(correl(correl~=0));
+        
+        % List of frames where the correlation is lower than the mean
+        badcorrel = allframes(correl < meanCorrel);
+        
+        % Apply Exclusion Criteria to Determine frames to rerun
         Vframecheck = zeros(numframes,1);
         
-        for frame = 1:numframes
-            if ismember(frame,skippedind) || ismember(frame,allframes(noCSI))
-                continue
-            end
-            % Choroid Volume Calculation
-            Vframecheck(frame) = sum(traces(frame).CSI-traces(frame).BM);
-            %                 Vframe{frame} = ChoroidVolumeCalc(traces(frame).usedCSI,traces(frame).BM);
+        validFrames = hasCSI & ~ismember(allframes,skippedind);
+        validFrames = validFrames & ~logical(cellfun(@isempty,{traces.CSI})); 
+        
+        % Choroid Volume Calculation
+        for frame = allframes(validFrames)
+            Vframecheck(frame) = sum(traces(frame).CSI - traces(frame).BM);
         end
-        [~,~,Endcheck,~,Vcheck,~,~]=ChoroidUsableFramesCheck(numframes,Vframecheck,EndHeights,EndHeights,EndHeights,{traces.CSI});
-        error=setdiff(unique([badcorrel setdiff(allframes(~Endcheck | ~Vcheck),allframes(noCSI))]),skippedind);
+        
+        [~,~,Endcheck,~,Vcheck,~,~] = ChoroidUsableFramesCheck(numframes,Vframecheck,EndHeights,EndHeights,EndHeights,{traces.CSI});
+        
+        error = setdiff(unique([badcorrel setdiff(allframes(~Endcheck | ~Vcheck),allframes(~hasCSI))]),skippedind);
         
         %% Rerun Using Endheight Trends if Required
         Vframe=zeros(numframes,1);
         
-        if any(error)%var(EndHeights(~isnan(EndHeights(:,1)),1))>20 || var(EndHeights(~isnan(EndHeights(:,2)),2))>20
+        if any(error)
             load(fullfile(directory,'Data Files','OrientedGradient.mat'));
             [newEndHeights,traces] = ChoroidEndheightRerun(EndHeights,error,numframes,skippedind,nodes,OG,other,traces,meanCSI);
-            correl=zeros(numframes,1);
-            for i=1:numframes
+            correl = zeros(numframes,1);
+            for i = allframes
                 if ismember(i,skippedind)
                     continue
                 end
@@ -101,21 +109,22 @@ for iter=1:length(dirlist)
                     traces(frame).usedCSI=traces(frame).nCSI;
                 end
             end
-            disp(['Done Rerun, Iteration ',num2str(iter)])
         else
             newEndHeights=EndHeights;
             usedEndHeights=EndHeights;
             [traces.usedCSI]=traces.CSI;
-            disp(['Done Rerun, Iteration ',num2str(iter)])
         end
         
-        for frame=1:numframes
+        disp(logit(savedir,['Done Rerun ChoroidPostProcess, Iteration ',num2str(iter)]))
+        
+        for frame = allframes
             if ismember(frame,skippedind) || isempty(traces(frame).usedCSI)
                 continue
             end
+            
             % Choroid Volume Calculation
-            Vframe(frame)=sum(traces(frame).usedCSI-traces(frame).BM);
-            %                 Vframe{frame} = ChoroidVolumeCalc(traces(frame).usedCSI,traces(frame).BM);
+            Vframe(frame) = sum(traces(frame).usedCSI-traces(frame).BM);
+
         end
         
         save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe');
@@ -126,15 +135,18 @@ for iter=1:length(dirlist)
         
         close all
         
-        exception = [];
-        
     catch exception
         
-        exception.stack(1)
-        exception.stack(2)
-        exception.stack(3)
+        errorString = ['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory];
         
-        disp(logit(directory,['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory]))
+        if ismember('stack',fieldnames(exception))
+            for s = 1:numel(exception.stack)
+                text = ['Function: ' exception.stack(s).name ' (at: ' num2str(exception.stack(s).line) '). '];
+                errorString = [errorString, text];
+            end
+        end
+        
+        disp(logit(directory,errorString))
         
         error2{iter} = exception;
         
@@ -143,20 +155,12 @@ for iter=1:length(dirlist)
         clearvars -except iter dirlist rerun messedup2 mostrecent clock error2
         
         close all
-        
-%         if iter==length(dirlist) && ~isempty(gcp('nocreate'))
-%             delete(pool)
-%         end
 
         continue
     end
 end
 
 runtime2 = toc(clock);
-
-% if ~isempty(gcp('nocreate'))
-%     delete(gcp('nocreate'))
-% end
 
 end
 
