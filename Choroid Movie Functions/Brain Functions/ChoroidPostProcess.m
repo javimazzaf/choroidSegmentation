@@ -1,4 +1,4 @@
-function [messedup2,error2,runtime2] =  ChoroidPostProcess(varargin)
+function [messedup2,error2,runtime2] = ChoroidPostProcess(varargin)
 
 % Uses the whole set of segmented CSI to correct for specific frames with
 % very different segmentation traces (possibly errors). It assigns a new
