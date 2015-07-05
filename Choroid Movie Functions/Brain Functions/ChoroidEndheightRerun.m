@@ -5,18 +5,25 @@ function [newEndHeights,traces] = ChoroidEndheightRerun(EndHeights,error,numfram
 %%
 newEndHeights=nan(numframes,2);
 
-parfor frame=1:numframes
-% for frame=1:numframes
-    if ismember(frame,skippedind) 
+meanColShift = round(mean([other.colshifts],2));
+
+if any(isempty(meanColShift)) || any(isnan(meanColShift))
+    return
+end
+
+% parfor frame=1:numframes
+for frame=1:numframes
+    if any(ismember(frame,skippedind)) || any(isempty(other(frame).shiftsize))
         continue
     elseif ~ismember(frame,error)
         traces(frame).nCSI=traces(frame).CSI;
         newEndHeights(frame,:)=EndHeights(frame,:);
     end
-    % ACA ESTA EL ERROR !!!!
-    meanshiftCSI=meanCSI+other(frame).shiftsize+round(mean([other.colshifts],2));
+    
+    meanshiftCSI = meanCSI + other(frame).shiftsize + meanColShift;
+    
     % Rerun Graph Search
-    [traces(frame).nCSI]=FindCSI(Set1{frame},Set2{frame},other(frame).shiftsize,other(frame).colshifts,... %(traces(frame).BM(1)+other(frame).colshifts(1)+other(frame).shiftsize+[commonL commonR])
+    [traces(frame).nCSI] = FindCSI(Set1{frame},Set2{frame},other(frame).shiftsize,other(frame).colshifts,... %(traces(frame).BM(1)+other(frame).colshifts(1)+other(frame).shiftsize+[commonL commonR])
         meanshiftCSI);
     
     % Error Checking
