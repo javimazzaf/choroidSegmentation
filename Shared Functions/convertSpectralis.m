@@ -28,8 +28,12 @@ else
 end
 
 for iter=1:length(dirlist)
-    folder=dirlist{iter};
+    folder = dirlist{iter};
     if  isempty(dir(fullfile(folder,'Processed Images','*.tif')))
+        
+        disp(logit(folder,['Initiating convertSpectralis on ' folder]))
+        
+        try
         
         if ~exist(fullfile(folder,'Processed Images'),'dir')
            mkdir(fullfile(folder,'Processed Images'));
@@ -112,6 +116,11 @@ for iter=1:length(dirlist)
         if ~isempty(Heart)
             hrtdata(:,4)=hrtindx;
             save(fullfile(folder,'Data Files','HeartInfo.mat'),'hrtdata');
+        end
+        
+        catch dirExc
+            disp(logit(folder,['Error (convertSpectralis) in folder ' folder ' : ' dirExc.message]))
+            continue
         end
         
         disp(logit(folder,['Done convertSpectralis in folder ' folder]))
