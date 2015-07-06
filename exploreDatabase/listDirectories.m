@@ -71,6 +71,7 @@ disp(['Has Err:    ' num2str(numel(has.Err))])
 disp(['Has Map:    ' num2str(numel(has.Map))])
 disp(['Has Mov:    ' num2str(numel(has.Mov))])
 disp(['All:    ' num2str(numel(has.All))])
+
 num190 = sum(numBscans > 185 & numBscans < 195);
 num50  = sum(numBscans > 40 & numBscans < 52);
 num0   = sum(numBscans < 40);
