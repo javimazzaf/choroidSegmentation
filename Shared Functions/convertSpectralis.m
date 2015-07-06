@@ -79,10 +79,11 @@ for iter=1:length(dirlist)
                 imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
             catch
                 ind=cell2mat(regexp(ImageList(i).fileName,{dircontent.name}));
+                disp(logit(folder,['convertSpectralis: fixed ' folder]))
                 ImageList(i).fileName=ImageList(i).fileName(ind:end);
                 imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
             end
-            disp(folder)
+
             imout=rgb2gray(imtif);
             imwrite(imout,fullfile(folder,'Processed Images',no))
             
@@ -106,7 +107,7 @@ for iter=1:length(dirlist)
             save(fullfile(folder,'Data Files','HeartInfo.mat'),'hrtdata');
         end
         
-        disp(logit(folder,['Done convertSpectralis ' num2str(i)]))
+        disp(logit(folder,['Done convertSpectralis in folder ' folder]))
     else
         continue
     end
