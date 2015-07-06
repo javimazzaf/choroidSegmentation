@@ -1,7 +1,7 @@
 % LIST DIRECTORIES OF PATIENTS WITH SPECIFIC CHARACTERISTICS
 % The output can be used as parameters for the processing functions. For
 % example:
-%    convertSpectralis(fullfile(topdir,todo.convert));
+%    convertSpectralis(todo.convert);
 
 if ~ispc
     if ismac
@@ -50,13 +50,13 @@ groups = [];
 %              'Rigidity'};
 
 %%% FOR INDIVIDUAL STUDIES
-% studies   = {'Choroidal Mapping'}; 
-studies   = {'Rigidity'}; 
+studies   = {'Choroidal Mapping'}; 
+% studies   = {'Rigidity'}; 
 
 
 reproducibility = '';
 
-[todo, has] = getDirectories(topdir,groups,studies,reproducibility);
+[todo, has, numBscans] = getDirectories(topdir,groups,studies,reproducibility);
 
 
 disp(['Has RawIm:    ' num2str(numel(has.RawIm))])
@@ -71,6 +71,15 @@ disp(['Has Err:    ' num2str(numel(has.Err))])
 disp(['Has Map:    ' num2str(numel(has.Map))])
 disp(['Has Mov:    ' num2str(numel(has.Mov))])
 disp(['All:    ' num2str(numel(has.All))])
+num190 = sum(numBscans > 185 & numBscans < 195);
+num50  = sum(numBscans > 40 & numBscans < 52);
+num0   = sum(numBscans < 40);
+total  = numel(numBscans);
+
+disp('Number of bscans:')
+disp(['  ~190: ' num2str(num190) 9 '(' num2str(num190 * 100 / total,'%2.1f') '%)']);
+disp(['  ~50 : ' num2str(num50) 9 '(' num2str(num50 * 100 / total,'%2.1f') '%)']);
+disp(['  ~0  : ' num2str(num0) 9 '(' num2str(num0 * 100 / total,'%2.1f') '%)']);
 disp('----------------------------------')
 
 

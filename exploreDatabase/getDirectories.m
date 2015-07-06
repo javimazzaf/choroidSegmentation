@@ -1,6 +1,6 @@
 % Select directories that are ready for each particular step of the
-% processing
-function [todoDirs, hasDirs] = getDirectories(topdir,groups,studies,reprod)
+% processing, or that have specific information
+function [todoDirs, hasDirs, numBscans] = getDirectories(topdir,groups,studies,reprod)
 
 databasedir=fullfile(topdir,'share','SpectralisData');
 
@@ -61,16 +61,19 @@ bottomdirs=[onhDirs;otherDirs];
 
 % Get masks for  directories that are on a specific step of the processing
 hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
-hasImsMsk   = logical(cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) >= 1 ,fullfile(bottomdirs,'Processed Images')));
 hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Data Files','RegisteredImages.mat')));
 hasFrsMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessData.mat')));
 hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'PostProcessData.mat')));
 hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) ,fullfile(bottomdirs,'Results')));
 hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
 hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','Results.mat')));
-hasMapMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMap.mat')));
-hasMovMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovie.gif')));
+hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMap.mat')));
+hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovie.gif')));
 hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
+
+numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
+hasImsMsk   = logical(numBscans >= 1);
+
 %Strip out the topdir from the full list
 dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false);
 
