@@ -29,12 +29,19 @@ end
 
 for iter=1:length(dirlist)
     folder=dirlist{iter};
-    if ~exist(fullfile(folder,'Processed Images'),'dir') || isempty(dir(fullfile(folder,'Processed Images')))
-        mkdir(fullfile(folder,'Processed Images'));
-        mkdir(fullfile(folder,'Data Files'));
-        x=dir(fullfile(folder,'Raw Images','*.xml'));
+    if  isempty(dir(fullfile(folder,'Processed Images','*.tif')))
         
-        Heart=dir(fullfile(folder,'Raw Images','*.txt'));
+        if ~exist(fullfile(folder,'Processed Images'),'dir')
+           mkdir(fullfile(folder,'Processed Images'));
+        end
+        
+        if ~exist(fullfile(folder,'Data Files'),'dir')
+           mkdir(fullfile(folder,'Data Files'));
+        end
+        
+        x = dir(fullfile(folder,'Raw Images','*.xml'));
+        
+        Heart = dir(fullfile(folder,'Raw Images','*.txt'));
         
         if ~isempty(Heart)
             
@@ -79,7 +86,7 @@ for iter=1:length(dirlist)
                 imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
             catch
                 ind=cell2mat(regexp(ImageList(i).fileName,{dircontent.name}));
-                disp(logit(folder,['convertSpectralis: fixed ' folder]))
+                disp(logit(folder,['convertSpectralis: fixed error in ' folder]))
                 ImageList(i).fileName=ImageList(i).fileName(ind:end);
                 imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
             end
