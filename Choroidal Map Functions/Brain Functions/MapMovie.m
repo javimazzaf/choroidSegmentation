@@ -40,6 +40,7 @@ for iter=1:length(dirlist)
         load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
         
         df = figure('Visible','Off');
+%         df = figure();
         xlabel('Fundus X Position [mm]')
         ylabel('Fundux Y Position [mm]')
         title('Choroidal Thickness Map [\mum]')
@@ -119,8 +120,11 @@ for iter=1:length(dirlist)
             h5 = plot(xvec,repmat(yvec(i),length(xvec),1),'k--','linewidth',1.5);
             hold off
             drawnow
-            frame=getframe(df);
-            im=frame2im(frame);
+%             frame=getframe(df);
+%             im=frame2im(frame);
+ 
+            print(df,'~/aux.png','-dpng')
+            im = imread('~/aux.png');
             [imind,cm]=rgb2ind(im,256);
             
             if i==1
@@ -139,6 +143,8 @@ for iter=1:length(dirlist)
             %         print(ff,fullfile(directory,'Results','singleFrames',['frame_' num2str(i) '.pdf']),'-dpdf')
             %         close(ff);
         end
+        
+        delete('~/aux.png')
         
     catch exception
         errorString = ['Error MapMovie:' directory '. Message:' exception.message];
