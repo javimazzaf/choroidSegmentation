@@ -119,7 +119,7 @@ for iter=1:length(dirlist)
             h5 = plot(xvec,repmat(yvec(i),length(xvec),1),'k--','linewidth',1.5);
             hold off
             drawnow
-            frame=getframe(1);
+            frame=getframe(df);
             im=frame2im(frame);
             [imind,cm]=rgb2ind(im,256);
             
@@ -141,7 +141,7 @@ for iter=1:length(dirlist)
         end
         
     catch exception
-        errorString = ['Error MapMovie:' directory];
+        errorString = ['Error MapMovie:' directory '. Message:' exception.message];
         errorString = [errorString buildCallStack(exception)];
         
         disp(logit(directory,errorString));
