@@ -30,6 +30,11 @@ end
 
 for iter=1:length(dirlist)
     directory=dirlist{iter};
+    
+    disp(logit(directory,['Starting ChoroidMap:' directory]));
+    
+    try
+    
     load(fullfile(directory,'Results','FirstProcessData.mat'));
     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
     load(fullfile(directory,'Data Files','ImageList.mat'))
@@ -206,9 +211,19 @@ for iter=1:length(dirlist)
 %     saveas(gcf,fullfile(directory,'Results','ChoroidMap.jpg'),'jpg');
     saveas(gcf,fullfile(directory,'Results','ChoroidMap.pdf'),'pdf');
     
-    disp(logit(directory,['Done Maps:' directory]));
+    catch exception
+        errorString = ['Error ChoroidMap:' directory];
+        errorString = [errorString buildCallStack(exception)];
+        
+        disp(logit(directory,errorString));
+
+        continue
+    end    
+    
+    disp(logit(directory,['Done ChoroidMap:' directory]));
     
 end
+
     close all
 end
 

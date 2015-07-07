@@ -139,12 +139,7 @@ for iter=1:length(dirlist)
         
         errorString = ['Error ChoroidPostProcess(iter=' num2str(iter) '): ' exception.message ' in ' directory];
         
-        if ismember('stack',fieldnames(exception))
-            for s = 1:numel(exception.stack)
-                text = ['Function: ' exception.stack(s).name ' (at: ' num2str(exception.stack(s).line) '). '];
-                errorString = [errorString, text];
-            end
-        end
+        errorString = [errorString buildCallStack(exception)];
         
         disp(logit(directory,errorString))
         
