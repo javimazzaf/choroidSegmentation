@@ -5,7 +5,7 @@ function [Vchecked,inclframelist,Endcheck,CSIcheck,Vcheck,LEndFail,REndFail] = C
 frames=1:numframes; 
 
 usedLmeanHeight=median(usedEndHeights(~isnan(usedEndHeights(:,1)),1)); 
-usedLstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
+usedLstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,1)),1)); 
 usedRmeanHeight=mean(usedEndHeights(~isnan(usedEndHeights(:,2)),2));
 usedRstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,2)),2)); 
 
