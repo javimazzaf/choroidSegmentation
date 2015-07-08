@@ -16,8 +16,8 @@ allFrames = 1:numframes;
 toSkipFrames = ismember(allFrames,skippedind) | logical(cellfun(@isempty,{other.shiftsize}));
 errorFreeFrames    = ~ismember(allFrames,error);
 
-parfor frame = allFrames
-% for frame = allFrames
+% parfor frame = allFrames
+for frame = allFrames
     if toSkipFrames(frame), continue, end
     
     if errorFreeFrames(frame)

@@ -31,7 +31,7 @@ else
     dirlist=dirlist(FirstProcess&Rigidity);
 end
 
-finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
+% finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
 
 clock=tic;
 messedup2=[];

@@ -55,6 +55,9 @@ for indx=2:num-1
     if col(indx)==max(col)
         break
     end
+    
+    try
+    
     connected=elementIdx(abs(col(indx)-col)<=delColmax & col>col(indx) & abs(row(indx)-row)<=delRowmax & col<=n);
     
     if isempty(connected) && ~any(any(C(1:indx-1,indx+1:end)))
@@ -99,6 +102,10 @@ for indx=2:num-1
 %     counts=counts+sum(governing==repmat(max(governing,[],2),1,6));
     
     C(indx,connected)=Weight;
+    
+    catch exc
+        disp(exc.message)
+    end
 end
 
 C=sparse(C);
