@@ -7,7 +7,7 @@ frames=1:numframes;
 usedLmeanHeight=median(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
 usedLstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
 usedRmeanHeight=mean(usedEndHeights(~isnan(usedEndHeights(:,2)),2));
-usedRstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,2)),2));
+usedRstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,2)),2)); 
 
 usedVmean=median(Vframe(Vframe~=0 & ~isnan(Vframe)));
 usedVstd=std(Vframe(Vframe~=0 & ~isnan(Vframe)));
