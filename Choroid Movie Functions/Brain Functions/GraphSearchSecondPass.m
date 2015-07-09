@@ -55,10 +55,11 @@ for indx=2:num-1
     if col(indx)==max(col)
         break
     end
+    
     connected=elementIdx(abs(col(indx)-col)<=delColmax & col>col(indx) & abs(row(indx)-row)<=delRowmax & col<=n);
     
     if isempty(connected) && ~any(any(C(1:indx-1,indx+1:end)))
-        nextcol = min(col((col>col(indx) & abs(row(indx)-row)<=delRowmax)));
+        nextcol = min(col((col>col(indx) & abs(row(indx)-row)<=delRowmax))); % JM: column of nearest connectable node to the right
         
         if isempty(nextcol), continue, end % JM: There aren't any nodes connected to the current one
         
@@ -78,10 +79,21 @@ for indx=2:num-1
     Euclid=(dely.^2+delx.^2);
     VertJumpPenalty=(wM*heaviside(dely-maxJumpRow).*abs((dely-maxJumpRow))).*sigmf(dely,[alpha,maxJumpRow]);
     HorizJumpPenalty=(wM/2*(heaviside(delx-maxJumpCol).*abs((delx-maxJumpCol))).*sigmf(delx,[alpha,maxJumpCol]));  %was wm/2
-    EndTexturePenalty=(wM./texture(sub2ind(size(texture),row(connected),col(connected))));
+    
+    % JM: we skip computing the texture on the virtual "connected" node (very last node) 
+    % since texture is not defined for it.
+    
+    EndTexturePenalty = zeros(size(connected(:))); %JM: Initialize this weight with zeros
+    mskColValid = col(connected) <= size(texture,2); % JM: get mask for the connected nodes that are within texture matrix
+    EndTexturePenalty(mskColValid)=(wM./texture(sub2ind(size(texture),row(connected(mskColValid)),col(connected(mskColValid))))); % JM: compute weight only for the valid nodes
+    
     AffinityPenalty=wM./ConnectionAffinity;
-    DeviationPenalty=wM/2*abs((meanCSI(col(connected))-row(connected))).*...
-                     heaviside((meanCSI(col(connected))-row(connected))-10).*sigmf((meanCSI(col(connected))-row(connected)),[alpha,10]);
+    
+    % JM: skip evaluating meanCSI on virtual nodes.
+    DeviationPenalty = zeros(size(connected(:))); %JM: Initialize this weight with zeros
+    DeviationPenalty(mskColValid) = wM/2*abs((meanCSI(col(connected(mskColValid)))-row(connected(mskColValid)))) .*...
+                     heaviside((meanCSI(col(connected(mskColValid)))-row(connected(mskColValid)))-10)            .*...
+                     sigmf((meanCSI(col(connected(mskColValid)))-row(connected(mskColValid))),[alpha,10]);
     
     
     Weight=Euclid+... %Euclidian Distance Squared
@@ -99,6 +111,7 @@ for indx=2:num-1
 %     counts=counts+sum(governing==repmat(max(governing,[],2),1,6));
     
     C(indx,connected)=Weight;
+    
 end
 
 C=sparse(C);

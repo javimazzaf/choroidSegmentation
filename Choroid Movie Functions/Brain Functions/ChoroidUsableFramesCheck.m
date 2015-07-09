@@ -2,12 +2,12 @@ function [Vchecked,inclframelist,Endcheck,CSIcheck,Vcheck,LEndFail,REndFail] = C
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %% Determine Usable Frames
-frames=1:numframes;
+frames=1:numframes; 
 
-usedLmeanHeight=median(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
-usedLstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
+usedLmeanHeight=median(usedEndHeights(~isnan(usedEndHeights(:,1)),1)); 
+usedLstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,1)),1)); 
 usedRmeanHeight=mean(usedEndHeights(~isnan(usedEndHeights(:,2)),2));
-usedRstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,2)),2));
+usedRstdHeight=std(usedEndHeights(~isnan(usedEndHeights(:,2)),2)); 
 
 usedVmean=median(Vframe(Vframe~=0 & ~isnan(Vframe)));
 usedVstd=std(Vframe(Vframe~=0 & ~isnan(Vframe)));
