@@ -53,7 +53,6 @@ groups = [];
 studies   = {'Choroidal Mapping'}; 
 % studies   = {'Rigidity'}; 
 
-
 reproducibility = '';
 
 [todo, has, numBscans] = getDirectories(topdir,groups,studies,reproducibility);
