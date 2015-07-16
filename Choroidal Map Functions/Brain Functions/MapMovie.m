@@ -78,7 +78,8 @@ for iter=1:length(dirlist)
         pos2=get(ax2,'position');
         set(ax1,'Position',[pos1(1) pos2(2) pos2(3) pos2(4)])
         
-        filename=fullfile(directory,'Results','MapMovie.gif');
+%         filename=fullfile(directory,'Results','MapMovie.gif');
+        filename=fullfile(directory,'Results','MapMovieGabor.gif');
         
 %         df = gcf;
         

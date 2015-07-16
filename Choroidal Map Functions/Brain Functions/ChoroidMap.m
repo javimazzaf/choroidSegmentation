@@ -188,6 +188,7 @@ for iter=1:length(dirlist)
     fh = figure('Visible','off');
     subplot(1,2,1);
     imshow(fundimfinal,Rfund,colormap('jet'));
+%     image(fundimfinal,Rfund), colormap('jet');
     xlabel('Fundus X Position [mm]')
     ylabel('Fundux Y Position [mm]')
     title('Fundus Cam View')
@@ -219,7 +220,7 @@ for iter=1:length(dirlist)
     'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
     'fheight','mapInfo');
     
-    saveas(gcf,fullfile(directory,'Results','ChoroidMapGabor.pdf'),'pdf');
+    saveas(fh,fullfile(directory,'Results','ChoroidMapGabor.pdf'),'pdf');
 
     catch exception
         errorString = ['Error ChoroidMap. Message: ' exception.message ' at: ' directory];
