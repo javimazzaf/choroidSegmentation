@@ -37,7 +37,8 @@ for iter=1:length(dirlist)
         
         load(fullfile(directory,'Results','FirstProcessData.mat')); %Get Traces
         load(fullfile(directory,'Data Files','RegisteredImages.mat')); %Get Frames
-        load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
+%         load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
+        load(fullfile(directory,'Results','ChoroidMapGabor.mat')); %Get Map 
         
         df = figure('Visible','Off');
 %         df = figure();
