@@ -222,7 +222,7 @@ for iter=1:length(dirlist)
     saveas(gcf,fullfile(directory,'Results','ChoroidMapGabor.pdf'),'pdf');
 
     catch exception
-        errorString = ['Error ChoroidMap:' directory];
+        errorString = ['Error ChoroidMap. Message: ' exception.message ' at: ' directory];
         errorString = [errorString buildCallStack(exception)];
         
         disp(logit(directory,errorString));
