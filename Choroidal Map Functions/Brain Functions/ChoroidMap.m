@@ -185,32 +185,42 @@ for iter=1:length(dirlist)
     fundimHSV(:,:,3)=k;
     fundimfinal=hsi2rgb(fundimHSV);
     
-    h1=figure;
-    ax1=subplot(1,2,1);
-    h2=imshow(fundimfinal,Rfund,colormap('jet'));
+    fh = figure('Visibility','off');
+    subplot(1,2,1);
+    imshow(fundimfinal,Rfund,colormap('jet'));
     xlabel('Fundus X Position [mm]')
     ylabel('Fundux Y Position [mm]')
     title('Fundus Cam View')
     
-    ax2=subplot(1,2,2);
-    h3=imshow(Cmap,newRbscan,colormap('jet'));
+    subplot(1,2,2);
+    h3 = imshow(Cmap,newRbscan,colormap('jet'));
     set(h3,'cdatamapping','scaled');
-    cbar=colorbar;
+%     cbar=colorbar;
+    colorbar;
+    
     % hold on
     % h3=imshow(Cmap,colormap('jet'));
     % set(h3,'cdatamapping','scaled');
     xlabel('Fundus X Position [mm]')
     ylabel('Fundux Y Position [mm]')
     title('Choroidal Thickness Map [\mum]')
-    save(fullfile(directory,'Results','ChoroidMap.mat'),'Cmap','Volume','fundim','fundimfinal',...
-        'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
-        'fheight','mapInfo');
-    save(fullfile(directory,'Results','Results.mat'),'Cmap','Volume','fundim','fundimfinal',...
-        'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
-        'fheight');
+%     save(fullfile(directory,'Results','ChoroidMap.mat'),'Cmap','Volume','fundim','fundimfinal',...
+%         'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
+%         'fheight','mapInfo');
+
+%     save(fullfile(directory,'Results','Results.mat'),'Cmap','Volume','fundim','fundimfinal',...
+%         'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
+%         'fheight');
 %     saveas(gcf,fullfile(directory,'Results','ChoroidMap.jpg'),'jpg');
-    saveas(gcf,fullfile(directory,'Results','ChoroidMap.pdf'),'pdf');
+%     saveas(gcf,fullfile(directory,'Results','ChoroidMap.pdf'),'pdf');
+
+    %Testing Gabor
+    save(fullfile(directory,'Results','ChoroidMapGabor.mat'),'Cmap','Volume','fundim','fundimfinal',...
+    'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
+    'fheight','mapInfo');
     
+    saveas(gcf,fullfile(directory,'Results','ChoroidMapGabor.pdf'),'pdf');
+
     catch exception
         errorString = ['Error ChoroidMap:' directory];
         errorString = [errorString buildCallStack(exception)];
@@ -218,7 +228,9 @@ for iter=1:length(dirlist)
         disp(logit(directory,errorString));
 
         continue
-    end    
+    end 
+    
+    close(fh)
     
     disp(logit(directory,['Done ChoroidMap:' directory]));
     
