@@ -1,4 +1,4 @@
-function [Cmap,Volume] = ChoroidMap(varargin)
+function ChoroidMap(varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -185,7 +185,7 @@ for iter=1:length(dirlist)
     fundimHSV(:,:,3)=k;
     fundimfinal=hsi2rgb(fundimHSV);
     
-    fh = figure('Visibility','off');
+    fh = figure('Visible','off');
     subplot(1,2,1);
     imshow(fundimfinal,Rfund,colormap('jet'));
     xlabel('Fundus X Position [mm]')
