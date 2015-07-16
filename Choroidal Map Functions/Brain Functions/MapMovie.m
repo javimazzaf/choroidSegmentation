@@ -86,6 +86,14 @@ for iter=1:length(dirlist)
         %         mkdir(fullfile(directory,'Results','singleFrames'));
         %     end
         
+        % Compute absolute max weight
+        maxWeight = -Inf;
+        for i=1:length(yvec)
+           for k = 1:numel(traces(i).CSI)
+               maxWeight = max(maxWeight,max(traces(i).CSI(k).weight(:)));
+           end
+        end
+        
         for i=1:length(yvec)
 %             figure(df)
             h4=subplot(1,2,1);
@@ -110,7 +118,7 @@ for iter=1:length(dirlist)
             %         [~,iCSI] = interpCSI(xCSI,yCSI, numel(traces(i).BM));
             %         plot(iCSI,'-r','LineWidth',2)
             
-            errorbar(xCSI,yCSI,wCSI * 10,'.r')
+            errorbar(xCSI,yCSI,wCSI / maxWeight * 10,'.r')
             
             subplot(1,2,1), plot(traces(i).BM,'-m','LineWidth',2)
             hold off

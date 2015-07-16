@@ -78,8 +78,8 @@ for iter = 1:numel(dirlist)
         indToProcess = setdiff(start:numframes,skippedind);
         
         %-% Iterate over frames of current subject
-        parfor frame = indToProcess
-            %         for frame = indToProcess
+%         parfor frame = indToProcess
+         for frame = indToProcess
             try
                 
                 %                 if ~ismember(frame,skippedind) , continue, end

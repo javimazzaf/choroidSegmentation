@@ -1,5 +1,5 @@
 function [PathPts,usedNodes] = mapGraphSearchFirstPass(nodesMask,edgeness,alpha,wM,delColmax,delRowmax,maxJumpCol,...
-    maxJumpRow,on1,on2,on3,on4)
+    maxJumpRow,on1,on2,on3,on4,grad)
 % Computes the graph search for the nodes in "nodesMask" with weights
 % computed here using "edginess" image, and parameters alpha,wM,delColmax,
 % delRowmax,maxJumpCol,maxJumpRow,on1,on2,on3,on4

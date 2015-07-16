@@ -54,7 +54,7 @@ for im = 1:length(combo1)
     
     % Cache the vector used to specify how bins are created
     % N = x;
-    
+    % JM: In this if case it computs the bins and edges
     if isempty(y),
         if length(x) == 1,
             %        x = 1:double(x);
@@ -113,10 +113,10 @@ for im = 1:length(combo1)
     col=col(usedind);
     row=row(usedind);
     
-    Pt={max(1,row-(offset+1)),max(1,col-(offset+1))}; %Upper-Left
-    Qt={max(1,row-(offset+1)),min(p,col+(offset))}; %Upper-Right
-    Rt={row,max(1,col-(offset+1))}; %Lower-Left
-    St={row,min(p,col+(offset))}; %Lower-Right
+    Pt={max(1,row-(offset+1)),max(1,col-(offset+1))}; %Upper-Left corner
+    Qt={max(1,row-(offset+1)),min(p,col+(offset))}; %Upper-Right corner
+    Rt={row,max(1,col-(offset+1))}; %center-Left corner
+    St={row,min(p,col+(offset))}; %center-Right
     
     Pb={max(1,row-1),max(1,col-(offset+1))}; %Upper-Left
     Qb={max(1,row-1),min(p,col+(offset))}; %Upper-Right
@@ -167,6 +167,8 @@ for im = 1:length(combo1)
         X=Xrs;
         X=X(offset+1:end-offset,offset+1:end-offset);
     end
+    
+    % JM: I do not get this thing below
     if sign
         filttop=zeros(radius);
         filttop(1:offset+1,:)=1;
@@ -190,6 +192,7 @@ for i=1:numel(angles)
         Ptheta{i}=imadd(Ptheta{i},P{i,j});
     end
 end
+
 for i=1:numel(angles)
     Pb=max(Pb,mat2gray(Ptheta{i}));
 end

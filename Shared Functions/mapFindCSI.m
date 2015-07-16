@@ -33,7 +33,8 @@ CSI = [];
 if ~isempty(PathPts)
     for k = 1:numel(PathPts)
         
-        if mean(full(PathPts(k).weight)) < 0.5, continue, end
+%         if mean(full(PathPts(k).weight)) < 0.5, continue, end
+        if mean(full(PathPts(k).weight)) < 0.2, continue, end
         
         kCSI.weight = PathPts(k).weight;
         
@@ -41,7 +42,7 @@ if ~isempty(PathPts)
         kCSI.y = PathPts(k).y;
         kCSI.keep = PathPts(k).keep;
         
-        kCSI.y = kCSI.y - colshifts(kCSI.x) - shiftsize;
+%         kCSI.y = kCSI.y - colshifts(kCSI.x) - shiftsize;
         
         CSI = [CSI kCSI];
 

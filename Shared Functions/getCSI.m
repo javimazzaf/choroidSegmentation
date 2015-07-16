@@ -10,7 +10,8 @@ shiftedBscan = BMImageShift(bscan,colShifts,maxShift,'Pad');
 %-% Edge Probability
 scalesize = [10 15 20];
 angles    = [-20 0 20];
-[~,OG] = EdgeProbability(shiftedBscan,scalesize,angles,meanTop,maxShift);
+% [~,OG] = EdgeProbability(shiftedBscan,scalesize,angles,meanTop,maxShift);
+[~,OG] = EdgeProbabilityGrad(shiftedBscan,scalesize,angles,meanTop,maxShift);
 
 %-% Inflection Points
 Infl2 = zeros(size(shiftedBscan));
@@ -69,7 +70,26 @@ Infl2(Infl2 & g) = 0;
 
 nodes = Infl2;
 
+% New edginess based on absolute gradient
+edg = edgeness(shiftedBscan,scalesize/4,angles+90);
+
 %-% Find CSI
 [CSI, ~] = mapFindCSI(nodes,OG,maxShift,colShifts);
+
+% imshow(bscan,[]), hold on, disp('testing')
+
+% Recompute weights and undo shift from absolute gradient
+
+for k = 1:numel(CSI)
+
+    CSI(k).weight = edg(sub2ind(size(edg),CSI(k).y,CSI(k).x));
+    CSI(k).y = CSI(k).y - colShifts(CSI(k).x) - maxShift;
+    
+%     errorbar(CSI(k).x,CSI(k).y,normWeight,'.r'), disp('testing')
+    
+end
+
+
+
 
 end
