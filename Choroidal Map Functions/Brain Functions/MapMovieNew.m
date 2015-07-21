@@ -164,6 +164,8 @@ for iter=1:length(dirlist)
             %         hold off
             %         print(ff,fullfile(directory,'Results','singleFrames',['frame_' num2str(i) '.pdf']),'-dpdf')
             %         close(ff);
+            
+            disp(i)
         end
         
         delete('~/aux.png')
