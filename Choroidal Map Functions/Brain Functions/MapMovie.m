@@ -38,7 +38,7 @@ for iter=1:length(dirlist)
         load(fullfile(directory,'Results','FirstProcessData.mat')); %Get Traces
         load(fullfile(directory,'Data Files','RegisteredImages.mat')); %Get Frames
 %         load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
-        load(fullfile(directory,'Results','ChoroidMapGabor.mat')); %Get Map 
+        load(fullfile(directory,'Results','ChoroidMapGabor2.mat')); %Get Map 
         
         df = figure('Visible','Off');
 %         df = figure();
@@ -80,7 +80,7 @@ for iter=1:length(dirlist)
         set(ax1,'Position',[pos1(1) pos2(2) pos2(3) pos2(4)])
         
 %         filename=fullfile(directory,'Results','MapMovie.gif');
-        filename=fullfile(directory,'Results','MapMovieGabor.gif');
+        filename=fullfile(directory,'Results','MapMovieGabor2.gif');
         
 %         df = gcf;
         

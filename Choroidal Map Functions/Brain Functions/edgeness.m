@@ -1,6 +1,11 @@
 function edg = edgeness(inImage,scales,angs)
 
-angFilt = zeros([size(inImage),numel(angs)]);
+% Pad image to avoid edge effects
+maxKernelSize = max(scales) * 6;
+padSize = maxKernelSize / 2;
+padIm =padarray(inImage,[padSize padSize],'both','replicate');
+
+angFilt = zeros([size(padIm),numel(angs)]);
 
 for a = 1:numel(angs)
     
@@ -14,7 +19,7 @@ for a = 1:numel(angs)
         
         gf = gaborFilter(scale,ang);
    
-        grad = filter2(gf,inImage,'same');
+        grad = filter2(gf,padIm,'same');
         
         aux = aux + grad;
         
@@ -26,26 +31,11 @@ end
 
 edg = max(angFilt,[],3);
 
-% gf = gaborFilter(scales(1),ang(1));
-% 
-% edg = filter2(gf,inImage,'same');
-% 
-% %     bw = y > tan(angles(a)) * x;
-% %
-% %     gr = imfilter(im, heaviside(-11:11)' - 0.5);
+% Undo padding
+edg = edg(padSize+1:end-padSize,padSize+1:end-padSize);
+
 end
 
-% function gc = gaborContrast(inImage, width,ang)
-%    gf = gaborFilter(width,ang);
-%    
-%    gDif = filter2(gf,inImage,'same');
-%    gSum = filter2(abs(gf),inImage,'same');
-%    
-%    gc = gDif ./ gSum;
-%    
-%    gc(abs(gSum) < eps(gSum)) = NaN;
-%    
-% end
 
 function gf = gaborFilter(width,ang)
 
@@ -55,7 +45,5 @@ xrot =   x * cosd(ang) + y * sind(ang);
 yrot = - x * sind(ang) + y * cosd(ang);
 
 gf = exp(- (xrot.^2 + yrot.^2) / 2 / width^2) .* sin(2 * pi * xrot / sz);
-
-% gf = gf / sum(abs(gf(:))) / 2;
 
 end

@@ -196,6 +196,7 @@ for iter=1:length(dirlist)
     subplot(1,2,2);
     h3 = imshow(Cmap,newRbscan,colormap('jet'));
     set(h3,'cdatamapping','scaled');
+    caxis([0 500])
 %     cbar=colorbar;
     colorbar;
     
@@ -216,11 +217,11 @@ for iter=1:length(dirlist)
 %     saveas(gcf,fullfile(directory,'Results','ChoroidMap.pdf'),'pdf');
 
     %Testing Gabor
-    save(fullfile(directory,'Results','ChoroidMapGabor.mat'),'Cmap','Volume','fundim','fundimfinal',...
+    save(fullfile(directory,'Results','ChoroidMapGabor2.mat'),'Cmap','Volume','fundim','fundimfinal',...
     'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
     'fheight','mapInfo');
     
-    saveas(fh,fullfile(directory,'Results','ChoroidMapGabor.pdf'),'pdf');
+    saveas(fh,fullfile(directory,'Results','ChoroidMapGabor2.pdf'),'pdf');
 
     catch exception
         errorString = ['Error ChoroidMap. Message: ' exception.message ' at: ' directory];

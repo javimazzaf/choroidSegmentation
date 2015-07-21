@@ -1,17 +1,11 @@
-function [CSI,colShifts,maxShift,shiftedBscan] = getCSI(bscan, yTop)
-
-%-% Flattening of Image According to BM
-meanTop   = round(mean(yTop));
-colShifts = meanTop - yTop;
-maxShift  = double(max(abs(colShifts)));
-
-shiftedBscan = BMImageShift(bscan,colShifts,maxShift,'Pad');
+function CSI = getCSI(shiftedBscan,rpeHeight)
 
 %-% Edge Probability
 scalesize = [10 15 20];
 angles    = [-20 0 20];
+
 % [~,OG] = EdgeProbability(shiftedBscan,scalesize,angles,meanTop,maxShift);
-[~,OG] = EdgeProbabilityGrad(shiftedBscan,scalesize,angles,meanTop,maxShift);
+OG = EdgeProbabilityGrad(shiftedBscan,scalesize,angles,rpeHeight);
 
 %-% Inflection Points
 Infl2 = zeros(size(shiftedBscan));

@@ -1,17 +1,13 @@
 function [CSI,usedNodes] = mapFindCSI(varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
-if nargin==4
+if nargin==3
     Set1=varargin{1};
     Set2=varargin{2};
-    shiftsize=varargin{3};
-    colshifts=varargin{4};
     option=1;
-elseif nargin>=5
+elseif nargin==4
     Set1=varargin{1};
     Set2=varargin{2};
-    shiftsize=varargin{3};
-    colshifts=varargin{4};
     option=2;
     meanCSI=varargin{5};
 else
