@@ -62,10 +62,10 @@ for iter = 1:numel(dirlist)
                 traces(frame).RPEheight = RPEheight;
                 traces(frame).CSI = yCSI;
                 
-                other(frame).colshifts = colShifts;
-                other(frame).shiftsize = maxShift;
-                other(frame).smallsize = size(bscan);
-                other(frame).bigsize   = size(bscan);
+%                 other(frame).colshifts = colShifts;
+%                 other(frame).shiftsize = maxShift;
+%                 other(frame).smallsize = size(bscan);
+%                 other(frame).bigsize   = size(bscan);
                 
                 disp(logit(savedir,['Succeeded frame:' num2str(frame)]));
                 
