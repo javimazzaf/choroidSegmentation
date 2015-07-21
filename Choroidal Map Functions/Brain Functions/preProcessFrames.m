@@ -94,5 +94,5 @@ for frame = indToProcess
     end
 end
 
-save(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
+save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
 save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight');

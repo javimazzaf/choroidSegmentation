@@ -77,7 +77,7 @@ for iter = 1:numel(dirlist)
         end
         
         %-% Save Data
-        save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
+        save(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
         
         % Log & Display
         disp(logit(savedir,['Done ChoroidMapFirstProcess(iter=' num2str(iter) '): ' directory]));
