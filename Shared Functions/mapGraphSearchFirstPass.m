@@ -171,9 +171,12 @@ if isempty(path) || any(isinf(dist))
 %        end
     end
     
+    minWeight = getParameter('MIN_MEAN_PATH_WEIGHT');
+    minLength = getParameter('MIN_PATH_LENGTH');
+     
     % Keep segments that do not overlap and remove unsignificant ones
     for k = 1:numel(PathPts)
-        if PathPts(k).meanWeight < 0.5 || PathPts(k).length < 5
+        if PathPts(k).meanWeight < minWeight || PathPts(k).length < minLength
             PathPts(k).keep = 0;
         elseif all(count(logical(domains(k,:))) == 1)
             PathPts(k).keep = 1;

@@ -35,107 +35,16 @@ for iter = 1:numel(dirlist)
         
         disp(['Starting ChoroidFirstProcess: ' directory])
         
-        % Load registered images for current subject
-        load(fullfile(directory,'Data Files','RegisteredImages.mat'));
-        load(fullfile(directory,'Data Files','ImageList.mat'))
-        
-        numframes = numel(bscanstore);
-        
-        %Initialize Variables
-        nodes      = cell(numframes,1);
-        EndHeights = nan(numframes,2);
-        
-        traces     = struct('RET',[],'RPE',[],'BM',[],'CSI',[],'nCSI',[],'usedCSI',[]);
-        traces(numframes).CSI = [];
-        
-        other      = struct('colshifts',[],'shiftsize',[],'smallsize',[],'bigsize',[]);
-        other(numframes).colshifts = [];
-        
-        indToProcess = setdiff(start:numframes,skippedind);
-%         indToProcess = setdiff(start:start + 20,skippedind);
-        
-%       Computes RPE on each frame, flattens the images with respecto to it,
-%       registers them to the same RPE, and averages neightbors.
-
-        % Get the sampling of BScans to decide the type of averaging to do.
-        DeltaX = ImageList(start).scaleX;
-        DeltaY = - diff([ImageList([start,start + 1]).startY]);
-        
-        AVERAGING_SIZE   = getParameter('AVERAGING_SIZE');
-        SigmaFilterScans = max(1,ceil(AVERAGING_SIZE * DeltaX / DeltaY));
-        
-        interScansFilter = exp(-(-SigmaFilterScans:SigmaFilterScans).^2 / 2 / SigmaFilterScans^2);
-        interScansFilter = interScansFilter / sum(interScansFilter);
-        
-        shiftedScans = NaN([size(bscanstore{1}), numframes]);
-        
-        posRPE   = round(size(bscanstore{1},1) / 3);
-        
-        absMinShift = Inf;
-        absMaxShift = -Inf;
-%         parfor (frame = indToProcess, workersAvailable)
-        for frame = indToProcess
-            try
-                
-                bscan = double(bscanstore{frame});
-                
-                [yRet,yTop] = getRetinaAndRPE(bscan,8);
-                
-                %-% Flattening of Image According to BM
-                
-                colShifts = posRPE - yTop;
-                maxShift  = double(max(abs(colShifts)));
-                
-%                 thisShiftSize = 2 * maxShift + size(bscan,1);
-                
-                shiftedScans(:,:,frame) = imageFlattening(bscan,colShifts,maxShift);
-                
-                %-% Store Relevant Variables
-                traces(frame).RET = yRet;
-                traces(frame).RPE = [];
-                traces(frame).BM  = yTop;
-                
-                other(frame).colshifts = colShifts;
-                other(frame).shiftsize = maxShift;
-                other(frame).smallsize = size(bscan);
-                other(frame).bigsize   = size(shiftedScans(:,:,frame));
-                
-                absMaxShift = max(absMaxShift,double(max(colShifts)));
-                absMinShift = min(absMinShift,double(min(colShifts)));
-                
-                disp(frame)
-            catch
-                disp(logit(savedir,['Error frame:' num2str(frame)]));   
-            end
+        if exist(fullfile(savedir,'FirstProcessDataNew.mat'),'file')
+            load(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
         end
         
-        RPEheight = posRPE - absMaxShift;
+        if ~exist(fullfile(savedir,'processedImages.mat'),'file')
+            preProcessFrames(directory); 
+        end
         
-        shiftedScans = shiftedScans(absMaxShift:end+absMinShift,:,:);
-        avgScans     = NaN(size(shiftedScans));
-        
-        for frame = indToProcess
-            try        
-             
-                startFrame = max(1,frame-SigmaFilterScans);
-                lastFrame  = min(numframes,frame+SigmaFilterScans);
-                
-                auxSum = zeros(size(shiftedScans,1),size(shiftedScans,2));
-                
-                % Make additions for average
-                for avgFrame = startFrame:lastFrame
-                    aux = shiftedScans(:,:,avgFrame) * interScansFilter(avgFrame - frame + SigmaFilterScans + 1);
-                    auxSum = nansum(cat(3,auxSum,aux),3); 
-                end
-                
-                % Compute weighted average
-                avgScans(:,:,frame) = auxSum / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
-                disp(frame)
-            catch
-                disp(logit(savedir,['Error frame:' num2str(frame)]));   
-            end
-        end        
-                
+        load(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight');
+
         %-% Iterate over frames of current subject
 %         parfor (frame = indToProcess, workersAvailable)
         for frame = indToProcess
@@ -150,24 +59,13 @@ for iter = 1:numel(dirlist)
                 EndHeights(frame,:) = [NaN NaN];
                 
                 %-% Store Other Relevant Variables
-%                 traces(frame).RET = yRet;
-%                 traces(frame).RPE = [];
-%                 traces(frame).BM  = yTop;
                 traces(frame).RPEheight = RPEheight;
                 traces(frame).CSI = yCSI;
                 
                 other(frame).colshifts = colShifts;
                 other(frame).shiftsize = maxShift;
                 other(frame).smallsize = size(bscan);
-%                 other(frame).bigsize   = size(shiftedBscan);
                 other(frame).bigsize   = size(bscan);
-                
-%                 imshow(bscan,[]), hold on
-%                 plot(1:numel(traces(frame).BM),traces(frame).RPEheight * ones(size(traces(frame).BM)))
-%                 
-%                 for test = 1:numel(traces(frame).CSI)
-%                   errorbar(traces(frame).CSI(test).x,traces(frame).CSI(test).y,traces(frame).CSI(test).weight / max(traces(frame).CSI(test).weight) * 10,'.r')
-%                 end
                 
                 disp(logit(savedir,['Succeeded frame:' num2str(frame)]));
                 
@@ -176,15 +74,8 @@ for iter = 1:numel(dirlist)
             end
         end
         
-        %         if ~exist(fullfile(directory,'Data Files','OrientedGradient.mat'),'file')
-        %             save(fullfile(directory,'Data Files','OrientedGradient.mat'),'OG')
-        %         end
-        
         %-% Save Data
-%         save(fullfile(savedir,'FirstProcessData.mat'),'nodes','traces','other','EndHeights');
         save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
-        
-        save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans');
         
         % Log & Display
         disp(logit(savedir,['Done ChoroidMapFirstProcess(iter=' num2str(iter) '): ' directory]));
