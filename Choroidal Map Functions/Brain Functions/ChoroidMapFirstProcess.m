@@ -69,8 +69,10 @@ for iter = 1:numel(dirlist)
                 
                 disp(logit(savedir,['Succeeded frame:' num2str(frame)]));
                 
-            catch
-                disp(logit(savedir,['Error frame:' num2str(frame)]));   
+            catch localExc
+                errString = ['Error frame:' num2str(frame) ' ' localExc.message];
+                errString = [errString buildCallStack(localExc)];
+                disp(logit(savedir,errString));   
             end
         end
         
