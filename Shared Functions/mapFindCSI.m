@@ -1,11 +1,11 @@
 function [CSI,usedNodes] = mapFindCSI(varargin)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
-if nargin==3
+if nargin==2
     Set1=varargin{1};
     Set2=varargin{2};
     option=1;
-elseif nargin==4
+elseif nargin==3
     Set1=varargin{1};
     Set2=varargin{2};
     option=2;
@@ -30,7 +30,7 @@ if ~isempty(PathPts)
     for k = 1:numel(PathPts)
         
 %         if mean(full(PathPts(k).weight)) < 0.5, continue, end
-        if mean(full(PathPts(k).weight)) < 0.2, continue, end
+        if mean(full(PathPts(k).weight)) < 0.01, continue, end
         
         kCSI.weight = PathPts(k).weight;
         

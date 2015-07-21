@@ -24,14 +24,19 @@ edg = edgeness(shiftbscan,sigma,angles);
 edg(edg < 0) = 0;
 
 % Keeps information within a valid region
-CHOROID_MIN_WIDTH = getParameter('CHOROID_MIN_WIDTH');
-CHOROID_MAX_WIDTH = getParameter('CHOROID_MAX_WIDTH');
-padPb = edg(rpeHeight + CHOROID_MIN_WIDTH:end - CHOROID_MAX_WIDTH,:);  
+
+padPb = zeros(size(edg));
+
+validRows = rpeHeight + getParameter('CHOROID_MIN_WIDTH') + (0:getParameter('CHOROID_MAX_WIDTH') - 1);
+
+padPb(validRows,:) = edg(validRows,:);  
 
 padPb(1,:) = 0;
 
 padPb = padPb / max(padPb(:));
 
 padPb = padPb.^2;
+
+padPb(padPb <= getParameter('EDGINESS_THRESHOLD')) = 0;
 
 end

@@ -52,6 +52,7 @@ for iter = 1:numel(dirlist)
         other(numframes).colshifts = [];
         
         indToProcess = setdiff(start:numframes,skippedind);
+%         indToProcess = setdiff(start:start + 20,skippedind);
         
 %       Computes RPE on each frame, flattens the images with respecto to it,
 %       registers them to the same RPE, and averages neightbors.
@@ -152,12 +153,21 @@ for iter = 1:numel(dirlist)
 %                 traces(frame).RET = yRet;
 %                 traces(frame).RPE = [];
 %                 traces(frame).BM  = yTop;
+                traces(frame).RPEheight = RPEheight;
                 traces(frame).CSI = yCSI;
                 
                 other(frame).colshifts = colShifts;
                 other(frame).shiftsize = maxShift;
                 other(frame).smallsize = size(bscan);
-                other(frame).bigsize   = size(shiftedBscan);
+%                 other(frame).bigsize   = size(shiftedBscan);
+                other(frame).bigsize   = size(bscan);
+                
+%                 imshow(bscan,[]), hold on
+%                 plot(1:numel(traces(frame).BM),traces(frame).RPEheight * ones(size(traces(frame).BM)))
+%                 
+%                 for test = 1:numel(traces(frame).CSI)
+%                   errorbar(traces(frame).CSI(test).x,traces(frame).CSI(test).y,traces(frame).CSI(test).weight / max(traces(frame).CSI(test).weight) * 10,'.r')
+%                 end
                 
                 disp(logit(savedir,['Succeeded frame:' num2str(frame)]));
                 
@@ -171,7 +181,8 @@ for iter = 1:numel(dirlist)
         %         end
         
         %-% Save Data
-        save(fullfile(savedir,'FirstProcessData.mat'),'nodes','traces','other','EndHeights');
+%         save(fullfile(savedir,'FirstProcessData.mat'),'nodes','traces','other','EndHeights');
+        save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
         
         % Log & Display
         disp(logit(savedir,['Done ChoroidMapFirstProcess(iter=' num2str(iter) '): ' directory]));

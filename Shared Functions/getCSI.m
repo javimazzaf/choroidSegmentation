@@ -20,6 +20,10 @@ nCols = size(filteredBscan,2);
 testGrad = [];
 testGrad2 = [];
 
+der1Thresh = getParameter('FIRST_DERIVATIVE_THRESHOLD');
+der2Thresh = getParameter('SECOND_DERIVATIVE_THRESHOLD');
+RPE_CSI_gap = getParameter('CHOROID_MIN_WIDTH') + 10;
+
 for j = 1:nCols
     
     filteredAscan = smooth(double(filteredBscan(:,j)),10);
@@ -27,12 +31,11 @@ for j = 1:nCols
     grad  = gradient(filteredAscan);
     grad2 = del2(    filteredAscan);
     
-    testGrad = [testGrad grad];
+    testGrad  = [testGrad grad];
     testGrad2 = [testGrad2 grad2];
-    
-    %                     z     = (grad2 < 1E-16) & (grad > 0.7);
-    z     = (abs(grad2) < 1E-2) & (grad > 0.7); %[JM]
-    z(1:meanTop + maxShift + 15) = 0;
+
+    z = (abs(grad2) < der2Thresh) & (grad > der1Thresh); %[JM]
+    z(1:rpeHeight + RPE_CSI_gap) = 0;
     
     Infl2(z,j) = 1;
 end
@@ -68,7 +71,8 @@ nodes = Infl2;
 edg = edgeness(shiftedBscan,scalesize/4,angles+90);
 
 %-% Find CSI
-[CSI, ~] = mapFindCSI(nodes,OG,maxShift,colShifts);
+% [CSI, ~] = mapFindCSI(nodes,OG,maxShift,colShifts);
+[CSI, ~] = mapFindCSI(nodes,OG);
 
 % imshow(bscan,[]), hold on, disp('testing')
 
@@ -77,7 +81,7 @@ edg = edgeness(shiftedBscan,scalesize/4,angles+90);
 for k = 1:numel(CSI)
 
     CSI(k).weight = edg(sub2ind(size(edg),CSI(k).y,CSI(k).x));
-    CSI(k).y = CSI(k).y - colShifts(CSI(k).x) - maxShift;
+%     CSI(k).y = CSI(k).y - colShifts(CSI(k).x) - maxShift;
     
 %     errorbar(CSI(k).x,CSI(k).y,normWeight,'.r'), disp('testing')
     
