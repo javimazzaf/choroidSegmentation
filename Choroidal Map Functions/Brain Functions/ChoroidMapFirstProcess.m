@@ -184,6 +184,8 @@ for iter = 1:numel(dirlist)
 %         save(fullfile(savedir,'FirstProcessData.mat'),'nodes','traces','other','EndHeights');
         save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
         
+        save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans');
+        
         % Log & Display
         disp(logit(savedir,['Done ChoroidMapFirstProcess(iter=' num2str(iter) '): ' directory]));
         
