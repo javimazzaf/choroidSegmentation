@@ -38,6 +38,9 @@ for iter=1:length(dirlist)
         load(fullfile(directory,'Results','FirstProcessDataNew.mat')); %Get Traces
 %         load(fullfile(directory,'Data Files','RegisteredImages.mat')); %Get Frames
         load(fullfile(directory,'Results','processedImages.mat'),'shiftedScans'); %'avgScans'
+        
+        shiftedScans = uint8(shiftedScans / max(shiftedScans(:)) * 255);
+        
 %         load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
         load(fullfile(directory,'Results','ChoroidMapNew.mat')); %Get Map 
         
@@ -128,7 +131,10 @@ for iter=1:length(dirlist)
             errorbar(xCSI,yCSI,wCSI / maxWeight * 10,'.r')
             
 %             subplot(1,2,1), plot(traces(i).BM,'-m','LineWidth',2)
-            subplot(1,2,1), plot(traces(i).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
+            if ~isempty(traces(i).RPEheight)
+              subplot(1,2,1), plot(traces(i).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
+            end
+            
             hold off
             
             subplot(1,2,2)
