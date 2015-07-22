@@ -8,8 +8,10 @@ function preProcessFrames(directory)
 
 savedir   = fullfile(directory,'Results');
 
-varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore');
+varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore','skippedind','start');
 bscanstore = varStruct.bscanstore;
+skippedind = varStruct.skippedind;
+start      = varStruct.start;
 
 varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
 ImageList = varStruct.ImageList;
@@ -26,7 +28,7 @@ traces(numframes).CSI = [];
 other      = struct('colshifts',[],'shiftsize',[],'smallsize',[],'bigsize',[]);
 other(numframes).colshifts = [];
 
-indToProcess = setdiff(1:numframes,skippedind);
+indToProcess = setdiff(start:numframes,skippedind);
 
 DeltaX = ImageList(start).scaleX;
 DeltaY = - diff([ImageList([start,start + 1]).startY]);
