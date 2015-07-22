@@ -8,8 +8,11 @@ function preProcessFrames(directory)
 
 savedir   = fullfile(directory,'Results');
 
-load(fullfile(directory,'Data Files','RegisteredImages.mat'));
-load(fullfile(directory,'Data Files','ImageList.mat'))
+varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore');
+bscanstore = varStruct.bscanstore;
+
+varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
+ImageList = bscanstore.ImageList;
 
 numframes = numel(bscanstore);
 
