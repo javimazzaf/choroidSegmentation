@@ -115,7 +115,9 @@ if isempty(path) || any(isinf(dist))
         
         stretch.x = cols(paths(k).ix);
         stretch.y = rows(paths(k).ix);
-        stretch.weight = edgeness(sub2ind(size(edgeness),stretch.y,stretch.x));
+        
+        stretch.weight     = edgeness(sub2ind(size(edgeness),stretch.y,stretch.x));
+        stretch.sumWeight  = sum(full(stretch.weight));
         stretch.meanWeight = mean(full(stretch.weight));
         stretch.meanHeight = mean(full(stretch.y));
         stretch.length     = numel(full(stretch.y));
@@ -142,41 +144,45 @@ if isempty(path) || any(isinf(dist))
     end
     
     ids   = bi2de(domains')'; % Builds a unique number for each combination of segments
-    ix    = setdiff(unique(ids),[0, 2.^(0:size(domains,1)-1)]); % Gets a list of the unique numbers but those representing only one segement
+    ix    = setdiff(unique(ids),[0, 2.^(0:size(domains,1)-1)]); % Gets a list of the unique numbers except those representing only one segement
     
     keep = ones(1,size(domains,1));
     
     for k = 1:numel(ix)
-%        slice = ids == ix(k);
-%        overlaps = bwconncomp(slice);
-       
-%        for o = 1:overlaps.NumObjects
-%           overlapRegion = overlaps(o).PixelIdxList{:};
-          
-%           numOverlappingSegments = count(overlapRegion(1));
           
           objIx = find(de2bi(ix(k),numel(paths))); %List segments that overlap here
           
           objIx = setdiff(objIx,find(keep==0));
           
-          [~,ixWeight] = sort([PathPts(objIx).meanWeight],'ascend');
-          [~,iHeight]  = sort([PathPts(objIx).meanHeight],'descend');
-          [~,iLength]  = sort([PathPts(objIx).length],'ascend');
+          sumWeights  = [PathPts(objIx).sumWeight];
+          meanWeights = [PathPts(objIx).meanWeight];
+          heights     = [PathPts(objIx).meanHeight]; % disfavors segments at the bottom of the scan (originated on noise)
+          
+          sumWeightRates  = getParameter('SEGMENT_SELECTION_SUMWEIGTH')  *  sumWeights  / sum(sumWeights);
+          meanWeightRates = getParameter('SEGMENT_SELECTION_MEANWEIGTH') *  meanWeights / sum(meanWeights);
+          heightRates     = getParameter('SEGMENT_SELECTION_HEIGHTS')    ./ heights     / sum(1./heights);
+          
+          fullRate = sumWeightRates + meanWeightRates + heightRates;
+          
+%           [~,ixWeight] = sort([PathPts(objIx).meanWeight],'ascend');
+%           [~,iHeight]  = sort([PathPts(objIx).meanHeight],'descend');
+%           [~,iLength]  = sort([PathPts(objIx).length],'ascend');
           
           % Combine the three ordering criteria
-          [~,ixWin] = max(mean([ixWeight;iHeight;iLength]));
+%           [~,ixWin] = max(mean([ixWeight;iHeight;iLength]));
+          [~,ixWin] = max(fullRate);
           
           keep(setdiff(objIx,objIx(ixWin))) = 0; %Discard those not choosen 
           
 %        end
     end
     
-    minWeight = getParameter('MIN_MEAN_PATH_WEIGHT');
-    minLength = getParameter('MIN_PATH_LENGTH');
+    minMeanWeight = getParameter('MIN_MEAN_PATH_WEIGHT');
+    minSumWeight  = getParameter('MIN_SUM_PATH_WEIGTH');
      
     % Keep segments that do not overlap and remove unsignificant ones
     for k = 1:numel(PathPts)
-        if PathPts(k).meanWeight < minWeight || PathPts(k).length < minLength
+        if PathPts(k).meanWeight < minMeanWeight || PathPts(k).length < minSumWeight
             PathPts(k).keep = 0;
         elseif all(count(logical(domains(k,:))) == 1)
             PathPts(k).keep = 1;

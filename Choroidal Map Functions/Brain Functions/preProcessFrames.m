@@ -67,10 +67,13 @@ for frame = indToProcess
     end
 end
 
-RPEheight = posRPE - absMaxShift;
+safeTopLimit    = max(1,absMaxShift);
+safeBottomLimit = min(size(shiftedScans,1),size(shiftedScans,1) + absMinShift);
 
-shiftedScans = shiftedScans(absMaxShift:end+absMinShift,:,:);
+shiftedScans = shiftedScans(safeTopLimit:safeBottomLimit,:,:);
 avgScans     = NaN(size(shiftedScans));
+
+RPEheight = posRPE - safeTopLimit + 1;
 
 for frame = indToProcess
     try
@@ -78,16 +81,16 @@ for frame = indToProcess
         startFrame = max(1,frame-SigmaFilterScans);
         lastFrame  = min(numframes,frame+SigmaFilterScans);
         
-        auxSum = zeros(size(shiftedScans,1),size(shiftedScans,2));
+        allAux = [];
         
-        % Make additions for average
+        % Concatenate images to average
         for avgFrame = startFrame:lastFrame
-            aux = shiftedScans(:,:,avgFrame) * interScansFilter(avgFrame - frame + SigmaFilterScans + 1);
-            auxSum = nansum(cat(3,auxSum,aux),3);
+            avgWeight = interScansFilter(avgFrame - frame + SigmaFilterScans + 1);
+            allAux = cat(3,allAux,shiftedScans(:,:,avgFrame) * avgWeight);
         end
         
         % Compute weighted average
-        avgScans(:,:,frame) = auxSum / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
+        avgScans(:,:,frame) = nansum(allAux,3) / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
         disp(frame)
     catch
         disp(logit(savedir,['Error frame:' num2str(frame)]));

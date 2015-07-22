@@ -27,9 +27,10 @@ edg(edg < 0) = 0;
 
 padPb = zeros(size(edg));
 
-validRows = rpeHeight + getParameter('CHOROID_MIN_WIDTH') + (0:getParameter('CHOROID_MAX_WIDTH') - 1);
+topRow = max(1, rpeHeight + getParameter('CHOROID_MIN_WIDTH'));
+botRow = min(size(padPb,1), topRow + getParameter('CHOROID_MAX_WIDTH') - 1);
 
-padPb(validRows,:) = edg(validRows,:);  
+padPb(topRow:botRow,:) = edg(topRow:botRow,:);  
 
 padPb(1,:) = 0;
 

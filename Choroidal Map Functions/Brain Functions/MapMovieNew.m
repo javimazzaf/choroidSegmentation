@@ -116,6 +116,8 @@ for iter=1:length(dirlist)
             wCSI = [];
             
             for k = 1:numel(traces(i).CSI)
+                if ~(traces(i).CSI(k).keep), continue, end
+                
                 xCSI = [xCSI; traces(i).CSI(k).x(:)];
                 yCSI = [yCSI; traces(i).CSI(k).y(:)];
                 wCSI = [wCSI; traces(i).CSI(k).weight(:)];
