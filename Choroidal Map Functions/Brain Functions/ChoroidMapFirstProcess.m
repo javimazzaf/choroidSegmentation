@@ -39,10 +39,16 @@ for iter = 1:numel(dirlist)
             preProcessFrames(directory); 
         end
         
-        load(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight');
+        varStruct = load(fullfile(savedir,'processedImages.mat'),'avgScans','indToProcess','RPEheight');
+        avgScans     = varStruct.avgScans;
+        indToProcess = varStruct.indToProcess;
+        RPEheight    = varStruct.RPEheight;
         
         if exist(fullfile(savedir,'FirstProcessDataNew.mat'),'file')
-            load(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
+            varStruct = load(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
+            traces = varStruct.traces; 
+            other = varStruct.other;
+            EndHeights = varStruct.EndHeights;
         end
 
         %-% Iterate over frames of current subject
