@@ -1,10 +1,10 @@
 function preProcessFrames(directory)
 
-if ~ispc && ~ismac
-    workersAvailable = Inf; 
-else
-    workersAvailable = 0; 
-end
+% if ~ispc && ~ismac
+%     workersAvailable = Inf; 
+% else
+%     workersAvailable = 0; 
+% end
 
 savedir   = fullfile(directory,'Results');
 
@@ -39,7 +39,7 @@ posRPE   = round(size(bscanstore{1},1) / 3);
 
 absMinShift = Inf;
 absMaxShift = -Inf;
-parfor (frame = indToProcess, workersAvailable)
+parfor frame = indToProcess
 % for frame = indToProcess
     try
         
