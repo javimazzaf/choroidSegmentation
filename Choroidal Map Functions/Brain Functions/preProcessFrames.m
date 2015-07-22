@@ -1,5 +1,11 @@
 function preProcessFrames(directory)
 
+if ~ispc && ~ismac
+    workersAvailable = Inf; 
+else
+    workersAvailable = 0; 
+end
+
 savedir   = fullfile(directory,'Results');
 
 load(fullfile(directory,'Data Files','RegisteredImages.mat'));
@@ -33,8 +39,8 @@ posRPE   = round(size(bscanstore{1},1) / 3);
 
 absMinShift = Inf;
 absMaxShift = -Inf;
-%         parfor (frame = indToProcess, workersAvailable)
-for frame = indToProcess
+parfor (frame = indToProcess, workersAvailable)
+% for frame = indToProcess
     try
         
         bscan = double(bscanstore{frame});
