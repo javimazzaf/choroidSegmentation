@@ -26,7 +26,7 @@ traces(numframes).CSI = [];
 other      = struct('colshifts',[],'shiftsize',[],'smallsize',[],'bigsize',[]);
 other(numframes).colshifts = [];
 
-indToProcess = setdiff(start:numframes,skippedind);
+indToProcess = setdiff(1:numframes,skippedind);
 
 DeltaX = ImageList(start).scaleX;
 DeltaY = - diff([ImageList([start,start + 1]).startY]);
