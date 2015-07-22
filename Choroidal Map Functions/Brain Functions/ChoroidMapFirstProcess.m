@@ -35,15 +35,15 @@ for iter = 1:numel(dirlist)
         
         disp(['Starting ChoroidFirstProcess: ' directory])
         
-        if exist(fullfile(savedir,'FirstProcessDataNew.mat'),'file')
-            load(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
-        end
-        
         if ~exist(fullfile(savedir,'processedImages.mat'),'file')
             preProcessFrames(directory); 
         end
         
         load(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight');
+        
+        if exist(fullfile(savedir,'FirstProcessDataNew.mat'),'file')
+            load(fullfile(savedir,'FirstProcessDataNew.mat'),'traces','other','EndHeights');
+        end
 
         %-% Iterate over frames of current subject
 %         parfor (frame = indToProcess, workersAvailable)
