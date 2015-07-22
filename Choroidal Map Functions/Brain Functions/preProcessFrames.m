@@ -12,7 +12,7 @@ varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscans
 bscanstore = varStruct.bscanstore;
 
 varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
-ImageList = bscanstore.ImageList;
+ImageList = varStruct.ImageList;
 
 numframes = numel(bscanstore);
 
