@@ -44,8 +44,8 @@ posRPE   = round(size(bscanstore{1},1) / 3);
 
 absMinShift = Inf;
 absMaxShift = -Inf;
-parfor frame = indToProcess
-% for frame = indToProcess
+% parfor frame = indToProcess
+for frame = indToProcess
     try
         
         bscan = double(bscanstore{frame});

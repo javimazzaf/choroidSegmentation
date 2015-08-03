@@ -52,8 +52,8 @@ for iter = 1:numel(dirlist)
         end
 
         %-% Iterate over frames of current subject
-        parfor (frame = indToProcess, workersAvailable)
-%         for frame = indToProcess
+%         parfor (frame = indToProcess, workersAvailable)
+        for frame = indToProcess
             try
                 
                 bscan = avgScans(:,:,frame);
