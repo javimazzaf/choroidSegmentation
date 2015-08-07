@@ -37,7 +37,7 @@ for iter=1:length(dirlist)
         
         load(fullfile(directory,'Results','FirstProcessDataNew.mat')); %Get Traces
 %         load(fullfile(directory,'Data Files','RegisteredImages.mat')); %Get Frames
-        load(fullfile(directory,'Results','processedImages.mat'),'shiftedScans'); %'avgScans'
+        load(fullfile(directory,'Results','processedImages.mat'),'shiftedScans','safeTopLimit','safeBottomLimit'); %'avgScans'
         
         shiftedScans = uint8(shiftedScans / max(shiftedScans(:)) * 255);
         
@@ -79,7 +79,7 @@ for iter=1:length(dirlist)
         ax2=subplot(1,2,1);
         
 %         subimage(bscanstore{1});
-        subimage(shiftedScans(:,:,1)); 
+        subimage(shiftedScans(safeTopLimit(1):safeBottomLimit(1),:,1)); 
 
         pos1=get(ax1,'position');
         pos2=get(ax2,'position');
@@ -106,7 +106,7 @@ for iter=1:length(dirlist)
 %             figure(df)
             h4=subplot(1,2,1);
 %             subimage(bscanstore{i});
-            subimage(shiftedScans(:,:,i));
+            subimage(shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i));
             
             set(h4,'visible','off')
             hold on

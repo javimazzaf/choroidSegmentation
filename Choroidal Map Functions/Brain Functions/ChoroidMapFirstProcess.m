@@ -13,7 +13,7 @@ elseif ismac
     workersAvailable = 0; %Uses 1 worker computing
 else
     dirlist = fullfile(filesep,'srv','samba',varargin{1});
-    workersAvailable = 0; %Uses 1 worker computing
+    workersAvailable = Inf; %Uses 1 worker computing
 end
 
 
@@ -52,20 +52,21 @@ for iter = 1:numel(dirlist)
         end
 
         %-% Iterate over frames of current subject
-%         parfor (frame = indToProcess, workersAvailable)
-        for frame = indToProcess
+        parfor (frame = indToProcess, workersAvailable)
+%         for frame = indToProcess
             try
                 
-                bscan = avgScans(:,:,frame);
+%                 bscan = avgScans(:,:,frame);
+                bscan = avgScans{frame};
                 
-                yCSI = getCSI(bscan,RPEheight);
+                yCSI = getCSI(bscan,RPEheight(frame));
                 
                 if isempty(yCSI), continue, end
                 
                 EndHeights(frame,:) = [NaN NaN];
                 
                 %-% Store Other Relevant Variables
-                traces(frame).RPEheight = RPEheight;
+                traces(frame).RPEheight = RPEheight(frame);
                 traces(frame).CSI = yCSI;
                 
 %                 other(frame).colshifts = colShifts;

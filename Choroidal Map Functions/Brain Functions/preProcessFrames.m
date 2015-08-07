@@ -42,10 +42,11 @@ shiftedScans = NaN([size(bscanstore{1}), numframes]);
 
 posRPE   = round(size(bscanstore{1},1) / 3);
 
-absMinShift = Inf;
-absMaxShift = -Inf;
-% parfor frame = indToProcess
-for frame = indToProcess
+safeTopLimit    = NaN(1,max(indToProcess));
+safeBottomLimit = NaN(1,max(indToProcess));
+
+parfor frame = indToProcess
+% for frame = indToProcess
     try
         
         bscan = double(bscanstore{frame});
@@ -69,8 +70,8 @@ for frame = indToProcess
         other(frame).smallsize = size(bscan);
         other(frame).bigsize   = size(shiftedScans(:,:,frame));
         
-        absMaxShift = max(absMaxShift,double(max(colShifts)));
-        absMinShift = min(absMinShift,double(min(colShifts)));
+        safeTopLimit(frame)    = max(1,double(max(colShifts)));
+        safeBottomLimit(frame) = min(size(shiftedScans,1),size(shiftedScans,1) + double(min(colShifts)));
         
         disp(frame)
     catch
@@ -78,13 +79,10 @@ for frame = indToProcess
     end
 end
 
-safeTopLimit    = max(1,absMaxShift);
-safeBottomLimit = min(size(shiftedScans,1),size(shiftedScans,1) + absMinShift);
+% safeTopLimit    = max(1,absMaxShift);
+% safeBottomLimit = min(size(shiftedScans,1),size(shiftedScans,1) + absMinShift);
 
-shiftedScans = shiftedScans(safeTopLimit:safeBottomLimit,:,:);
-avgScans     = NaN(size(shiftedScans));
-
-RPEheight = posRPE - safeTopLimit + 1;
+avgScans     = cell(1,size(shiftedScans,3));
 
 for frame = indToProcess
     try
@@ -93,20 +91,28 @@ for frame = indToProcess
         lastFrame  = min(numframes,frame+SigmaFilterScans);
         
         allAux = [];
+
+        % Get the safe top and bottom limits within the frames to average
+        % to have them cropped at the same size.
         
+        safeTop = nanmax(safeTopLimit(startFrame:lastFrame));
+        safeBottom = nanmin(safeBottomLimit(startFrame:lastFrame));
+
         % Concatenate images to average
         for avgFrame = startFrame:lastFrame
             avgWeight = interScansFilter(avgFrame - frame + SigmaFilterScans + 1);
-            allAux = cat(3,allAux,shiftedScans(:,:,avgFrame) * avgWeight);
+            allAux = cat(3,allAux,shiftedScans(safeTop:safeBottom,:,avgFrame) * avgWeight);
         end
         
         % Compute weighted average
-        avgScans(:,:,frame) = nansum(allAux,3) / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
+        avgScans{frame} = nansum(allAux,3) / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
         disp(frame)
     catch
         disp(logit(savedir,['Error frame:' num2str(frame)]));
     end
 end
 
+RPEheight = posRPE - safeTopLimit + 1;
+
 save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
-save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight');
+save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight','safeTopLimit','safeBottomLimit');
