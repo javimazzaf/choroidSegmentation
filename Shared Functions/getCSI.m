@@ -1,16 +1,16 @@
-function CSI = getCSI(shiftedBscan,rpeHeight)
+function CSI = getCSI(origShiftedBscan,rpeHeight)
 
 %-% Edge Probability
 scalesize = [10 15 20];
 angles    = [-20 0 20];
 
 % [~,OG] = EdgeProbability(shiftedBscan,scalesize,angles,meanTop,maxShift);
-OG = EdgeProbabilityGrad(shiftedBscan,scalesize,angles,rpeHeight);
+OG = EdgeProbabilityGrad(origShiftedBscan,scalesize,angles,rpeHeight);
 
 %-% Inflection Points
-Infl2 = zeros(size(shiftedBscan));
+Infl2 = zeros(size(origShiftedBscan));
 
-shiftedBscan = shiftedBscan / max(shiftedBscan(:)) * 255;
+shiftedBscan = origShiftedBscan / max(origShiftedBscan(:)) * 255;
 
 filteredBscan = imfilter(shiftedBscan,OrientedGaussian([3 3],0));
 colspacing    = 2;
@@ -67,8 +67,8 @@ Infl2(Infl2 & g) = 0;
 
 nodes = Infl2;
 
-% New edginess based on absolute gradient
-edg = edgeness(shiftedBscan,scalesize/4,angles+90);
+% New edginess based on absolute gradient from unNormalized image
+edg = edgeness(origShiftedBscan,scalesize/4,angles+90);
 
 %-% Find CSI
 % [CSI, ~] = mapFindCSI(nodes,OG,maxShift,colShifts);
