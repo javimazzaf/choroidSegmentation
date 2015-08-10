@@ -106,31 +106,38 @@ for iter=1:length(dirlist)
 %             figure(df)
             h4=subplot(1,2,1);
 %             subimage(bscanstore{i});
-            subimage(shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i));
+            if ~isnan(safeTopLimit(i)) && ~isnan(safeBottomLimit(i))
+              subimage(shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i));
+            else
+              subimage(shiftedScans(:,:,i));
+            end
             
             set(h4,'visible','off')
             hold on
             
-            xCSI = [];
-            yCSI = [];
-            wCSI = [];
-            
+%             xCSI = [];
+%             yCSI = [];
+%             wCSI = [];
+            clr = 'rgymcb';
             for k = 1:numel(traces(i).CSI)
                 if ~(traces(i).CSI(k).keep), continue, end
                 
-                xCSI = [xCSI; traces(i).CSI(k).x(:)];
-                yCSI = [yCSI; traces(i).CSI(k).y(:)];
-                wCSI = [wCSI; traces(i).CSI(k).weight(:)];
+                xCSI = traces(i).CSI(k).x(:);
+                yCSI = traces(i).CSI(k).y(:);
+                wCSI = traces(i).CSI(k).weight(:);
+                
+                errorbar(xCSI,yCSI,wCSI / maxWeight * 10,['.' clr(mod(k,6) + 1)])
+                
             end
             
-            [xCSI,ix,~] = unique(xCSI);
-            yCSI = yCSI(ix);
-            wCSI = wCSI(ix);
+%             [xCSI,ix,~] = unique(xCSI);
+%             yCSI = yCSI(ix);
+%             wCSI = wCSI(ix);
             
             %         [~,iCSI] = interpCSI(xCSI,yCSI, numel(traces(i).BM));
             %         plot(iCSI,'-r','LineWidth',2)
             
-            errorbar(xCSI,yCSI,wCSI / maxWeight * 10,'.r')
+%             errorbar(xCSI,yCSI,wCSI / maxWeight * 10,'.r')
             
 %             subplot(1,2,1), plot(traces(i).BM,'-m','LineWidth',2)
             if ~isempty(traces(i).RPEheight)
