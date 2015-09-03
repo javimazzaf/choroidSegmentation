@@ -22,7 +22,7 @@ testGrad2 = [];
 
 der1Thresh = getParameter('FIRST_DERIVATIVE_THRESHOLD');
 der2Thresh = getParameter('SECOND_DERIVATIVE_THRESHOLD');
-RPE_CSI_gap = getParameter('CHOROID_MIN_WIDTH') + 10;
+RPE_CSI_gap = getParameter('CHOROID_MIN_WIDTH');
 
 for j = 1:nCols
     

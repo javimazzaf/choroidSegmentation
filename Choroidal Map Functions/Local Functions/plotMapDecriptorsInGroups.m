@@ -1,6 +1,6 @@
-function plotMapDecriptorsInGroups
+function plotMapDecriptorsInGroups(dr)
 
-load('/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/mapData.mat','descriptors')
+load(fullfile(dr,'mapData.mat'),'descriptors')
 
 allConditions = unique(descriptors.Group(:));
 
@@ -19,35 +19,61 @@ hf = figure;
 bar(populations(mskCond))
 set(gca,'XTickLabels',conditions)
 ylabel('N patients')
-print(hf,'populations.png','-dpng')
+print(hf,fullfile(dr,'populations.png'),'-dpng')
 
 % Mean thickness
 hf = figure;
 boxplot(data.meanthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('mean Thickness [\mum]')
-print(hf,'meanThickness.png','-dpng')
+print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
+
+% Mean thickness corrected for age
+hf = figure;
+meanThicknessCorrected = data.meanthick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+boxplot(meanThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 400])
+ylabel('mean Thickness corrected for age [\mum]')
+print(hf,fullfile(dr,'meanThicknessCorrected.png'),'-dpng')
 
 % Min thickness
 hf = figure;
 boxplot(data.minthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 150])
 ylabel('min Thickness [\mum]')
-print(hf,'minThickness.png','-dpng')
+print(hf,fullfile(dr,'minThickness.png'),'-dpng')
 
 % Max thickness
 hf = figure;
 boxplot(data.maxthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 700])
 ylabel('max Thickness [\mum]')
-print(hf,'maxThickness.png','-dpng')
+print(hf,fullfile(dr,'maxThickness.png'),'-dpng')
 
-% Max thickness
+% Std thickness
 hf = figure;
 boxplot(data.stdthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 100])
 ylabel('std Thickness [\mum]')
-print(hf,'stdThickness.png','-dpng')
+print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
+
+% Q5 thickness
+hf = figure;
+boxplot(data.q5thick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 400])
+ylabel('P5 Thickness [\mum]')
+print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
+
+% Q95 thickness
+hf = figure;
+boxplot(data.q95thick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 700])
+ylabel('P95 Thickness [\mum]')
+print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
 
 % % Polar angle of plane fit
 % hf = figure;
@@ -58,7 +84,7 @@ print(hf,'stdThickness.png','-dpng')
 % bar(meanAzimuth)
 % set(gca,'XTickLabels',conditions)
 % ylabel('mean Azimuth')
-% print(hf,'meanAzimuth.png','-dpng')
+% print(hf,fullfile(dr,'meanAzimuth.png','-dpng'))
 
 % Azimuth angle of plane fit, in scatter plot
 hf = figure;
@@ -71,56 +97,56 @@ for k = 1:numel(conditions)
     polar(data.azimuth(msk)/180*pi,pi/2 - data.polar(msk)/180*pi,lns), hold on
 end
 
-legend(conditions)
+% legend(conditions)
 title('Azimuth Scatter')
-print(hf,'scatterAzimuth.png','-dpng')
+print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
 
-% Histogram of azimuth of plane fit
-hf = figure;
-clr     = 'rgbcmk';
-
-mxCounts = -Inf;
-mxInd    = 1;
-
-for k = 1:numel(conditions)
-    msk = ismember(data.Group(:),conditions{k}); 
-    [counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
-
-    counts = counts / sum(counts);
-    
-    thisMax = max(counts);
-    
-    if thisMax > mxCounts
-        mxCounts = thisMax;
-        mxInd = k;
-    end
-end
-
-msk = ismember(data.Group(:),conditions{mxInd});
-lns = ['o-' clr(mod(mxInd,length(clr)) + 1)];
-[counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
-counts = counts / sum(counts);
-counts  = [counts counts(1)];
-centers = [centers centers(1)];
-polar(centers/180*pi,counts,lns), hold on
-
-for k = setdiff(1:numel(conditions),mxInd)
-    msk = ismember(data.Group(:),conditions{k});
-    lns = ['o-' clr(mod(k,length(clr)) + 1)];
-    
-    [counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
-    
-    counts = counts / sum(counts);
-    
-    counts  = [counts counts(1)];
-    centers = [centers centers(1)];
-    
-    polar(centers/180*pi,counts,lns)
-end
-
-legend(conditions)
-title('Azimuth Histogram')
-print(hf,'histogramAzimuth.png','-dpng')
+% % Histogram of azimuth of plane fit
+% hf = figure;
+% clr     = 'rgbcmk';
+% 
+% mxCounts = -Inf;
+% mxInd    = 1;
+% 
+% for k = 1:numel(conditions)
+%     msk = ismember(data.Group(:),conditions{k}); 
+%     [counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
+% 
+%     counts = counts / sum(counts);
+%     
+%     thisMax = max(counts);
+%     
+%     if thisMax > mxCounts
+%         mxCounts = thisMax;
+%         mxInd = k;
+%     end
+% end
+% 
+% msk = ismember(data.Group(:),conditions{mxInd});
+% lns = ['o-' clr(mod(mxInd,length(clr)) + 1)];
+% [counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
+% counts = counts / sum(counts);
+% counts  = [counts counts(1)];
+% centers = [centers centers(1)];
+% polar(centers/180*pi,counts,lns), hold on
+% 
+% for k = setdiff(1:numel(conditions),mxInd)
+%     msk = ismember(data.Group(:),conditions{k});
+%     lns = ['o-' clr(mod(k,length(clr)) + 1)];
+%     
+%     [counts, centers] = hist(data.azimuth(msk),[22.5:45:337.5]);
+%     
+%     counts = counts / sum(counts);
+%     
+%     counts  = [counts counts(1)];
+%     centers = [centers centers(1)];
+%     
+%     polar(centers/180*pi,counts,lns)
+% end
+% 
+% legend(conditions)
+% title('Azimuth Histogram')
+% print(hf,fullfile(dr,'histogramAzimuth.png'),'-dpng')
 
 % polar angle of plane fit
 hf = figure;
@@ -128,7 +154,20 @@ boxplot(90-data.polar(:),data.Group(:),'notch','on','labels',conditions,'labelor
 ylim([0, 3])
 ylabel('polar angle [deg]')
 title('Polar angle')
-print(hf,'polar.png','-dpng')
+print(hf,fullfile(dr,'polar.png'),'-dpng')
+
+% Age
+hf = figure;
+boxplot(data.Age(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+legend(conditions)
+set(gca,'FontSize',14)
+ylabel('Age [years]')
+print(hf,fullfile(dr,'age.png'),'-dpng')
+
+% Correlation Thickness and Age
+hf = figure;
+FigureMaker(data.Age(:),data.meanthick(:),'Age [yr]','meanThickness [\mum]','d','poly1',false,[])
+print(hf,fullfile(dr,'correlMeanThcknessVsAge.png'),'-dpng')
 
 % % Histogram of polar angle of plane fit
 % hf = figure;
@@ -147,6 +186,84 @@ print(hf,'polar.png','-dpng')
 % 
 % legend(conditions)
 % title('Polar Histogram')
-% print(hf,'histogramPolar.png','-dpng')
+% print(hf,fullfile(dr,'histogramPolar.png'),'-dpng')
+
+% Azimuth angle cumulative histogram
+hf = figure;
+
+% sym = 'os^*x+v><';
+% clr     = 'rgbcmk';
+
+edges = 0:15:360;
+x = [0:30:330, 0];
+
+hs = [];
+
+xPs = [];
+yPs = [];
+rPs = [];
+
+mxIx = 1;
+mxIxVector = 1;
+
+for k = 1:numel(conditions)
+    msk = ismember(data.Group(:),conditions{k});
+    
+    angs = mod(data.azimuth(msk) + 360, 360);
+    pols = mod(90 - data.polar(msk) + 360, 360);
+    
+    h = histcounts(angs,edges);
+    
+    h = [h(1)+h(end), h(2:2:end-1) + h(3:2:end-1)];
+    
+    h = h / sum(h);
+    
+    h = [h h(1)];
+    
+    if max(h) > max(hs(:))
+        mxIx = k;
+    end
+    
+    hs = [hs;h];
+    
+    xProjs = nanmean(pols .* cosd(angs));
+    yProjs = nanmean(pols .* sind(angs));
+    
+    rProjs = norm([xProjs,yProjs]);
+    
+    xPs = [xPs xProjs];
+    yPs = [yPs yProjs];
+    
+    if rProjs > max(rPs)
+        mxIxVector = k;
+    end
+    
+    rPs = [rPs rProjs];
+    
+end
+
+for k = [mxIx, setdiff(1:numel(conditions),mxIx)]
+    
+    lns = [sym(mod(k,length(sym)) + 1) '-' clr(mod(k,length(clr)) + 1)];
+    
+    polar(x/180*pi,hs(k,:),lns), hold on
+end
+
+% legend(conditions)
+set(gca,'FontSize',14)
+print(hf,fullfile(dr,'AzimHistPolar.png'),'-dpng')
+
+hf = figure;
+
+for k = [mxIxVector, setdiff(1:numel(conditions),mxIxVector)]
+    
+    lns = ['-' clr(mod(k,length(clr)) + 1)];
+    
+    compass(xPs(k),yPs(k),lns), hold on
+end
+
+% legend(conditions)
+set(gca,'FontSize',14)
+print(hf,fullfile(dr,'AzimResult.png'),'-dpng')
 
 end

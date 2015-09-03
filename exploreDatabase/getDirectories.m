@@ -63,6 +63,7 @@ bottomdirs=[onhDirs;otherDirs];
 hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
 hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Data Files','RegisteredImages.mat')));
 hasFrsMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessData.mat')));
+hasFrsMapNewMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessDataNew.mat')));
 hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'PostProcessData.mat')));
 hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) ,fullfile(bottomdirs,'Results')));
 hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
@@ -81,6 +82,7 @@ dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false)
 todoDirs.convert   = dirlist(hasRawMsk & ~hasImsMsk);
 todoDirs.register  = dirlist(hasImsMsk & ~hasRegMsk);
 todoDirs.firstProc = dirlist(hasRegMsk & ~hasFrsMsk);
+todoDirs.firstMapNew = dirlist(hasRegMsk & ~hasFrsMapNewMsk);
 todoDirs.postProc  = dirlist(hasFrsMsk & ~hasPosMsk);
 todoDirs.compFigs  = dirlist(hasPosMsk & ~hasFigMsk);
 todoDirs.compDCT   = dirlist(hasFigMsk & ~hasDCTMsk);
@@ -93,6 +95,7 @@ hasDirs.RawIm = dirlist(hasImsMsk);
 hasDirs.Imags = dirlist(hasImsMsk);
 hasDirs.Regis = dirlist(hasRegMsk);
 hasDirs.First = dirlist(hasFrsMsk);
+hasDirs.FirstMapNew = dirlist(hasFrsMapNewMsk);
 hasDirs.Post  = dirlist(hasPosMsk);
 hasDirs.Figs  = dirlist(hasFigMsk);
 hasDirs.DCT   = dirlist(hasDCTMsk);
@@ -100,6 +103,7 @@ hasDirs.OR    = dirlist(hasORMsk);
 hasDirs.Err   = dirlist(hasErrMsk);
 hasDirs.Map   = dirlist(hasMapMsk);
 hasDirs.Mov   = dirlist(hasMovMsk);
+
 
 save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
 

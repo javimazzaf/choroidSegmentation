@@ -1,4 +1,4 @@
-function [desc] = MapDescriptors(dirlist)
+function [desc] = MapDescriptors(dirlist,fileName)
 
 if ispc
     dirlist = fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
@@ -37,6 +37,8 @@ for i=1:length(dirlist)
     maxRawThickness  = max(rawThickness);
     minRawThickness  = min(rawThickness);
     stdRawThickness  = sqrt(sum(rawThickness.^2 .* rawWeigth) / sum(rawWeigth) - meanRawThickness^2);
+    q5RawThickness  = prctile(rawThickness,5);
+    q95RawThickness = prctile(rawThickness,95);
     
     [sf, N] = fitPlane(rawX,rawY,rawThickness,rawWeigth);
     
@@ -50,17 +52,34 @@ for i=1:length(dirlist)
     azimuth = azimuth * 180 / pi; 
     polar   = polar * 180 / pi;
     
-    temp = table(meanRawThickness, maxRawThickness, minRawThickness, stdRawThickness, azimuth, polar,...
-            'VariableNames',{'meanthick','maxthick','minthick','stdthick','azimuth','polar'});
+    [aredsT, fh] = getAREDSthickness(rawX,rawY,rawThickness,rawWeigth,EyeStr);
     
+    temp = table(meanRawThickness, maxRawThickness, minRawThickness, stdRawThickness, azimuth, polar, q5RawThickness, q95RawThickness, ...
+                 aredsT.D1.mean, aredsT.D1.SD, aredsT.D1.N, aredsT.D3.nasal.mean, aredsT.D3.nasal.SD, aredsT.D3.nasal.N, aredsT.D3.inferior.mean, aredsT.D3.inferior.SD, aredsT.D3.inferior.N,...
+                 aredsT.D3.temporal.mean, aredsT.D3.temporal.SD, aredsT.D3.temporal.N, aredsT.D3.superior.mean, aredsT.D3.superior.SD, aredsT.D3.superior.N,aredsT.D6.nasal.mean,...
+                 aredsT.D6.nasal.SD, aredsT.D6.nasal.N, aredsT.D6.inferior.mean, aredsT.D6.inferior.SD, aredsT.D6.inferior.N, aredsT.D6.temporal.mean, aredsT.D6.temporal.SD, aredsT.D6.temporal.N,...
+                 aredsT.D6.superior.mean, aredsT.D6.superior.SD, aredsT.D6.superior.N,...
+                 'VariableNames',{'meanthick','maxthick','minthick','stdthick','azimuth','polar','q5thick','q95thick',...
+                 'AREDS_D1Mean', 'AREDS_D1SD', 'AREDS_D1N','AREDS_D3nasalMean', 'AREDS_D3nasalSD', 'AREDS_D3nasalN','AREDS_D3inferiorMean', 'AREDS_D3inferiorSD', 'AREDS_D3inferiorN',...
+                 'AREDS_D3temporalMean', 'AREDS_D3temporalSD', 'AREDS_D3temporalN', 'AREDS_D3superiorMean', 'AREDS_D3superiorSD', 'AREDS_D3superiorN','AREDS_D6nasalMean',...
+                 'AREDS_D6nasalSD', 'AREDS_D6nasalN','AREDS_D6inferiorMean', 'AREDS_D6inferiorSD', 'AREDS_D6inferiorN','AREDS_D6temporalMean', 'AREDS_D6temporalSD', 'AREDS_D6temporalN',...
+                 'AREDS_D6superiorMean', 'AREDS_D6superiorSD', 'AREDS_D6superiorN'});
+   
     info = [info, temp];
         
     desc = [desc;info];
     
     disp(i)
+    
+    print(fh, fullfile(directory,'Results','AREDS.png'),'-dpng')
+    
+    close(fh)
 
 end
 
+descriptors = desc;
+
+save(fileName,'descriptors')
 
 end
 
