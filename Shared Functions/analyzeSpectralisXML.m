@@ -1,108 +1,54 @@
-function [patientData, timeSeries]=analyzeSpectralisXML(fileName)
-
+function [patientData,timeSeries]=analyzeSpectralisXML(fileName)
 % This function reads the Spectralis XML files and extracts the most
-% relevant parameters. It gives back to struct variables, patientData and
-% TimeSeries
-% patientData contains personal data and the scan width
-% timeSeries has details of every single image acquiered
-% 2 Body
-% 4 Patient
-% 12 Study
-% 10 Series / 12 if the name of the study is included (dynamic laminometer)
-% 18 Images
-
-
-%% open and parse the file
-%allXMLfields=parseXML('0DEBD110.xml')
-%allXMLfields=parseXML('E72E5350.xml')
+% relevant parameters. timeSeries includes both the oct and fundus
+% parameters of each series. (it works with the previous xml format)
+%
+% 14/09/2015 M.Hidalgo
 
 allXMLfields=parseXML(fileName);
 
-%%
-patientData.LastName=allXMLfields.Children(2).Children(4).Children(4).Children(1).Data;
-patientData.FisrtName=allXMLfields.Children(2).Children(4).Children(6).Children(1).Data;
-patientData.BirthDate=allXMLfields.Children(2).Children(4).Children(8).Children(1).Data;
-patientData.Sex=allXMLfields.Children(2).Children(4).Children(10).Children(1).Data;
-% patientData.Width=allXMLfields.Children(2).Children(4).Children(12).Children(10).Children(14).Children(2).Children.Data;
-patientData.Width=allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(14).Children(2).Children.Data;
+b=struct2cell(allXMLfields.Children);
+b=strmatch('BODY',cellstr(b(1,1,1:end)),'exact');
+p=struct2cell(allXMLfields.Children(b).Children);
+p=strmatch('Patient',cellstr(p(1,1,1:end)),'exact');
+ln=struct2cell(allXMLfields.Children(b).Children(p).Children);
+ln=strmatch('LastName',cellstr(ln(1,1,1:end)),'exact');
 
-itOCT=1;
-% Checks the number of fields inside "Study" in the XML file
+patientData.LastName=allXMLfields.Children(b).Children(p).Children(ln).Children(1).Data;
+patientData.FirstName=allXMLfields.Children(b).Children(p).Children(ln+2).Children(1).Data;
+patientData.Sex=allXMLfields.Children(b).Children(p).Children(ln+6).Children(1).Data;
+study=allXMLfields.Children(b).Children(p).Children(ln+8).Children; 
+s=struct2cell(study); s=strmatch('Series',cellstr(s(1,1,1:end)),'exact');
+acq=struct2cell(study(s(1)).Children); acq=cellstr(acq(1,1,1:end)); im=strmatch('Image',acq,'exact');
+oct=struct2cell(study(s(1)).Children(im(2)).Children); oct=cellstr(oct(1,1,1:end));
+oa=strmatch('OphthalmicAcquisitionContext',oct,'exact'); T=strmatch('AcquisitionTime',oct,'exact');
 
-% if size(allXMLfields.Children(2).Children(4).Children(12).Children, 2)<12;
-if size(allXMLfields.Children(2).Children(4).Children(12).Children, 2)<14;
-    
-    % Images in this case have one LOCALIZER image at the beginning and the
-    % rest are OCTs, and only one Series, but many images
-    
-    patientData.NumImages=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(18).Children.Data);
-    for it=1:patientData.NumImages-1
-        timeSeries(itOCT).id=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(2).Children.Data);
-        timeSeries(itOCT).hour=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(8).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).minute=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(8).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).second=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(8).Children(2).Children(6).Children.Data);
-        timeSeries(itOCT).UTC=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(8).Children(2).Children(8).Children.Data);
-        timeSeries(itOCT).width=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(2).Children.Data);
-        timeSeries(itOCT).height=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(4).Children.Data);
-        timeSeries(itOCT).scaleX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(6).Children.Data);
-        timeSeries(itOCT).scaleY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(8).Children.Data);
-        timeSeries(itOCT).numAvg=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(12).Children.Data);
-        timeSeries(itOCT).quality=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(14).Children.Data);
-        timeSeries(itOCT).startX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(20).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).startY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(20).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).endX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(22).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).endY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(12).Children(22).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).filePath=allXMLfields.Children(2).Children(4).Children(12).Children(12).Children(20+2*it).Children(14).Children(4).Children.Data;
-        timeSeries(itOCT).fileName=timeSeries(itOCT).filePath(strfind(timeSeries(itOCT).filePath, '.')-8:strfind(timeSeries(itOCT).filePath, '.')+3);
-
-        itOCT=itOCT+1;
-    end
-    
-    % if there are 2 children in "Series" 
-else
-    
-    % in this case there are one LOCALIZER and one OCT per series, many
-    % Series, two Images per Series
-    
-    for it=1:(size(allXMLfields.Children(2).Children(4).Children(12).Children, 2)-1)/2-5
-        timeSeries(itOCT).id=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(2).Children.Data);
-        timeSeries(itOCT).hour=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(8).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).minute=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(8).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).second=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(8).Children(2).Children(6).Children.Data);
-        timeSeries(itOCT).UTC=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(8).Children(2).Children(8).Children.Data);
-        timeSeries(itOCT).width=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(2).Children.Data);
-        timeSeries(itOCT).height=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(4).Children.Data);
-        timeSeries(itOCT).scaleX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(6).Children.Data);
-        timeSeries(itOCT).scaleY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(8).Children.Data);
-        timeSeries(itOCT).numAvg=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(12).Children.Data);
-        timeSeries(itOCT).quality=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(14).Children.Data);
-        timeSeries(itOCT).startX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(20).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).startY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(20).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).endX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(22).Children(2).Children(2).Children.Data);
-        timeSeries(itOCT).endY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(12).Children(22).Children(2).Children(4).Children.Data);
-        timeSeries(itOCT).filePath=allXMLfields.Children(2).Children(4).Children(12).Children(10+2*it).Children(20).Children(14).Children(4).Children.Data;
-        timeSeries(itOCT).fileName=timeSeries(itOCT).filePath(strfind(timeSeries(itOCT).filePath, '.')-8:strfind(timeSeries(itOCT).filePath, '.')+3);
-        fundusfileName=allXMLfields.Children(2).Children(4).Children(12).Children(10+it*2).Children(18).Children(14).Children(4).Children.Data;
-
-        %timeSeries(itOCT).fundusfileName=fundusfileName(strfind(fundusfileName,'.')-8:strfind(fundusfileName,'.')+3);
-
-        %<JM>
-        stIx = strfind(fundusfileName,'\');
-        if isempty(stIx), stIx = 1;
-        else              stIx = stIx(end) + 1; end
-
-        %disp(fundusfileName(stIx:end))
-
-        timeSeries(itOCT).fundusfileName=fundusfileName(stIx:end);
-        %</JM>
-
-        timeSeries(itOCT).fwidth=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+it*2).Children(18).Children(12).Children(2).Children.Data);
-        timeSeries(itOCT).fheight=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+it*2).Children(18).Children(12).Children(4).Children.Data);
-        timeSeries(itOCT).fscaleX=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+it*2).Children(18).Children(12).Children(6).Children.Data);
-        timeSeries(itOCT).fscaleY=str2num(allXMLfields.Children(2).Children(4).Children(12).Children(10+it*2).Children(18).Children(12).Children(8).Children.Data);
-        
-        itOCT=itOCT+1;
-    end
+for i=1:numel(s)
+    %fundus image parameters
+    fundusfileName=study(s(i)).Children(im(1)).Children(strmatch('ImageData',oct,'exact')).Children(4).Children.Data;
+    indx=strfind(fundusfileName,'\'); timeSeries(i).fundusfileName=fundusfileName(indx(end)+1:end);
+    timeSeries(i).fwidth=str2num(study(s(i)).Children(im(1)).Children(oa).Children(2).Children.Data);
+    timeSeries(i).fheight=str2num(study(s(i)).Children(im(1)).Children(oa).Children(4).Children.Data);
+    timeSeries(i).fscaleX=str2num(study(s(i)).Children(im(1)).Children(oa).Children(6).Children.Data);
+    timeSeries(i).fscaleY=str2num(study(s(i)).Children(im(1)).Children(oa).Children(8).Children.Data);
+    %oct image parameters
+    timeSeries(i).id=str2num(study(s(i)).Children(strmatch('ID',acq,'exact')).Children(1).Data); 
+    timeSeries(i).hour=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(2).Children.Data);
+    timeSeries(i).minute=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(4).Children.Data);
+    timeSeries(i).second=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(6).Children.Data);
+    timeSeries(i).UTC=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(8).Children.Data);
+    timeSeries(i).width=str2num(study(s(i)).Children(im(2)).Children(oa).Children(2).Children.Data);
+    timeSeries(i).height=str2num(study(s(i)).Children(im(2)).Children(oa).Children(4).Children.Data);
+    timeSeries(i).scaleX=str2num(study(s(i)).Children(im(2)).Children(oa).Children(6).Children.Data);
+    timeSeries(i).scaleY=str2num(study(s(i)).Children(im(2)).Children(oa).Children(8).Children.Data);
+    timeSeries(i).numAvg=str2num(study(s(i)).Children(im(2)).Children(oa).Children(12).Children.Data);
+    timeSeries(i).quality=str2num(study(s(i)).Children(im(2)).Children(oa).Children(14).Children.Data);
+    timeSeries(i).startX=str2num(study(s(i)).Children(im(2)).Children(oa).Children(20).Children(2).Children(2).Children.Data);
+    timeSeries(i).startY=str2num(study(s(i)).Children(im(2)).Children(oa).Children(20).Children(2).Children(4).Children.Data);
+    timeSeries(i).endX=str2num(study(s(i)).Children(im(2)).Children(oa).Children(22).Children(2).Children(2).Children.Data);
+    timeSeries(i).endY=str2num(study(s(i)).Children(im(2)).Children(oa).Children(22).Children(2).Children(4).Children.Data);
+    timeSeries(i).filePath=study(s(i)).Children(im(2)).Children(strmatch('ImageData',oct,'exact')).Children(4).Children.Data;
+    indx2=strfind(timeSeries(i).filePath,'\'); timeSeries(i).fileName=timeSeries(i).filePath(indx2(end)+1:end); 
+    clear indx indx2
 end
-
-
+end
