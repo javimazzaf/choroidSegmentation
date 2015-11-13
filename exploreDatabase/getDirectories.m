@@ -75,6 +75,8 @@ hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Erro
 numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
 hasImsMsk   = logical(numBscans >= 1);
 
+has192Msk   = numBscans > 185 & numBscans < 195;
+
 %Strip out the topdir from the full list
 dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false);
 
@@ -103,7 +105,7 @@ hasDirs.OR    = dirlist(hasORMsk);
 hasDirs.Err   = dirlist(hasErrMsk);
 hasDirs.Map   = dirlist(hasMapMsk);
 hasDirs.Mov   = dirlist(hasMovMsk);
-
+hasDirs.m192  = dirlist(has192Msk);
 
 save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
 
