@@ -128,7 +128,7 @@ for iter=1:length(dirlist)
         
         save(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore','skippedind','imlist','start');
         
-        disp(['Done iteration ' num2str(iter) ': ' directory])
+        disp(logit(directory,['ChoroidRegistration. Done iteration ' num2str(iter) ': ' directory]))
         
         clearvars -except iter dirlist messedup error
        
@@ -137,7 +137,7 @@ for iter=1:length(dirlist)
 %         if exist('fileID','var')
 %             fclose(fileID);
 %         end
-        disp(['Skipped: ' exception.message])
+        disp(logit(directory,['ChoroidRegistration. Skipped folder: ' directory '. Error:' exception.message]))
 
         error{iter}=exception;
         messedup=[messedup;iter];
