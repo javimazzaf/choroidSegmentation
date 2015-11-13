@@ -70,15 +70,13 @@ for iter=1:length(dirlist)
                 return
             end
         end
+        
         close gcf
-        col=sort(col);
-        if col(1)<1
-            col(1)=1;
-        end
-        if col(2)>size(bscan,2)
-            col(2)=size(bscan,2);
-        end
-        dlmwrite(fullfile(directory,'Data Files','TrimInfo.txt'),[col],'precision','%g','newline','pc')
+        col = round(sort(col));
+        col(1) = max(1,col(1));
+        col(2) = min(col(2),size(bscan,2));
+        
+        dlmwrite(fullfile(directory,'Data Files','TrimInfo.txt'),col,'precision','%.0f','newline','pc')
     else
         fclose(fileID);
     end

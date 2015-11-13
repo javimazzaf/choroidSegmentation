@@ -27,10 +27,13 @@ else
     end
 end
 
-c=parcluster('local');
-if isempty(gcp('nocreate'))
-    pool=parpool(c,12);
-end
+% finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
+
+% c=parcluster('local');
+% if isempty(gcp('nocreate'))
+%     pool=parpool(c,12);
+% end
+
 tic
 messedup=[];
 error=cell(length(dirlist),1);
@@ -149,9 +152,9 @@ for iter=1:length(dirlist)
     end
 end
 
-if ~isempty(gcp('nocreate'))
-    delete(pool)
-end
+% if ~isempty(gcp('nocreate'))
+%     delete(pool)
+% end
 time=toc;
 
 
