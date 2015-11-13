@@ -17,7 +17,7 @@ ln=strmatch('LastName',cellstr(ln(1,1,1:end)),'exact');
 patientData.LastName=allXMLfields.Children(b).Children(p).Children(ln).Children(1).Data;
 patientData.FirstName=allXMLfields.Children(b).Children(p).Children(ln+2).Children(1).Data;
 patientData.Sex=allXMLfields.Children(b).Children(p).Children(ln+6).Children(1).Data;
-study=allXMLfields.Children(b).Children(p).Children(ln+8).Children; 
+study=allXMLfields.Children(b).Children(p).Children(ln+8).Children;
 s=struct2cell(study); s=strmatch('Series',cellstr(s(1,1,1:end)),'exact');
 acq=struct2cell(study(s(1)).Children); acq=cellstr(acq(1,1,1:end)); im=strmatch('Image',acq,'exact');
 oct=struct2cell(study(s(1)).Children(im(2)).Children); oct=cellstr(oct(1,1,1:end));
@@ -32,7 +32,7 @@ for i=1:numel(s)
     timeSeries(i).fscaleX=str2num(study(s(i)).Children(im(1)).Children(oa).Children(6).Children.Data);
     timeSeries(i).fscaleY=str2num(study(s(i)).Children(im(1)).Children(oa).Children(8).Children.Data);
     %oct image parameters
-    timeSeries(i).id=str2num(study(s(i)).Children(strmatch('ID',acq,'exact')).Children(1).Data); 
+    timeSeries(i).id=str2num(study(s(i)).Children(strmatch('ID',acq,'exact')).Children(1).Data);
     timeSeries(i).hour=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(2).Children.Data);
     timeSeries(i).minute=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(4).Children.Data);
     timeSeries(i).second=str2num(study(s(i)).Children(im(2)).Children(T).Children(2).Children(6).Children.Data);
@@ -48,7 +48,8 @@ for i=1:numel(s)
     timeSeries(i).endX=str2num(study(s(i)).Children(im(2)).Children(oa).Children(22).Children(2).Children(2).Children.Data);
     timeSeries(i).endY=str2num(study(s(i)).Children(im(2)).Children(oa).Children(22).Children(2).Children(4).Children.Data);
     timeSeries(i).filePath=study(s(i)).Children(im(2)).Children(strmatch('ImageData',oct,'exact')).Children(4).Children.Data;
-    indx2=strfind(timeSeries(i).filePath,'\'); timeSeries(i).fileName=timeSeries(i).filePath(indx2(end)+1:end); 
+    indx2=strfind(timeSeries(i).filePath,'\'); timeSeries(i).fileName=timeSeries(i).filePath(indx2(end)+1:end);
     clear indx indx2
 end
+
 end
