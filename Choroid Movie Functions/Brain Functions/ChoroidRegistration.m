@@ -27,7 +27,7 @@ else
     end
 end
 
-% finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
+finishup = onCleanup(@() delete(gcp('nocreate'))); %Close parallel pool when function returns or error
 
 % c=parcluster('local');
 % if isempty(gcp('nocreate'))
@@ -58,11 +58,10 @@ for iter=1:length(dirlist)
         skippedind=nan(numframes,1);
         
         start=find(quality>18 & numAvg > 1,1,'first');
-        fileID = fopen(fullfile(directory,'Data Files','TrimInfo.txt'));
-        trimvalues=fscanf(fileID,'%d');
-        CutLeft=trimvalues(1);
-        CutRight=trimvalues(2);
-        fclose(fileID);
+        
+        trimvalues = dlmread(fullfile(directory,'Data Files','TrimInfo.txt'));
+        CutLeft  = trimvalues(1);
+        CutRight = trimvalues(2);
         
         start = 1;
         
