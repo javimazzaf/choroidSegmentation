@@ -62,6 +62,10 @@ for iter = 1:numel(dirlist)
         directory    = dirlist{iter};
         resDirectory = resDirlist{iter};
         
+        if ~exist(resDirectory,'dir')
+            mkdir(resDirectory);
+        end
+        
         disp(['Starting ChoroidFirstProcess: ' directory])
         
         % Load registered images for current subject       
