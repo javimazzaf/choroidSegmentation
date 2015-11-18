@@ -3,29 +3,49 @@ function [messedup,error,runtime] = ChoroidFirstProcess(varargin)
 % coroid-sclera interface, in each frame in the array bscanstore in the
 % file RegisteredImages.mat for each directory in varargin{1}.
 
-if length(varargin)==1
-    if ispc
-        dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-    elseif ismac
-        dirlist = fullfile([filesep 'Volumes'],varargin{1});
-    else
-        dirlist = fullfile(filesep,'srv','samba',varargin{1});
+
+% if length(varargin)==1
+%     if ispc
+%         dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
+%     elseif ismac
+%         dirlist = fullfile([filesep 'Volumes'],varargin{1});
+%     else
+%         dirlist = fullfile(filesep,'srv','samba',varargin{1});
+%     end
+% else
+%     if ispc
+%         load(fullfile([filesep filesep 'HMR-BRAIN'],'Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
+%         dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
+%     else
+%         load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
+%         dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
+%     end
+%     [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
+%     dirlist=dirlist(~missregims);
+%     if isempty(dirlist)
+%         errordlg('No diretories prerequisite data. Run required registration program first')
+%         return
+%     end
+% end
+
+if nargin >=1
+    if ispc,       dataBaseDir = [filesep filesep 'HMR-BRAIN'];
+     elseif ismac, dataBaseDir = [filesep 'Volumes'];
+     else          dataBaseDir = [filesep 'srv' filesep 'samba'];
     end
+    
+    dirlist    = fullfile(dataBaseDir,varargin{1});
+    resDirlist = dirlist;
 else
-    if ispc
-        load(fullfile([filesep filesep 'HMR-BRAIN'],'Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
-    else
-        load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
-    end
-    [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
-    dirlist=dirlist(~missregims);
-    if isempty(dirlist)
-        errordlg('No diretories prerequisite data. Run required registration program first')
-        return
-    end
+    throw(MException('ChoroidFirstProcess:NotEnoughArguments','Not enough arguments.'))
 end
+
+% If second parameter is set, it is used as the base path for the results.
+% Otherwise, the results are stored in the same dir as the input data.
+if nargin >=2
+    resDirlist = fullfile(varargin{2},varargin{1});
+end
+
 
 % c = parcluster('local');
 
@@ -39,7 +59,8 @@ error     =  cell(length(dirlist),1);
 % Iterate over subjects
 for iter = 1:numel(dirlist)
     try
-        directory = dirlist{iter};
+        directory    = dirlist{iter};
+        resDirectory = resDirlist{iter};
         
         disp(['Starting ChoroidFirstProcess: ' directory])
         
@@ -76,7 +97,8 @@ for iter = 1:numel(dirlist)
                     
                 bscan = bscanstore{frame};
                 
-                [yret,~,yRPE,yBM] = FindAllMembranes(bscan,directory);
+%                 [yret,~,yRPE,yBM] = FindAllMembranes(bscan,directory);
+                [yret,~,yRPE,yBM] = FindAllMembranes(bscan,resDirectory);
                 
                 traces(frame).RET = yret;
                 traces(frame).RPE = yRPE;
@@ -158,30 +180,42 @@ for iter = 1:numel(dirlist)
                 other(frame).smallsize = size(bscan);
                 other(frame).bigsize = size(shiftedBscan);
                 
-                disp(logit(directory,['Correct segmentation (frame' num2str(frame) ')']))
+%                 disp(logit(directory,['Correct segmentation (frame' num2str(frame) ')']))
+                disp(logit(resDirectory,['Correct segmentation (frame' num2str(frame) ')']))
+                
                 
             catch exc
                 
-                disp(logit(directory,['Error ChoroidFirstProcess(iter=' num2str(iter) ')(frame' num2str(frame) '): ' exc.message]))
+%                 disp(logit(directory,['Error ChoroidFirstProcess(iter=' num2str(iter) ')(frame' num2str(frame) '): ' exc.message]))
+                disp(logit(resDirectory,['Error ChoroidFirstProcess(iter=' num2str(iter) ')(frame' num2str(frame) '): ' exc.message]))
                
             end
         end
         
-        if ~exist(fullfile(directory,'Data Files','OrientedGradient.mat'),'file')
-            save(fullfile(directory,'Data Files','OrientedGradient.mat'),'OG')
+%         if ~exist(fullfile(directory,'Data Files','OrientedGradient.mat'),'file')
+%             save(fullfile(directory,'Data Files','OrientedGradient.mat'),'OG')
+%         end
+        if ~exist(fullfile(resDirectory,'Data Files','OrientedGradient.mat'),'file')
+            save(fullfile(resDirectory,'Data Files','OrientedGradient.mat'),'OG')
         end
         
         %-% Save Data
-        savedir = fullfile(directory,'Results');
+        
+%         savedir = fullfile(directory,'Results');
+        savedir = fullfile(resDirectory,'Results');
+        
         mkdir(savedir)
         save(fullfile(savedir,'FirstProcessData.mat'),'nodes','traces','other','EndHeights');
         
-        disp(logit(directory,['Done ChoroidFirstProcess(iter=' num2str(iter) '): ' directory]))
+%         disp(logit(directory,['Done ChoroidFirstProcess(iter=' num2str(iter) '): ' directory]))
+        disp(logit(resDirectory,['Done ChoroidFirstProcess(iter=' num2str(iter) '): ' resDirectory]))
 
     catch exception
-        disp(directory)
+%         disp(directory)
+        disp(resDirectory)
         error{iter}=exception;
-        disp(logit(directory,['Skipped ChoroidFirstProcess(iter=' num2str(iter) '): ' exception.message]))
+%         disp(logit(directory,['Skipped ChoroidFirstProcess(iter=' num2str(iter) '): ' exception.message]))
+        disp(logit(resDirectory,['Skipped ChoroidFirstProcess(iter=' num2str(iter) '): ' exception.message]))
         messedup=[messedup;iter];
 
         continue
