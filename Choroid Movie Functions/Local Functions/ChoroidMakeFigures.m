@@ -47,6 +47,9 @@ for iter=1:length(dirlist)
     numframes=length(dir(fullfile(directory,'Processed Images','*.png')));
     
     savedir=fullfile(directory,'Results');
+    
+    disp(logit(savedir,['ChoroidMakeFigures - Starting: ' savedir]))
+    
     load(fullfile(savedir,'FirstProcessData.mat'));
     load(fullfile(savedir,'PostProcessData.mat'));
     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
@@ -97,6 +100,7 @@ for iter=1:length(dirlist)
     title('Summary Image, Included Frames')
     saveas(inclFh,fullfile(savedir,'Summary Image Included'),'fig')
     close(inclFh)
+    disp(logit(savedir,'Summary Image Included - saved'))
     
     if ~isempty([traces(notinclEND).BM])
         exclEndFh = figure('Visible','off');
@@ -107,6 +111,7 @@ for iter=1:length(dirlist)
         title('Summary Image, Excluded Frames, Endheight')
         saveas(exclEndFh,fullfile(savedir,'Summary Image Excluded End'),'fig')
         close(exclEndFh)
+        disp(logit(savedir,'Summary Image Excluded End - saved'))
     end
     
     if ~isempty([traces(notinclVOL).BM])
@@ -118,6 +123,7 @@ for iter=1:length(dirlist)
         title('Summary Image, Excluded Frames, Volume')
         saveas(exclVolFh,fullfile(savedir,'Summary Image Excluded Volume'),'fig')
         close(exclVolFh)
+        disp(logit(savedir,'Summary Image Excluded Volume - saved'))
     end
     
     load(fullfile(directory,'Data Files','ImageList.mat'));
@@ -134,6 +140,7 @@ for iter=1:length(dirlist)
     ylabel('Choroid Volume [Pixels]')
     saveas(volChangeFh,fullfile(savedir,'Volume Change.fig'));
     close(volChangeFh)
+    disp(logit(savedir,'Volume Change Plot - saved'))
     
     % Plot Lomb-Scargle filter results
     LS_Fh = figure('Visible','off');
@@ -151,6 +158,7 @@ for iter=1:length(dirlist)
     line([HR HR],yl,'Color','r','LineWidth',1)
     saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.fig'));
     close(LS_Fh)
+    disp(logit(savedir,'Frequency Correlation Total PLOT - saved'))
     
     % DELETE ONCE ROUNDING OF YCSI IN ALL STORED DATA
     usedEndHeights = round(usedEndHeights);
@@ -161,6 +169,7 @@ for iter=1:length(dirlist)
     
     %% Output Visualization
     if viz
+        disp(logit(savedir,'Starting saving visualization of each frame.'))
         EndExclude=text2im('Excluded - EndHeight Check');
         EndExclude=padarray(~EndExclude,[50 50],'pre');
         [Endy,Endx]=size(EndExclude);
@@ -239,9 +248,14 @@ for iter=1:length(dirlist)
             stop=find(name(:)=='.',1,'last');
             name=name(1:stop-1);
             imwrite(im,fullfile(savedir,'Visualization',[name '.jpg']),'JPG')
+            disp(logit(savedir,['Saving ' name '.jpg']))
         end
     end
-   catch
+    
+    disp(logit(savedir,['ChoroidMakeFigures - Done: ' savedir]))
+    
+   catch exception
+       disp(logit(savedir,['Error ChoroidMakeFigures: ' savedir '. ' exception.message]))
        continue
     end
 
