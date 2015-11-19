@@ -13,7 +13,7 @@ function ChoroidMakeFigures(varargin)
 %                              it uses the default path in HMR-Brain:
 %                              /srv/samba/share . . . 
 
-viz = 0; %Default visualisation = OFF
+viz = false; %Default visualisation = OFF
 
 if nargin == 0
     throw(MException('ChoroidFirstProcess:NotEnoughArguments','Not enough arguments.'))
@@ -39,6 +39,8 @@ if nargin >=3
     dirlist    = fullfile(varargin{3},varargin{1});
 end
 
+% *** Code starts ***
+
 for iter=1:length(dirlist)
    try
     directory=dirlist{iter};
@@ -49,8 +51,8 @@ for iter=1:length(dirlist)
     load(fullfile(savedir,'PostProcessData.mat'));
     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
     
-    noCSI=~cell2mat(cellfun(@isempty,cellfun(@find,cellfun(@isnan,cellfun(@min,{traces.usedCSI},'uniformoutput',0),'uniformoutput',0),'uniformoutput',0),'uniformoutput',0));
-    meanCSI=mean([traces(~noCSI).usedCSI],2);
+    noCSI   = ~cell2mat(cellfun(@isempty,cellfun(@find,cellfun(@isnan,cellfun(@min,{traces.usedCSI},'uniformoutput',0),'uniformoutput',0),'uniformoutput',0),'uniformoutput',0));
+    meanCSI = mean([traces(~noCSI).usedCSI],2);
     
     % load(fullfile(directory,'Data Files','RegisteredImages.mat');
     %% %%%%%%%%%%%%%%%%%%%%%% Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,70 +80,63 @@ for iter=1:length(dirlist)
             continue
         end
         temp=traces(i).BM;
-        traceoffset(i)=alignheight-temp(1);
+        traceoffset(i) = alignheight - temp(1);
     end
     
-    tracelength=length(traces(inclframelist(1)).BM);
-    notinclCSI=allframes(~CSIcheck&~isnan(traceoffset'));
-    notinclEND=allframes(~Endcheck&CSIcheck&~isnan(traceoffset'));
-    notinclVOL=allframes(~Vcheck&CSIcheck&Endcheck&~isnan(traceoffset'));
+    tracelength = length(traces(inclframelist(1)).BM);
+    notinclCSI  = allframes(~CSIcheck&~isnan(traceoffset'));
+    notinclEND  = allframes(~Endcheck&CSIcheck&~isnan(traceoffset'));
+    notinclVOL  = allframes(~Vcheck&CSIcheck&Endcheck&~isnan(traceoffset'));
     
-    im=bscanstore{inclframelist(1)};
-    figure
+    im = bscanstore{inclframelist(1)};
+    inclFh = figure('Visible','off');
     imshow(im)
     hold all
     plot([traces(inclframelist).BM]+repmat(traceoffset(inclframelist),tracelength,1))
     plot([traces(inclframelist).usedCSI]+repmat(traceoffset(inclframelist),tracelength,1))
     title('Summary Image, Included Frames')
-    saveas(gcf,fullfile(savedir,'Summary Image Included'),'fig')
+    saveas(inclFh,fullfile(savedir,'Summary Image Included'),'fig')
+    close(inclFh)
     
     if ~isempty([traces(notinclEND).BM])
-        figure
+        exclEndFh = figure('Visible','off');
         imshow(im)
         hold all
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
         plot([traces(notinclEND).usedCSI]+repmat(traceoffset(notinclEND),tracelength,1))
         title('Summary Image, Excluded Frames, Endheight')
-        saveas(gcf,fullfile(savedir,'Summary Image Excluded End'),'fig')
+        saveas(exclEndFh,fullfile(savedir,'Summary Image Excluded End'),'fig')
+        close(exclEndFh)
     end
     
     if ~isempty([traces(notinclVOL).BM])
-        figure
+        exclVolFh = figure('Visible','off');
         imshow(im)
         hold all
         plot([traces(notinclVOL).BM]+repmat(traceoffset(notinclVOL),tracelength,1))
         plot([traces(notinclVOL).usedCSI]+repmat(traceoffset(notinclVOL),tracelength,1))
         title('Summary Image, Excluded Frames, Volume')
-        saveas(gcf,fullfile(savedir,'Summary Image Excluded Volume'),'fig')
+        saveas(exclVolFh,fullfile(savedir,'Summary Image Excluded Volume'),'fig')
+        close(exclVolFh)
     end
     
-    %% %DELETE SOON
-%     load(fullfile(directory,'Data Files','HeartInfo.mat'));
     load(fullfile(directory,'Data Files','ImageList.mat'));
-%     %Parse Heartfile Time data
-%     hrttime = (60.*(abs(hrtdata(:,1)-floor(hrtdata(:,1)))*100)+hrtdata(:,2));
-%     hrtseries(:,1)=hrttime(find(hrtdata(:,4),1,'first'):find(hrtdata(:,4),1,'last'),1);
-%     hrtseries(:,2)=hrtdata(find(hrtdata(:,4),1,'first'):find(hrtdata(:,4),1,'last'),3);
     
     %Parse Image Time data
     imtime = (60.*[ImageList.minute]+[ImageList.second]);
     imtime = imtime(inclframelist);
     imtime = imtime - min(imtime(1));  
     
-%     % Zero both Heart and Image Time
-%     timeoffset=min(imtime(1),hrtseries(1,1));
-%     imtime=imtime-timeoffset;
-%     hrtseries(:,1)=hrtseries(:,1)-timeoffset;
-    
-    %  Plots of the Volume and Cardiac Time Series and Frequency Correlations
-    %% Plots of the Volume Time Series
-    fg = figure();
+    % Plot volume time series
+    volChangeFh = figure('Visible','off');
     plot(imtime,Vchecked,'o-b');
     xlabel('Time (s)')
     ylabel('Choroid Volume [Pixels]')
-    saveas(fg,fullfile(savedir,'Volume Change.fig'));
+    saveas(volChangeFh,fullfile(savedir,'Volume Change.fig'));
+    close(volChangeFh)
     
-    fg = figure();
+    % Plot Lomb-Scargle filter results
+    LS_Fh = figure('Visible','off');
     hold all
     plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
     legend('Choroid')
@@ -149,20 +144,23 @@ for iter=1:length(dirlist)
     xlabel('f [Hz]')
     ylabel('P(f) [Normalized]')
     xlim([0 7])
+    
     %Draw line at heart rate
     HR = GetHeartRate(directory) / 60;
     yl = ylim();
     line([HR HR],yl,'Color','r','LineWidth',1)
-    saveas(fg,fullfile(savedir,'FrequencyCorrelationTotal.fig'));
+    saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.fig'));
+    close(LS_Fh)
     
-    %% DELETE ONCE ROUNDING OF YCSI IN ALL STORED DATA
-    usedEndHeights=round(usedEndHeights);
-    Vchecked=round(Vchecked);
-    for i=1:length(traces)
+    % DELETE ONCE ROUNDING OF YCSI IN ALL STORED DATA
+    usedEndHeights = round(usedEndHeights);
+    Vchecked = round(Vchecked);
+    for i = 1:length(traces)
         traces(i).usedCSI=round(traces(i).usedCSI);
     end
+    
     %% Output Visualization
-    if viz == 1
+    if viz
         EndExclude=text2im('Excluded - EndHeight Check');
         EndExclude=padarray(~EndExclude,[50 50],'pre');
         [Endy,Endx]=size(EndExclude);
@@ -179,7 +177,7 @@ for iter=1:length(dirlist)
         LeftEndHeights=usedEndHeights(:,1);
         RightEndHeights=usedEndHeights(:,2);
         
-        circle=strel('disk',7);
+        circle = strel('disk',7);
         
         mkdir(fullfile(savedir,'Visualization'));
         for i=1:numframes
