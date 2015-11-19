@@ -1,6 +1,6 @@
 % Select directories that are ready for each particular step of the
 % processing
-function [todoDirs, hasDirs] = getDirectories(topdir,groups,studies,reprod)
+function [todoDirs, hasDirs, masks] = getDirectories(topdir,groups,studies,reprod)
 
 databasedir=fullfile(topdir,'share','SpectralisData');
 
@@ -86,7 +86,7 @@ todoDirs.compMap   = dirlist(hasFrsMsk & ~hasMapMsk);
 todoDirs.compMov   = dirlist(hasMapMsk & ~hasMovMsk);
 
 hasDirs.All   = dirlist;
-hasDirs.RawIm = dirlist(hasImsMsk);
+hasDirs.RawIm = dirlist(hasRawMsk);
 hasDirs.Imags = dirlist(hasImsMsk);
 hasDirs.Regis = dirlist(hasRegMsk);
 hasDirs.First = dirlist(hasFrsMsk);
@@ -98,6 +98,21 @@ hasDirs.Err   = dirlist(hasErrMsk);
 hasDirs.Map   = dirlist(hasMapMsk);
 hasDirs.Mov   = dirlist(hasMovMsk);
 
-save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
+if nargout > 2
+    masks.RawIm = hasRawMsk;
+    masks.Imags = hasImsMsk;
+    masks.Regis = hasRegMsk;
+    masks.First = hasFrsMsk;
+    masks.Post  = hasPosMsk;
+    masks.Figs  = hasFigMsk;
+    masks.DCT   = hasDCTMsk;
+    masks.OR    = hasORMsk;
+    masks.Err   = hasErrMsk;
+    masks.Map   = hasMapMsk;
+    masks.Mov   = hasMovMsk;
+end
+
+
+% save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','masks');
 
 end

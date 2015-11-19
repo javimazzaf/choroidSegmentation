@@ -56,7 +56,7 @@ studies   = {'Rigidity'};
 
 reproducibility = '';
 
-[todo, has] = getDirectories(topdir,groups,studies,reproducibility);
+[todo, has, msks] = getDirectories(topdir,groups,studies,reproducibility);
 
 
 disp(['Has RawIm:    ' num2str(numel(has.RawIm))])
