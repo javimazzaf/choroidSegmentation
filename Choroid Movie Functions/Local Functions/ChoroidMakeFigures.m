@@ -1,39 +1,42 @@
 function ChoroidMakeFigures(varargin)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
 
-if nargin ~= 0
-    if ispc
-        dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-    elseif ismac
-        dirlist = fullfile([filesep 'Volumes'],varargin{1});
-    else
-        dirlist = fullfile(filesep,'srv','samba',varargin{1});
+% Creates figures from the segmentation results.
+% Arguments:
+%  - relativePathData: cell array of strings with the path of all
+%                      patients to make figures
+%  - Viz (opt): Flag indicating if it generates a folder containing an image
+%               for each frame and the segmentation result overlayed.
+%  - Base for data path (opt): String with a base path where to find the 
+%                              data. It is for debugging purpose if the 
+%                              results of first and post process have been 
+%                              stored in a non-default folder. If ommitted
+%                              it uses the default path in HMR-Brain:
+%                              /srv/samba/share . . . 
+
+viz = 0; %Default visualisation = OFF
+
+if nargin == 0
+    throw(MException('ChoroidFirstProcess:NotEnoughArguments','Not enough arguments.'))
+end
+
+% First argument
+if nargin < 3
+    if ispc,       dataBaseDir = [filesep filesep 'HMR-BRAIN'];
+     elseif ismac, dataBaseDir = [filesep 'Volumes'];
+     else          dataBaseDir = [filesep 'srv' filesep 'samba'];
     end
     
-    if nargin > 1
-       viz = varargin{2};
-    else
-       viz = 0;
-    end
-else
-    if ispc
-        load(fullfile([filesep filesep 'HMR-BRAIN'],'share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
-    else
-        load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
-    end
-    [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
-    PostProcess=logical(cellfun(@exist,fullfile(dirlist,'Results','PostProcessData.mat')));
-    Rigidity=~cellfun(@isempty,regexp(dirlist,'Rigidity','match'));
-    dirlist=dirlist(PostProcess&Rigidity);
-    if isempty(dirlist)
-        errordlg('No diretories prerequisite data. Run ComputeDeltaCT.m first')
-        return
-    end
-    
-    viz=1;
+    dirlist    = fullfile(dataBaseDir,varargin{1});
+end
+
+% Second argument
+if nargin >= 2
+    viz = varargin{2}; 
+end
+
+% Third argument
+if nargin >=3
+    dirlist    = fullfile(varargin{3},varargin{1});
 end
 
 for iter=1:length(dirlist)
