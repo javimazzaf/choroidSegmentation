@@ -19,7 +19,7 @@ hf = figure;
 bar(populations(mskCond))
 set(gca,'XTickLabels',conditions)
 ylabel('N patients')
-print(hf,fullfile(dr,'populations.png'),'-dpng')
+% print(hf,fullfile(dr,'populations.png'),'-dpng')
 
 % Mean thickness
 hf = figure;
@@ -27,7 +27,7 @@ boxplot(data.meanthick(:),data.Group(:),'notch','on','labels',conditions,'labelo
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('mean Thickness [\mum]')
-print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
 
 % Mean thickness corrected for age
 hf = figure;
@@ -36,28 +36,28 @@ boxplot(meanThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'l
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('mean Thickness corrected for age [\mum]')
-print(hf,fullfile(dr,'meanThicknessCorrected.png'),'-dpng')
+% print(hf,fullfile(dr,'meanThicknessCorrected.png'),'-dpng')
 
 % Min thickness
 hf = figure;
 boxplot(data.minthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 150])
 ylabel('min Thickness [\mum]')
-print(hf,fullfile(dr,'minThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'minThickness.png'),'-dpng')
 
 % Max thickness
 hf = figure;
 boxplot(data.maxthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 700])
 ylabel('max Thickness [\mum]')
-print(hf,fullfile(dr,'maxThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'maxThickness.png'),'-dpng')
 
 % Std thickness
 hf = figure;
 boxplot(data.stdthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 ylim([0, 100])
 ylabel('std Thickness [\mum]')
-print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
 
 % Q5 thickness
 hf = figure;
@@ -65,7 +65,7 @@ boxplot(data.q5thick(:),data.Group(:),'notch','on','labels',conditions,'labelori
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('P5 Thickness [\mum]')
-print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
+% print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
 
 % Q95 thickness
 hf = figure;
@@ -73,7 +73,26 @@ boxplot(data.q95thick(:),data.Group(:),'notch','on','labels',conditions,'labelor
 set(gca,'FontSize',14)
 ylim([0, 700])
 ylabel('P95 Thickness [\mum]')
-print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
+% print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
+
+% Q5 thickness Corrected
+hf = figure;
+q5ThicknessCorrected = data.q5thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+boxplot(q5ThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 400])
+ylabel('P5 Thickness corrected for age [\mum]')
+% print(hf,fullfile(dr,'P5ThicknessCorrectedForAge.png'),'-dpng')
+
+% Q95 thickness Corrected
+hf = figure;
+q95ThicknessCorrected = data.q95thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+boxplot(q95ThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 700])
+ylabel('P95 Thickness corrected for age [\mum]')
+% print(hf,fullfile(dr,'P95ThicknessCorrectedForAge.png'),'-dpng')
+
 
 % % Polar angle of plane fit
 % hf = figure;
@@ -99,7 +118,7 @@ end
 
 % legend(conditions)
 title('Azimuth Scatter')
-print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
+% print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
 
 % % Histogram of azimuth of plane fit
 % hf = figure;
@@ -154,7 +173,7 @@ boxplot(90-data.polar(:),data.Group(:),'notch','on','labels',conditions,'labelor
 ylim([0, 3])
 ylabel('polar angle [deg]')
 title('Polar angle')
-print(hf,fullfile(dr,'polar.png'),'-dpng')
+% print(hf,fullfile(dr,'polar.png'),'-dpng')
 
 % Age
 hf = figure;
@@ -162,12 +181,12 @@ boxplot(data.Age(:),data.Group(:),'notch','on','labels',conditions,'labelorienta
 legend(conditions)
 set(gca,'FontSize',14)
 ylabel('Age [years]')
-print(hf,fullfile(dr,'age.png'),'-dpng')
+% print(hf,fullfile(dr,'age.png'),'-dpng')
 
 % Correlation Thickness and Age
 hf = figure;
 FigureMaker(data.Age(:),data.meanthick(:),'Age [yr]','meanThickness [\mum]','d','poly1',false,[])
-print(hf,fullfile(dr,'correlMeanThcknessVsAge.png'),'-dpng')
+% print(hf,fullfile(dr,'correlMeanThcknessVsAge.png'),'-dpng')
 
 % % Histogram of polar angle of plane fit
 % hf = figure;
@@ -251,7 +270,7 @@ end
 
 % legend(conditions)
 set(gca,'FontSize',14)
-print(hf,fullfile(dr,'AzimHistPolar.png'),'-dpng')
+% print(hf,fullfile(dr,'AzimHistPolar.png'),'-dpng')
 
 hf = figure;
 
@@ -264,6 +283,6 @@ end
 
 % legend(conditions)
 set(gca,'FontSize',14)
-print(hf,fullfile(dr,'AzimResult.png'),'-dpng')
+% print(hf,fullfile(dr,'AzimResult.png'),'-dpng')
 
 end
