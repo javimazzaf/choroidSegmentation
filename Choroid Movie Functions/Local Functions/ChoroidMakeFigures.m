@@ -61,13 +61,13 @@ for iter=1:length(dirlist)
     %% %%%%%%%%%%%%%%%%%%%%%% Analysis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [Vchecked,inclframelist,Endcheck,CSIcheck,Vcheck,LEndFail,REndFail] = ChoroidUsableFramesCheck(numframes,Vframe,EndHeights,newEndHeights,usedEndHeights,{traces.usedCSI});
     
-    [Output] = ChoroidTimeSeries(Vchecked,inclframelist,directory,savedir);
+    Output = ChoroidTimeSeries(Vchecked,inclframelist,directory);
     
     save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe','Vchecked',...
         'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output');
     %% Assign Loaded Variables
-    Pvt=Output{1};
-    fvt=Output{2};
+    Pvt = Output{1};
+    fvt = Output{2};
 %     Ph=Output{3};
 %     fh=Output{4};
 %     imtime=Output{5};
@@ -93,7 +93,7 @@ for iter=1:length(dirlist)
     im = bscanstore{inclframelist(1)};
     inclFh = figure('Visible','off');
     axes('Visible','off');
-%     imshow(im)
+
     image(im,'CDataMapping','scaled')
     colormap(gray)
     axis off
@@ -108,7 +108,7 @@ for iter=1:length(dirlist)
     if ~isempty([traces(notinclEND).BM])
         exclEndFh = figure('Visible','off');
         axes('Visible','off');
-%         imshow(im)
+
         image(im,'CDataMapping','scaled')
         colormap(gray)
         axis off
