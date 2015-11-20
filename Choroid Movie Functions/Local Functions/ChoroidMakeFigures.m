@@ -111,6 +111,8 @@ for iter=1:length(dirlist)
         image(im,'CDataMapping','scaled')
         axis off
         hold all
+        size([traces(notinclEND).usedCSI])
+        size(notinclEND)
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
         plot([traces(notinclEND).usedCSI]+repmat(traceoffset(notinclEND),tracelength,1))
         title('Summary Image, Excluded Frames, Endheight')
