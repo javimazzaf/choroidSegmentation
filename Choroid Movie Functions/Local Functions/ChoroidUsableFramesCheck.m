@@ -37,7 +37,11 @@ REndFail = ~(usedEndHeights(:,2) >= usedRmeanHeight-Allowed*usedRstdHeight & ...
     usedEndHeights(:,2) <= usedRmeanHeight+Allowed*usedRstdHeight & ...
     usedEndHeights(:,2) >= 0);
 
-CSIcheck=~(cellfun(@length,cellfun(@isnan,traces,'uniformoutput',0))==1)';
+% Mask for traces having nonempty & nonNaN info
+CSIcheck = (~cellfun(@isempty,traces,'uniformoutput',1) &...
+            ~cellfun(@(x) any(isnan(x)),traces,'uniformoutput',1))';
+
+% CSIcheck=~(cellfun(@length,cellfun(@isnan,traces,'uniformoutput',0))==1)';
 
 %Volume Allowance
 Allowed2=4000;

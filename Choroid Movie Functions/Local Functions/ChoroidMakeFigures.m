@@ -79,9 +79,8 @@ for iter=1:length(dirlist)
     traceoffset = nan(1,numframes);
     
     for i=1:numframes
-        if ismember(i,skippedind)
-            continue
-        end
+        if ismember(i,skippedind) || isempty(traces(i).BM), continue, end
+        
         temp=traces(i).BM;
         traceoffset(i) = alignheight - temp(1);
     end
@@ -98,7 +97,7 @@ for iter=1:length(dirlist)
     plot([traces(inclframelist).BM]+repmat(traceoffset(inclframelist),tracelength,1))
     plot([traces(inclframelist).usedCSI]+repmat(traceoffset(inclframelist),tracelength,1))
     title('Summary Image, Included Frames')
-    saveas(inclFh,fullfile(savedir,'Summary Image Included'),'fig')
+    saveas(inclFh,fullfile(savedir,'Summary Image Included.png'))
     close(inclFh)
     disp(logit(savedir,'Summary Image Included - saved'))
     
@@ -109,7 +108,7 @@ for iter=1:length(dirlist)
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
         plot([traces(notinclEND).usedCSI]+repmat(traceoffset(notinclEND),tracelength,1))
         title('Summary Image, Excluded Frames, Endheight')
-        saveas(exclEndFh,fullfile(savedir,'Summary Image Excluded End'),'fig')
+        saveas(exclEndFh,fullfile(savedir,'Summary Image Excluded End.png'))
         close(exclEndFh)
         disp(logit(savedir,'Summary Image Excluded End - saved'))
     end
@@ -121,7 +120,7 @@ for iter=1:length(dirlist)
         plot([traces(notinclVOL).BM]+repmat(traceoffset(notinclVOL),tracelength,1))
         plot([traces(notinclVOL).usedCSI]+repmat(traceoffset(notinclVOL),tracelength,1))
         title('Summary Image, Excluded Frames, Volume')
-        saveas(exclVolFh,fullfile(savedir,'Summary Image Excluded Volume'),'fig')
+        saveas(exclVolFh,fullfile(savedir,'Summary Image Excluded Volume.png'))
         close(exclVolFh)
         disp(logit(savedir,'Summary Image Excluded Volume - saved'))
     end
@@ -138,7 +137,7 @@ for iter=1:length(dirlist)
     plot(imtime,Vchecked,'o-b');
     xlabel('Time (s)')
     ylabel('Choroid Volume [Pixels]')
-    saveas(volChangeFh,fullfile(savedir,'Volume Change.fig'));
+    saveas(volChangeFh,fullfile(savedir,'Volume Change.png'));
     close(volChangeFh)
     disp(logit(savedir,'Volume Change Plot - saved'))
     
@@ -156,7 +155,7 @@ for iter=1:length(dirlist)
     HR = GetHeartRate(directory) / 60;
     yl = ylim();
     line([HR HR],yl,'Color','r','LineWidth',1)
-    saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.fig'));
+    saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));
     close(LS_Fh)
     disp(logit(savedir,'Frequency Correlation Total PLOT - saved'))
     
