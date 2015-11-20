@@ -95,6 +95,7 @@ for iter=1:length(dirlist)
     axes('Visible','off');
 %     imshow(im)
     image(im,'CDataMapping','scaled')
+    colormap(gray)
     axis off
     hold all
     plot([traces(inclframelist).BM]+repmat(traceoffset(inclframelist),tracelength,1))
@@ -109,6 +110,7 @@ for iter=1:length(dirlist)
         axes('Visible','off');
 %         imshow(im)
         image(im,'CDataMapping','scaled')
+        colormap(gray)
         axis off
         hold all
         size([traces(notinclEND).usedCSI])
@@ -126,6 +128,7 @@ for iter=1:length(dirlist)
         axes('Visible','off');
 %         imshow(im)
         image(im,'CDataMapping','scaled')
+        colormap(gray)
         axis off
         hold all
         plot([traces(notinclVOL).BM]+repmat(traceoffset(notinclVOL),tracelength,1))
