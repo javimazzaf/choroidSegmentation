@@ -2,6 +2,8 @@ function [Vchecked,inclframelist,Endcheck,CSIcheck,Vcheck,LEndFail,REndFail] = C
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 %% Determine Usable Frames
+
+disp('ChoroidUsableFramesCheck - Good version')
 frames=1:numframes;
 
 usedLmeanHeight=median(usedEndHeights(~isnan(usedEndHeights(:,1)),1));
