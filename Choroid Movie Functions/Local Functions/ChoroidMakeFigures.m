@@ -113,8 +113,6 @@ for iter=1:length(dirlist)
         colormap(gray)
         axis off
         hold all
-        size([traces(notinclEND).usedCSI])
-        size(notinclEND)
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
         plot([traces(notinclEND).usedCSI]+repmat(traceoffset(notinclEND),tracelength,1))
         title('Summary Image, Excluded Frames, Endheight')
@@ -148,7 +146,6 @@ for iter=1:length(dirlist)
     
     % Plot volume time series
     volChangeFh = figure('Visible','off');
-    axes('Visible','off');
     plot(imtime,Vchecked,'o-b');
     xlabel('Time (s)')
     ylabel('Choroid Volume [Pixels]')
@@ -158,7 +155,6 @@ for iter=1:length(dirlist)
     
     % Plot Lomb-Scargle filter results
     LS_Fh = figure('Visible','off');
-    axes('Visible','off');
     hold all
     plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
     legend('Choroid')
