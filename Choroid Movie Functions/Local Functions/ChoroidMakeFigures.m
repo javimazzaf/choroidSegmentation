@@ -265,7 +265,8 @@ for iter=1:length(dirlist)
     disp(logit(savedir,['ChoroidMakeFigures - Done: ' savedir]))
     
    catch exception
-       disp(logit(savedir,['Error ChoroidMakeFigures: ' savedir '. ' exception.message]))
+       errString = ['Error ChoroidMakeFigures: ' savedir '. ' exception.message ' - ' buildCallStack(exception)];
+       disp(logit(savedir,errString))
        continue
     end
 
