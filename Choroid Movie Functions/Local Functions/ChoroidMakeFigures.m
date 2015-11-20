@@ -92,7 +92,7 @@ for iter=1:length(dirlist)
     
     im = bscanstore{inclframelist(1)};
     inclFh = figure('Visible','off');
-    set(gca,'Visible','off')
+    axes('Visible','off');
     imshow(im)
     hold all
     plot([traces(inclframelist).BM]+repmat(traceoffset(inclframelist),tracelength,1))
@@ -104,7 +104,7 @@ for iter=1:length(dirlist)
     
     if ~isempty([traces(notinclEND).BM])
         exclEndFh = figure('Visible','off');
-        set(gca,'Visible','off')
+        axes('Visible','off');
         imshow(im)
         hold all
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
@@ -117,7 +117,7 @@ for iter=1:length(dirlist)
     
     if ~isempty([traces(notinclVOL).BM])
         exclVolFh = figure('Visible','off');
-        set(gca,'Visible','off')
+        axes('Visible','off');
         imshow(im)
         hold all
         plot([traces(notinclVOL).BM]+repmat(traceoffset(notinclVOL),tracelength,1))
@@ -137,7 +137,7 @@ for iter=1:length(dirlist)
     
     % Plot volume time series
     volChangeFh = figure('Visible','off');
-    set(gca,'Visible','off')
+    axes('Visible','off');
     plot(imtime,Vchecked,'o-b');
     xlabel('Time (s)')
     ylabel('Choroid Volume [Pixels]')
@@ -147,7 +147,7 @@ for iter=1:length(dirlist)
     
     % Plot Lomb-Scargle filter results
     LS_Fh = figure('Visible','off');
-    set(gca,'Visible','off')
+    axes('Visible','off');
     hold all
     plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
     legend('Choroid')
