@@ -93,7 +93,9 @@ for iter=1:length(dirlist)
     im = bscanstore{inclframelist(1)};
     inclFh = figure('Visible','off');
     axes('Visible','off');
-    imshow(im)
+%     imshow(im)
+    image(im,'CDataMapping','scaled')
+    axis off
     hold all
     plot([traces(inclframelist).BM]+repmat(traceoffset(inclframelist),tracelength,1))
     plot([traces(inclframelist).usedCSI]+repmat(traceoffset(inclframelist),tracelength,1))
@@ -105,7 +107,9 @@ for iter=1:length(dirlist)
     if ~isempty([traces(notinclEND).BM])
         exclEndFh = figure('Visible','off');
         axes('Visible','off');
-        imshow(im)
+%         imshow(im)
+        image(im,'CDataMapping','scaled')
+        axis off
         hold all
         plot([traces(notinclEND).BM]+repmat(traceoffset(notinclEND),tracelength,1))
         plot([traces(notinclEND).usedCSI]+repmat(traceoffset(notinclEND),tracelength,1))
@@ -118,7 +122,9 @@ for iter=1:length(dirlist)
     if ~isempty([traces(notinclVOL).BM])
         exclVolFh = figure('Visible','off');
         axes('Visible','off');
-        imshow(im)
+%         imshow(im)
+        image(im,'CDataMapping','scaled')
+        axis off
         hold all
         plot([traces(notinclVOL).BM]+repmat(traceoffset(notinclVOL),tracelength,1))
         plot([traces(notinclVOL).usedCSI]+repmat(traceoffset(notinclVOL),tracelength,1))
