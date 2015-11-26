@@ -68,8 +68,13 @@ for iter=1:length(dirlist)
         Pvt = Output{1};
         fvt = Output{2};
         
+        % Gets heart-rate
+        HR = GetHeartRate(directory) / 60;
+        
+        validSpectrum = hasFrequencyPeakAtHR(fvt,Pvt,HR);
+        
         save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe','Vchecked',...
-            'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output');
+            'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output','validSpectrum');
         
         % Visual Check on the Frames Included and Excluded
         
@@ -155,13 +160,14 @@ for iter=1:length(dirlist)
         hold all
         plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
         legend('Choroid')
-        title('Lomb-Scargle Normalized Periodogram')
+        validString = 'Invalid';
+        if validSpectrum, validString = 'Valid'; end
+        title(['Lomb-Scargle Normalized Periodogram (' validString ')'])
         xlabel('f [Hz]')
         ylabel('P(f) [Normalized]')
         xlim([0 7])
         
         %Draw line at heart rate
-        HR = GetHeartRate(directory) / 60;
         yl = ylim();
         line([HR HR],yl,'Color','r','LineWidth',1)
         saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));

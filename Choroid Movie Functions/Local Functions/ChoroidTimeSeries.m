@@ -22,27 +22,32 @@ if exist(fullfile(directory,'Data Files','HeartInfo.mat'),'file')
     load(fullfile(directory,'Data Files','HeartInfo.mat'),'hrttime','hrtdata');
     
     %Parse Heartfile Time data
-    hrttime=(60.*(abs(hrtdata(:,1)-floor(hrtdata(:,1)))*100)+hrtdata(:,2));
-    hrtseries(:,1)=hrttime(find(hrtdata(:,4),1,'first'):find(hrtdata(:,4),1,'last'),1);
-    hrtseries(:,2)=hrtdata(find(hrtdata(:,4),1,'first'):find(hrtdata(:,4),1,'last'),3);
-
-    % Zero both Heart and Image Time
-    timeoffset = min(imtime(1),hrtseries(1,1));
+    hrttime = 60 * (abs(hrtdata(:,1) - floor(hrtdata(:,1))) * 100) + hrtdata(:,2);
+    hrtTimeRange = find(hrtdata(:,4),1,'first'):find(hrtdata(:,4),1,'last');
     
-    hrtseries(:,1)=hrtseries(:,1)-timeoffset;
-    
-    % Heart Power Spectrum
-    [wk1h,wk2h,~,~,Fh] = lspr(hrtseries(:,1)',hrtseries(:,2)',2,4);
+    if ~isempty(hrtTimeRange)
+        
+        hrtseries = [hrttime(hrtTimeRange,1), hrtdata(hrtTimeRange,3)];
+        
+        % Zero both Heart and Image Time
+        timeoffset = min(imtime(1),hrtseries(1,1));
+        
+        hrtseries(:,1)=hrtseries(:,1)-timeoffset;
+        
+        % Heart Power Spectrum
+        [wk1h,wk2h,~,~,Fh] = lspr(hrtseries(:,1)',hrtseries(:,2)',2,4);
+        
+    end
     
 end
 
 % Bring imtime to the offset
-imtime = imtime-timeoffset;
+imtime = imtime - timeoffset;
 
 % Total Volume Power Spectrum
-[wk1v,wk2v,~,~,Fv]=lspr(imtime,Vchecked,2,4);
+[wk1v,wk2v,~,~,Fv] = lspr(imtime,Vchecked,2,4);
 
-Output={wk2v,wk1v,wk2h,wk1h,imtime,hrtseries,Fv,Fh};
+Output = {wk2v,wk1v,wk2h,wk1h,imtime,hrtseries,Fv,Fh};
 
 end
 
