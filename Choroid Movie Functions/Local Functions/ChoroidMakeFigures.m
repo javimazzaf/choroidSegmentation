@@ -19,17 +19,7 @@ if nargin == 0
     throw(MException('ChoroidFirstProcess:NotEnoughArguments','Not enough arguments.'))
 end
 
-% First argument
-if nargin < 3
-    if ispc,       dataBaseDir = [filesep filesep 'HMR-BRAIN'];
-    elseif ismac, dataBaseDir = [filesep 'Volumes'];
-    else          dataBaseDir = [filesep 'srv' filesep 'samba'];
-    end
-    
-    dirlist    = fullfile(dataBaseDir,varargin{1});
-end
-
-% Second argument
+% Check second argument
 if nargin >= 2
     viz = varargin{2};
 end
@@ -37,6 +27,13 @@ end
 % Third argument
 if nargin >=3
     dirlist    = fullfile(varargin{3},varargin{1});
+else
+    if ispc,       dataBaseDir = [filesep filesep 'HMR-BRAIN'];
+    elseif ismac,  dataBaseDir = [filesep 'Volumes'];
+    else           dataBaseDir = [filesep 'srv' filesep 'samba'];
+    end
+    
+    dirlist    = fullfile(dataBaseDir,varargin{1});
 end
 
 % *** Code starts ***
@@ -71,10 +68,16 @@ for iter=1:length(dirlist)
         % Gets heart-rate
         HR = GetHeartRate(directory) / 60;
         
-        validSpectrum = hasFrequencyPeakAtHR(fvt,Pvt,HR);
+        load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
         
+        t = 60 * [ImageList.minute] + [ImageList.second];
+        t = t(inclframelist);
+        
+        % Checks if the signal has a significant component at HR
+        [validSpectrum, faThreshold] = checkValidSpectrum(t,Vchecked,HR,0.05);
+
         save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe','Vchecked',...
-            'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output','validSpectrum');
+            'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output','validSpectrum','faThreshold');
         
         % Visual Check on the Frames Included and Excluded
         
@@ -139,7 +142,7 @@ for iter=1:length(dirlist)
             disp(logit(savedir,'Summary Image Excluded Volume - saved'))
         end
         
-        load(fullfile(directory,'Data Files','ImageList.mat'));
+%         load(fullfile(directory,'Data Files','ImageList.mat'));
         
         %Parse Image Time data
         imtime = (60.*[ImageList.minute]+[ImageList.second]);
@@ -157,8 +160,10 @@ for iter=1:length(dirlist)
         
         % Plot Lomb-Scargle filter results
         LS_Fh = figure('Visible','off');
+%         LS_Fh = figure('Visible','on');
         hold all
-        plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
+%         plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
+        plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7) / max(Pvt(fvt>.25 & fvt<7)),'b-')
         legend('Choroid')
         validString = 'Invalid';
         if validSpectrum, validString = 'Valid'; end
