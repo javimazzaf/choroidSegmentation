@@ -1,4 +1,4 @@
-function [isValid, faThreshold] = checkValidSpectrum(t,signal,HR,po)
+function [isValid, faThreshold, f, P] = checkValidSpectrum(t,signal,HR,po)
 
 % Checks if the series "signal", sampled at "t" values has a frequency
 % component at HR, that is significant at p = po.
@@ -65,12 +65,6 @@ faThreshold = getFalseAlarmThreshold(P,1,po,nFreq);
 
 isValid = mxPeak > faThreshold;
 
-% Testing Plot
-figure;
-plot(f,P,'.-b'), hold on
-line(xlim(),[1 1] * faThreshold,'Color','g')
-line([HR HR],ylim(),'Color','r','LineWidth',1)
-title(['HR = ' num2str(HR) ' - Valid = ' num2str(isValid)])
 end
 
 function [fmin, fmax, fStep] = getFreqInterval(t,f)

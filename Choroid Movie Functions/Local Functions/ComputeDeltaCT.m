@@ -51,6 +51,7 @@ for iter=1:length(dirlist)
     
     load(fullfile(directory,'Results','FirstProcessData.mat'));
     load(fullfile(directory,'Results','PostProcessData.mat'));
+    load(fullfile(directory,'timeSeriesData.mat'),'imtime');
     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
     load(fullfile(directory,'Data Files','ImageList.mat'))
     
@@ -64,11 +65,11 @@ for iter=1:length(dirlist)
     d1 = d1(inclframelist);
     % d1=d1(setdiff(1:numframes,skippedind));
     [~,~,~,~,deltad1] = WindowedPeaks(d1,mean(d1),...
-        round((GetHeartRate(directory)/3/60)/(Output{5}(1,2) - Output{5}(1,1))),0.0039);
+        round((GetHeartRate(directory)/3/60)/mode(diff(imtime))),0.0039);
     
     %% Volume Method 2 & 3
     
-    [deltad2,deltad3,d2,SNR] = LSFilt(Output,d1,2,6,directory,savedir,updatefigs);
+    [deltad2,deltad3,d2,SNR] = LSFilt(imtime,d1,2,6,directory,savedir,updatefigs);
     
     %%
     save(fullfile(directory,'Results','DeltaCT.mat'),...

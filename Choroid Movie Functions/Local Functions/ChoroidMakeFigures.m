@@ -61,23 +61,24 @@ for iter=1:length(dirlist)
           continue
         end
         
-        Output = ChoroidTimeSeries(Vchecked,inclframelist,directory);
-        Pvt = Output{1};
-        fvt = Output{2};
+%         Output = ChoroidTimeSeries(Vchecked,inclframelist,directory);
+%         Pvt = Output{1};
+%         fvt = Output{2};
         
         % Gets heart-rate
         HR = GetHeartRate(directory) / 60;
         
         load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
         
-        t = 60 * [ImageList.minute] + [ImageList.second];
-        t = t(inclframelist);
+        imtime = 60 * [ImageList.minute] + [ImageList.second];
+        imtime = imtime(inclframelist);
+        imtime = imtime - imtime(1);
         
         % Checks if the signal has a significant component at HR
-        [validSpectrum, faThreshold] = checkValidSpectrum(t,Vchecked,HR,0.05);
+        po = 0.05;
+        [validSpectrum, faThreshold, frequencies, Periodogram] = checkValidSpectrum(imtime,Vchecked,HR,po);
 
-        save(fullfile(savedir,'PostProcessData.mat'),'traces','newEndHeights','usedEndHeights','Vframe','Vchecked',...
-            'inclframelist','Endcheck','CSIcheck','Vcheck','LEndFail','REndFail','numframes','Output','validSpectrum','faThreshold');
+        save(fullfile(savedir,'timeSeriesData.mat'),'imtime','Vchecked','validSpectrum','faThreshold','po','frequencies', 'Periodogram');
         
         % Visual Check on the Frames Included and Excluded
         
@@ -144,10 +145,10 @@ for iter=1:length(dirlist)
         
 %         load(fullfile(directory,'Data Files','ImageList.mat'));
         
-        %Parse Image Time data
-        imtime = (60.*[ImageList.minute]+[ImageList.second]);
-        imtime = imtime(inclframelist);
-        imtime = imtime - min(imtime(1));
+%         %Parse Image Time data
+%         imtime = (60.*[ImageList.minute]+[ImageList.second]);
+%         imtime = imtime(inclframelist);
+%         imtime = imtime - min(imtime(1));
         
         % Plot volume time series
         volChangeFh = figure('Visible','off');
@@ -160,21 +161,22 @@ for iter=1:length(dirlist)
         
         % Plot Lomb-Scargle filter results
         LS_Fh = figure('Visible','off');
-%         LS_Fh = figure('Visible','on');
         hold all
-%         plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7)/max(Pvt(fvt>.25 & fvt<7)),'b-')
-        plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7) / max(Pvt(fvt>.25 & fvt<7)),'b-')
+%         plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7) / max(Pvt(fvt>.25 & fvt<7)),'b-')
+        plot(frequencies, Periodogram,'b-')
+        
         legend('Choroid')
         validString = 'Invalid';
         if validSpectrum, validString = 'Valid'; end
-        title(['Lomb-Scargle Normalized Periodogram (' validString ')'])
+        title(['Lomb-Scargle Normalized Periodogram (' validString ') HR = ' num2str(HR)])
         xlabel('f [Hz]')
-        ylabel('P(f) [Normalized]')
+        ylabel('Periodogram')
         xlim([0 7])
         
-        %Draw line at heart rate
-        yl = ylim();
-        line([HR HR],yl,'Color','r','LineWidth',1)
+        %Draw lines
+        line([HR HR],ylim(),'Color','r','LineWidth',1)
+        line(xlim(),[1 1] * faThreshold,'Color','g')
+        
         saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));
         close(LS_Fh)
         disp(logit(savedir,'Frequency Correlation Total PLOT - saved'))

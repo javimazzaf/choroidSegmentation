@@ -1,7 +1,6 @@
-function [deltad2,deltad3,d2,SNR]=LSFilt(Output,d,hifac,ofac,directory,savedir,updatefigs)
+function [deltad2,deltad3,d2,SNR]=LSFilt(imtime,d,hifac,ofac,directory,savedir,updatefigs)
 %%
 
-imtime=Output{5};
 distance=d;
 
 sT  = imtime;
@@ -46,7 +45,7 @@ d2=((d2(ind)-mean(d2(ind)))./(hamming(length(tf))')+mean(distance))';
 
 
 [pks,locs,vals,locs2,meandist] = WindowedPeaks(d2,mean(d2),...
-    round((fHR/3)/(Output{5}(1,2)-Output{5}(1,1))),0.0039);
+    round((fHR/3)/mode(diff(imtime))),0.0039);
 
 if jbtest(d2(locs))
     meanpks=median(d2(locs));
@@ -78,26 +77,16 @@ if updatefigs
     saveas(gcf,fullfile(savedir,'LombScargleFilter.fig'))
     
     figure(2)
-%     subplot(2,1,1), [ax,h1,h2]=plotyy(Output{6}(:,1),smooth(Output{6}(:,2)-mean(Output{6}(:,2)),5),tf,d2-mean(d2)); title('a)')
     subplot(2,1,1), plot(tf,d2-mean(d2),'-r','LineWidth',2.5); title('a)')
     hold all
-%     set(h1,'linestyle','-','linewidth',2);
-%     set(h2,'linestyle','-','linewidth',2.5,'color','r');
+
     set(gca,'Ytick',[],'ylim',[min(d2-mean(d2)) max(d2-mean(d2))]);    
     legend('CT')
-
-%     set(ax(1),'Ytick',[]);
-%     set(ax(2),'Ytick',[]);
-%     set(ax(1),'xlim',[min(tf(end),Output{6}(1,1)) max(tf(end),Output{6}(1,end))]);
-%     set(ax(2),'xlim',[min(tf(end),Output{6}(1,1)) max(tf(end),Output{6}(1,end))]);
-%     set(ax(1),'ylim',[min(Output{6}(:,2)-mean(Output{6}(:,2))) max(Output{6}(:,2)-median(Output{6}(:,2)))]);
-%     set(ax(2),'ylim',[min(d2-mean(d2)) max(d2-mean(d2))]);
-%     legend('Oximeter','CT')
     
     subplot(2,1,2)
     hold all
     plot(tf,d2*1000,'k.','marker','.','linestyle','-','linewidth',2)
-    % plot(filtV(:,1),filtV(:,2),'r--')
+
     xlim([0 tf(end)])
     plot(tf(locs),(pks)*1000,'mo')
     plot(tf(locs2),(vals)*1000,'go')
@@ -111,54 +100,5 @@ end
 
 deltad2 = meandist;
 deltad3 = meanpks - meanvals;
+
 end
-%
-% f2=f(f<wk1(end));
-% orig=abs(Fo(f<wk1(end)));
-% orig(abs(F(f<wk1(end)))==abs(Fo(f<wk1(end))))=0;
-%
-% if updatefigs
-%     figure(1)
-% subplot(2,1,2), h1=plot([fHR fHR],[0 max(abs(F))*1.1],'k-.','linewidth',2.5); hold on
-% subplot(2,1,2), plot([2*fHR 2*fHR],[0 max(abs(F))*1.1],'k-.','linewidth',2.5);
-% subplot(2,1,2), h2=plot(f2,orig,'--k','linewidth',2);
-% subplot(2,1,2), h3=plot(f(f<wk1(end)),abs(F(f<wk1(end))),'-k','linewidth',4); title('a)');
-% xlim([0 wk1(end)]);
-% ylim([0 max(abs(F))*1.05]);legend([h1 h2 h3],'1st & 2nd Heart Harmonics','F','F_{m}')
-% xlabel('f [Hz]');ylabel('F [AU]')
-%
-% subplot(2,1,1), plot(sT,sFn*1000,'--k','linewidth',1.5), hold on
-% subplot(2,1,1), plot(tf,d2*1000,'k-','linewidth',3), title('b)') ;legend('CT_{raw}','CT')
-% xlim([0 max(tf(end),sT(end))])
-% ylim([min(min(sFn),min(d2)) max(max(sFn),max(d2))]*1000)
-% xlabel('Time [s]');ylabel('CT [\mum]')
-% saveas(gcf,fullfile(savedir,'LombScargleFilter.fig'))
-%
-% figure(2)
-% subplot(2,1,1), [ax,h1,h2]=plotyy(Output{6}(:,1),smooth(Output{6}(:,2)-mean(Output{6}(:,2)),5),tf,d2-mean(d2)); title('a)')
-% hold all
-% set(h1,'linestyle','-','linewidth',2);
-% set(h2,'linestyle','-','linewidth',2.5,'color','r');
-%
-% set(ax(1),'Ytick',[]);
-% set(ax(2),'Ytick',[]);
-% set(ax(1),'xlim',[min(tf(end),Output{6}(1,1)) max(tf(end),Output{6}(1,end))]);
-% set(ax(2),'xlim',[min(tf(end),Output{6}(1,1)) max(tf(end),Output{6}(1,end))]);
-% set(ax(1),'ylim',[min(Output{6}(:,2)-mean(Output{6}(:,2))) max(Output{6}(:,2)-median(Output{6}(:,2)))]);
-% set(ax(2),'ylim',[min(d2-mean(d2)) max(d2-mean(d2))]);
-% legend('Oximeter','CT')
-%
-% subplot(2,1,2)
-% hold all
-% plot(tf,d2*1000,'k.','marker','.','linestyle','-','linewidth',2)
-% % plot(filtV(:,1),filtV(:,2),'r--')
-% xlim([0 tf(end)])
-% plot(tf(locs),(pks)*1000,'mo')
-% plot(tf(locs2),(vals)*1000,'go')
-% plot(tf,repmat(mean(d2*1000)+1000*meandist/2,1,length(tf)),'r--')
-% plot(tf,repmat(mean(d2*1000)-1000*meandist/2,1,length(tf)),'r--')
-% xlabel('Time [s]');ylabel('CT [\mum]')
-% legend('CT','Allowed Peaks','Allowed Valleys','Mean of Peaks and Valleys')
-% title('b)')
-% saveas(gcf,fullfile(savedir,'FilteredPeak2Peak.fig'))
-% end
