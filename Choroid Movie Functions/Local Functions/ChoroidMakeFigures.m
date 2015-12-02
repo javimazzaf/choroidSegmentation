@@ -168,7 +168,7 @@ for iter=1:length(dirlist)
         legend('Choroid')
         validString = 'Invalid';
         if validSpectrum, validString = 'Valid'; end
-        title(['Lomb-Scargle Normalized Periodogram (' validString ') HR = ' num2str(HR)])
+        title(['Lomb-Scargle Periodogram (HR = ' num2str(HR) ') - ' validString])
         xlabel('f [Hz]')
         ylabel('Periodogram')
         xlim([0 7])
