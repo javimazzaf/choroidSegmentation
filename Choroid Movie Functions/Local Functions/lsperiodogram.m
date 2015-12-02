@@ -9,6 +9,9 @@ function [frec, Periodogram] = lsperiodogram(t,y,wFun,nW)
 % not meant to filter and reconstruct the function, but only to check if
 % there are specific frequency components.
 
+% Javier Mazzaferri
+% 2015DEC01
+
 % These tolerance is set according to Scargle's Fortran code.
 tol1 = 1E-4;
 
