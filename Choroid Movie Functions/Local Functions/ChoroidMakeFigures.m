@@ -40,6 +40,7 @@ end
 
 for iter=1:length(dirlist)
     try
+        disp(iter) 
         directory=dirlist{iter};
         numframes=length(dir(fullfile(directory,'Processed Images','*.png')));
         
