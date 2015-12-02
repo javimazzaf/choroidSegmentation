@@ -68,9 +68,11 @@ hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Resu
 hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) || ~isempty(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Results')));
 hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
 hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','Results.mat')));
-hasMapMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMap.mat')));
-hasMovMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovie.gif')));
+hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMap.mat')));
+hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovie.gif')));
 hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
+hasValSpecMsk   = logical(cellfun(@validSpec,fullfile(bottomdirs,'Results','timeSeriesData.mat')));
+
 %Strip out the topdir from the full list
 dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false);
 
@@ -97,6 +99,7 @@ hasDirs.OR    = dirlist(hasORMsk);
 hasDirs.Err   = dirlist(hasErrMsk);
 hasDirs.Map   = dirlist(hasMapMsk);
 hasDirs.Mov   = dirlist(hasMovMsk);
+hasDirs.Valid = dirlist(hasValSpecMsk);
 
 if nargout > 2
     masks.RawIm = hasRawMsk;
@@ -110,6 +113,7 @@ if nargout > 2
     masks.Err   = hasErrMsk;
     masks.Map   = hasMapMsk;
     masks.Mov   = hasMovMsk;
+    masks.Valid = hasValSpecMsk;
 end
 
 
