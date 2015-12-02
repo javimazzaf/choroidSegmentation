@@ -74,6 +74,7 @@ for iter=1:length(dirlist)
         imtime = imtime(inclframelist);
         imtime = imtime - imtime(1);
         
+        
         % Checks if the signal has a significant component at HR
         po = 0.05;
         [validSpectrum, faThreshold, frequencies, Periodogram] = checkValidSpectrum(imtime,Vchecked,HR,po);
