@@ -165,7 +165,7 @@ for iter=1:length(dirlist)
 %         plot(fvt(fvt>.25 & fvt<7),Pvt(fvt>.25 & fvt<7) / max(Pvt(fvt>.25 & fvt<7)),'b-')
         plot(frequencies, Periodogram,'b-')
         
-        legend('Choroid')
+%         legend('Choroid')
         validString = 'Invalid';
         if validSpectrum, validString = 'Valid'; end
         title(['Lomb-Scargle Periodogram (HR = ' num2str(HR) ') - ' validString])
