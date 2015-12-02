@@ -179,7 +179,7 @@ for iter=1:length(dirlist)
         line(xlim(),[1 1] * faThreshold,'Color','g')
         
 %         saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));
-        print(fullfile(savedir,'FrequencyCorrelationTotal.png'),'-r300')
+        print(fullfile(savedir,'FrequencyCorrelationTotal.png'),'-dpng','-r300')
         close(LS_Fh)
         disp(logit(savedir,'Frequency Correlation Total PLOT - saved'))
         
