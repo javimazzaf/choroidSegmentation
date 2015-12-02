@@ -97,35 +97,6 @@ fStep = (fmax - fmin)/2;
 
 end
 
-function [isValid, zo] = hasPeak(f,P,loF,hiF)
-
-isValid = false;
-zo = inf;
-
-if isempty(f) || isempty(P),  return, end
-
-[pks,locs] = findpeaks(P);
-fpks = f(locs);
-
-% Count peaks explored around heartFreq
-nFreq = sum((f < hiF) & (f > loF));
-
-% Subset the peaks in the search frequency region
-msk = (fpks < hiF) & (fpks > loF);
-if ~any(msk), return, end
-
-% Gets the hight of the candidate peak
-mxPeak = max(pks(msk));
-
-% Computes the false alarm threshold 
-zo = getFalseAlarmThreshold(P,1,0.05,nFreq);
-
-% Data is valid if the peak is higher than the threshold for the required
-% confidence po.
-
-isValid = mxPeak > zo;
-
-end
 
 function [falseAlarmThreshold] = getFalseAlarmThreshold(vals,corrWindow,po,nPks)
 
