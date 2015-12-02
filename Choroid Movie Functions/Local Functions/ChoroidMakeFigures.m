@@ -73,7 +73,7 @@ for iter=1:length(dirlist)
         imtime = 60 * [ImageList.minute] + [ImageList.second];
         imtime = imtime(inclframelist);
         imtime = imtime - imtime(1);
-        % ch
+        %
         % Checks if the signal has a significant component at HR
         po = 0.05;
         [validSpectrum, faThreshold, frequencies, Periodogram] = checkValidSpectrum(imtime,Vchecked,HR,po);
