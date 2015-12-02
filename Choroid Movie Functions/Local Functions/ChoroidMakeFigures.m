@@ -108,6 +108,7 @@ for iter=1:length(dirlist)
         plot([traces(inclframelist).usedCSI]+repmat(traceoffset(inclframelist),tracelength,1))
         title('Summary Image, Included Frames')
         saveas(inclFh,fullfile(savedir,'Summary Image Included.png'))
+        
         close(inclFh)
         disp(logit(savedir,'Summary Image Included - saved'))
         
@@ -177,7 +178,8 @@ for iter=1:length(dirlist)
         line([HR HR],ylim(),'Color','r','LineWidth',1)
         line(xlim(),[1 1] * faThreshold,'Color','g')
         
-        saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));
+%         saveas(LS_Fh,fullfile(savedir,'FrequencyCorrelationTotal.png'));
+        print(fullfile(savedir,'FrequencyCorrelationTotal.png'),'-r300')
         close(LS_Fh)
         disp(logit(savedir,'Frequency Correlation Total PLOT - saved'))
         
