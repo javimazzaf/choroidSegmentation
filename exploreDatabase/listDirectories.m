@@ -70,6 +70,7 @@ disp(['Has OR:    ' num2str(numel(has.OR))])
 disp(['Has Err:    ' num2str(numel(has.Err))])
 disp(['Has Map:    ' num2str(numel(has.Map))])
 disp(['Has Mov:    ' num2str(numel(has.Mov))])
+disp(['Has Valid:    ' num2str(numel(has.Valid))])
 disp(['All:    ' num2str(numel(has.All))])
 disp('----------------------------------')
 
