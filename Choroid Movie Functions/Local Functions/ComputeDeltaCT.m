@@ -49,15 +49,17 @@ for iter=1:length(dirlist)
     
     savedir=fullfile(directory,'Results');
     
-    load(fullfile(directory,'Results','FirstProcessData.mat'));
+%     load(fullfile(directory,'Results','FirstProcessData.mat'));
     load(fullfile(directory,'Results','PostProcessData.mat'));
-    load(fullfile(directory,'Results','timeSeriesData.mat'),'imtime');
-    load(fullfile(directory,'Data Files','RegisteredImages.mat'));
-    load(fullfile(directory,'Data Files','ImageList.mat'))
+    load(fullfile(directory,'Results','timeSeriesData.mat'),'imtime','inclframelist');
+%     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
+    load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList')
     
     %% Volume Method 1 (Find d as the mean distance between BM and CSI for each frame)
+    d1 = NaN(1,numframes);
     for frame=1:numframes
-        if ismember(frame,skippedind)
+%         if ismember(frame,skippedind)
+        if ~ismember(frame,inclframelist)
             continue
         end
         d1(frame) = mean(traces(frame).usedCSI-traces(frame).BM).*ImageList(frame).scaleY;

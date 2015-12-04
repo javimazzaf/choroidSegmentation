@@ -79,7 +79,7 @@ for iter=1:length(dirlist)
         po = 0.05;
         [validSpectrum, faThreshold, frequencies, Periodogram] = checkValidSpectrum(imtime,Vchecked,HR,po);
 
-        save(fullfile(savedir,'timeSeriesData.mat'),'imtime','Vchecked','validSpectrum','faThreshold','po','frequencies', 'Periodogram');
+        save(fullfile(savedir,'timeSeriesData.mat'),'inclframelist','imtime','Vchecked','validSpectrum','faThreshold','po','frequencies', 'Periodogram');
         
         % Visual Check on the Frames Included and Excluded
         
