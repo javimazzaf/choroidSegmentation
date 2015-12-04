@@ -51,7 +51,7 @@ for iter=1:length(dirlist)
     
     load(fullfile(directory,'Results','FirstProcessData.mat'));
     load(fullfile(directory,'Results','PostProcessData.mat'));
-    load(fullfile(directory,'timeSeriesData.mat'),'imtime');
+    load(fullfile(directory,'Results','timeSeriesData.mat'),'imtime');
     load(fullfile(directory,'Data Files','RegisteredImages.mat'));
     load(fullfile(directory,'Data Files','ImageList.mat'))
     
