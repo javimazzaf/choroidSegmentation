@@ -50,8 +50,8 @@ groups = [];
 %              'Rigidity'};
 
 %%% FOR INDIVIDUAL STUDIES
-studies   = {'Choroidal Mapping'}; 
-% studies   = {'Rigidity'}; 
+% studies   = {'Choroidal Mapping'}; 
+studies   = {'Rigidity'}; 
 
 
 reproducibility = '';

@@ -4,30 +4,6 @@ function [messedup,error,runtime] = ChoroidFirstProcess(varargin)
 % file RegisteredImages.mat for each directory in varargin{1}.
 
 
-% if length(varargin)==1
-%     if ispc
-%         dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-%     elseif ismac
-%         dirlist = fullfile([filesep 'Volumes'],varargin{1});
-%     else
-%         dirlist = fullfile(filesep,'srv','samba',varargin{1});
-%     end
-% else
-%     if ispc
-%         load(fullfile([filesep filesep 'HMR-BRAIN'],'Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-%         dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
-%     else
-%         load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-%         dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
-%     end
-%     [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
-%     dirlist=dirlist(~missregims);
-%     if isempty(dirlist)
-%         errordlg('No diretories prerequisite data. Run required registration program first')
-%         return
-%     end
-% end
-
 if nargin >=1
     if ispc,       dataBaseDir = [filesep filesep 'HMR-BRAIN'];
      elseif ismac, dataBaseDir = [filesep 'Volumes'];
