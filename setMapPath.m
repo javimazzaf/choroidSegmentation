@@ -1,0 +1,1 @@
+addpath(genpath('/srv/samba/share/SpectralisData/Code/choroidCode/maps'))

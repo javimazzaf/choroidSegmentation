@@ -75,7 +75,6 @@ for i=1:length(dirlist)
     row.Data={Cmap,gx,gy};
     
     
-    
     info=[info;row];
     
     
