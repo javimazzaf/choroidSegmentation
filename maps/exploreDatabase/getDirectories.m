@@ -68,8 +68,8 @@ hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Resu
 hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) ,fullfile(bottomdirs,'Results')));
 hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
 hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','Results.mat')));
-hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMap.mat')));
-hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovie.gif')));
+hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMapNew.mat')));
+hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovieNew.gif')));
 hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
 
 numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
@@ -81,31 +81,27 @@ has192Msk   = numBscans > 185 & numBscans < 195;
 dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false);
 
 %Get directores ready to process a specific test
-todoDirs.convert   = dirlist(hasRawMsk & ~hasImsMsk);
-todoDirs.register  = dirlist(hasImsMsk & ~hasRegMsk);
-todoDirs.firstProc = dirlist(hasRegMsk & ~hasFrsMsk);
+todoDirs.convert     = dirlist(hasRawMsk & ~hasImsMsk);
+todoDirs.register    = dirlist(hasImsMsk & ~hasRegMsk);
 todoDirs.firstMapNew = dirlist(hasRegMsk & ~hasFrsMapNewMsk);
-todoDirs.postProc  = dirlist(hasFrsMsk & ~hasPosMsk);
-todoDirs.compFigs  = dirlist(hasPosMsk & ~hasFigMsk);
-todoDirs.compDCT   = dirlist(hasFigMsk & ~hasDCTMsk);
-todoDirs.compORM   = dirlist(hasDCTMsk & ~hasORMsk);
-todoDirs.compMap   = dirlist(hasFrsMsk & ~hasMapMsk);
-todoDirs.compMov   = dirlist(hasMapMsk & ~hasMovMsk);
+todoDirs.postProc    = dirlist(hasFrsMsk & ~hasPosMsk);
+todoDirs.compFigs    = dirlist(hasPosMsk & ~hasFigMsk);
+todoDirs.compDCT     = dirlist(hasFigMsk & ~hasDCTMsk);
+todoDirs.compORM     = dirlist(hasDCTMsk & ~hasORMsk);
+todoDirs.compMap     = dirlist(hasFrsMsk & ~hasMapMsk);
+todoDirs.compMov     = dirlist(hasMapMsk & ~hasMovMsk);
 
-hasDirs.All   = dirlist;
-hasDirs.RawIm = dirlist(hasImsMsk);
-hasDirs.Imags = dirlist(hasImsMsk);
-hasDirs.Regis = dirlist(hasRegMsk);
-hasDirs.First = dirlist(hasFrsMsk);
+hasDirs.All         = dirlist;
+hasDirs.RawIm       = dirlist(hasImsMsk);
+hasDirs.Imags       = dirlist(hasImsMsk);
+hasDirs.Regis       = dirlist(hasRegMsk);
 hasDirs.FirstMapNew = dirlist(hasFrsMapNewMsk);
-hasDirs.Post  = dirlist(hasPosMsk);
-hasDirs.Figs  = dirlist(hasFigMsk);
-hasDirs.DCT   = dirlist(hasDCTMsk);
-hasDirs.OR    = dirlist(hasORMsk);
-hasDirs.Err   = dirlist(hasErrMsk);
-hasDirs.Map   = dirlist(hasMapMsk);
-hasDirs.Mov   = dirlist(hasMovMsk);
-hasDirs.m192  = dirlist(has192Msk);
+
+
+hasDirs.Err         = dirlist(hasErrMsk);
+hasDirs.Map         = dirlist(hasMapMsk);
+hasDirs.Mov         = dirlist(hasMovMsk);
+hasDirs.m192        = dirlist(has192Msk);
 
 save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
 
