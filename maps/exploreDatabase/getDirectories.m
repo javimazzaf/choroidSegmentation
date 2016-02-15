@@ -88,7 +88,7 @@ todoDirs.postProc    = dirlist(hasFrsMsk & ~hasPosMsk);
 todoDirs.compFigs    = dirlist(hasPosMsk & ~hasFigMsk);
 todoDirs.compDCT     = dirlist(hasFigMsk & ~hasDCTMsk);
 todoDirs.compORM     = dirlist(hasDCTMsk & ~hasORMsk);
-todoDirs.compMap     = dirlist(hasFrsMsk & ~hasMapMsk);
+todoDirs.compMap     = dirlist(hasFrsMapNewMsk & ~hasMapMsk);
 todoDirs.compMov     = dirlist(hasMapMsk & ~hasMovMsk);
 
 hasDirs.All         = dirlist;

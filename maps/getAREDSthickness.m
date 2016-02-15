@@ -29,7 +29,7 @@ msk = (R <= 500);
 aredsT.D1.N = sum(msk(:));
 [aredsT.D1.mean, aredsT.D1.SD] = maskMeanAndSd(thick,weights,msk);
 
-fh = figure();
+fh = figure('Visible','Off');
 plot(X(msk),Y(msk),'.'), xlim([-3000 3000]), ylim([-3000 3000]), hold on
 title(eye), axis square
 
