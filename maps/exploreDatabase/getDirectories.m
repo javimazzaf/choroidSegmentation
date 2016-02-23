@@ -1,6 +1,6 @@
 % Select directories that are ready for each particular step of the
 % processing, or that have specific information
-function [todoDirs, hasDirs, numBscans, masks, examDates] = getDirectories(topdir,groups,studies,reprod)
+function [todoDirs, hasDirs, numBscans, masks] = getDirectories(topdir,groups,studies,reprod)
 
 databasedir=fullfile(topdir,'share','SpectralisData');
 
@@ -60,7 +60,7 @@ otherDirs = otherDirs(~cellfun(@isempty,regexp(otherDirs,'.*O[SD](\s\d+)?$',    
 bottomdirs=[onhDirs;otherDirs];
 
 % Build exam dates array associated with bottomdirs
-examDates = cellfun(@(x) datetime(x,'InputFormat','dd-MM-yyyy'),regexp(bottomdirs,'\d\d-\d\d-\d\d\d\d', 'match'),'UniformOutput',false);
+% examDates = cellfun(@(x) datetime(x,'InputFormat','dd-MM-yyyy'),regexp(bottomdirs,'\d\d-\d\d-\d\d\d\d', 'match'),'UniformOutput',false);
 
 % Get masks for  directories that are on a specific step of the processing
 masks.hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
@@ -106,6 +106,7 @@ hasDirs.Map         = dirlist(masks.hasMapMsk);
 hasDirs.Mov         = dirlist(masks.hasMovMsk);
 hasDirs.m192        = dirlist(masks.has192Msk);
 
-save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','examDates');
+save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
+% save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','examDates');
 
 end
