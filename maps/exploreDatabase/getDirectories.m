@@ -1,6 +1,6 @@
 % Select directories that are ready for each particular step of the
 % processing, or that have specific information
-function [todoDirs, hasDirs, numBscans] = getDirectories(topdir,groups,studies,reprod)
+function [todoDirs, hasDirs, numBscans, masks, examDates] = getDirectories(topdir,groups,studies,reprod)
 
 databasedir=fullfile(topdir,'share','SpectralisData');
 
@@ -59,50 +59,53 @@ otherDirs = otherDirs(~cellfun(@isempty,regexp(otherDirs,'.*O[SD](\s\d+)?$',    
 % Gather all the measurement directories in one array
 bottomdirs=[onhDirs;otherDirs];
 
+% Build exam dates array associated with bottomdirs
+examDates = cellfun(@(x) datetime(x,'InputFormat','dd-MM-yyyy'),regexp(bottomdirs,'\d\d-\d\d-\d\d\d\d', 'match'),'UniformOutput',false);
+
 % Get masks for  directories that are on a specific step of the processing
-hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
-hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Data Files','RegisteredImages.mat')));
-hasFrsMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessData.mat')));
-hasFrsMapNewMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessDataNew.mat')));
-hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'PostProcessData.mat')));
-hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) ,fullfile(bottomdirs,'Results')));
-hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
-hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','Results.mat')));
-hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMapNew.mat')));
-hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovieNew.gif')));
-hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
+masks.hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
+masks.hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Data Files','RegisteredImages.mat')));
+masks.hasFrsMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessData.mat')));
+masks.hasFrsMapNewMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessDataNew.mat')));
+masks.hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'PostProcessData.mat')));
+masks.hasFigMsk   = logical(cellfun(@(pth) ~isempty(dir(fullfile(pth,'*.fig'))) ,fullfile(bottomdirs,'Results')));
+masks.hasDCTMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'DeltaCT.mat')));
+masks.hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','Results.mat')));
+masks.hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMapNew.mat')));
+masks.hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovieNew.gif')));
+masks.hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
 
 numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
-hasImsMsk   = logical(numBscans >= 1);
+masks.hasImsMsk   = logical(numBscans >= 1);
 
-has192Msk   = numBscans > 185 & numBscans < 195;
+masks.has192Msk   = numBscans > 185 & numBscans < 195;
 
 %Strip out the topdir from the full list
 dirlist = cellfun(@(aux) strrep(aux,topdir,''),bottomdirs,'uniformoutput',false);
 
 %Get directores ready to process a specific test
-todoDirs.convert     = dirlist(hasRawMsk & ~hasImsMsk);
-todoDirs.register    = dirlist(hasImsMsk & ~hasRegMsk);
-todoDirs.firstMapNew = dirlist(hasRegMsk & ~hasFrsMapNewMsk);
-todoDirs.postProc    = dirlist(hasFrsMsk & ~hasPosMsk);
-todoDirs.compFigs    = dirlist(hasPosMsk & ~hasFigMsk);
-todoDirs.compDCT     = dirlist(hasFigMsk & ~hasDCTMsk);
-todoDirs.compORM     = dirlist(hasDCTMsk & ~hasORMsk);
-todoDirs.compMap     = dirlist(hasFrsMapNewMsk & ~hasMapMsk);
-todoDirs.compMov     = dirlist(hasMapMsk & ~hasMovMsk);
+todoDirs.convert     = dirlist(masks.hasRawMsk & ~masks.hasImsMsk);
+todoDirs.register    = dirlist(masks.hasImsMsk & ~masks.hasRegMsk);
+todoDirs.firstMapNew = dirlist(masks.hasRegMsk & ~masks.hasFrsMapNewMsk);
+todoDirs.postProc    = dirlist(masks.hasFrsMsk & ~masks.hasPosMsk);
+todoDirs.compFigs    = dirlist(masks.hasPosMsk & ~masks.hasFigMsk);
+todoDirs.compDCT     = dirlist(masks.hasFigMsk & ~masks.hasDCTMsk);
+todoDirs.compORM     = dirlist(masks.hasDCTMsk & ~masks.hasORMsk);
+todoDirs.compMap     = dirlist(masks.hasFrsMapNewMsk & ~masks.hasMapMsk);
+todoDirs.compMov     = dirlist(masks.hasMapMsk & ~masks.hasMovMsk);
 
 hasDirs.All         = dirlist;
-hasDirs.RawIm       = dirlist(hasImsMsk);
-hasDirs.Imags       = dirlist(hasImsMsk);
-hasDirs.Regis       = dirlist(hasRegMsk);
-hasDirs.FirstMapNew = dirlist(hasFrsMapNewMsk);
+hasDirs.RawIm       = dirlist(masks.hasImsMsk);
+hasDirs.Imags       = dirlist(masks.hasImsMsk);
+hasDirs.Regis       = dirlist(masks.hasRegMsk);
+hasDirs.FirstMapNew = dirlist(masks.hasFrsMapNewMsk);
 
 
-hasDirs.Err         = dirlist(hasErrMsk);
-hasDirs.Map         = dirlist(hasMapMsk);
-hasDirs.Mov         = dirlist(hasMovMsk);
-hasDirs.m192        = dirlist(has192Msk);
+hasDirs.Err         = dirlist(masks.hasErrMsk);
+hasDirs.Map         = dirlist(masks.hasMapMsk);
+hasDirs.Mov         = dirlist(masks.hasMovMsk);
+hasDirs.m192        = dirlist(masks.has192Msk);
 
-save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
+save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','examDates');
 
 end

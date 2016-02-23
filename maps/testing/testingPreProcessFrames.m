@@ -1,20 +1,15 @@
-function preProcessFrames(directory)
-
-% if ~ispc && ~ismac
-%     workersAvailable = Inf; 
-% else
-%     workersAvailable = 0; 
-% end
+function testingPreProcessFrames(directory,DeltaX,DeltaY)
 
 savedir   = fullfile(directory,'Results');
 
 varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore','skippedind','start');
+
 bscanstore = varStruct.bscanstore;
 skippedind = varStruct.skippedind;
-start      = varStruct.start;
 
-varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
-ImageList = varStruct.ImageList;
+% varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
+% ImageList = varStruct.ImageList;
+start = 1;
 
 numframes = numel(bscanstore);
 
@@ -30,8 +25,8 @@ other(numframes).colshifts = [];
 
 indToProcess = setdiff(start:numframes,skippedind);
 
-DeltaX = ImageList(start).scaleX;
-DeltaY = - diff([ImageList([start,start + 1]).startY]);
+% DeltaX = ImageList(start).scaleX;
+% DeltaY = - diff([ImageList([start,start + 1]).startY]);
 
 SigmaFilterScans = max(1,ceil(getParameter('AVERAGING_SIZE') * DeltaX / DeltaY));
 
@@ -64,7 +59,6 @@ for frame = indToProcess
         traces(frame).RET = yRet;
         traces(frame).RPE = [];
         traces(frame).BM  = yTop;
-        traces(frame).RETthickness = yTop - yRet;
         
         other(frame).colshifts = colShifts;
         other(frame).shiftsize = maxShift;

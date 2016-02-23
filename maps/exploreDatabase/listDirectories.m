@@ -55,7 +55,7 @@ studies   = {'Choroidal Mapping'};
 
 reproducibility = '';
 
-[todo, has, numBscans] = getDirectories(topdir,groups,studies,reproducibility);
+[todo, has, numBscans, masks, examDates] = getDirectories(topdir,groups,studies,reproducibility);
 
 disp(['Has RawIm:          ' num2str(numel(has.RawIm))])
 disp(['Has Imags:          ' num2str(numel(has.Imags))])

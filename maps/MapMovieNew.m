@@ -98,26 +98,39 @@ for iter=1:length(dirlist)
         maxWeight = -Inf;
         for i=1:length(yvec)
            for k = 1:numel(traces(i).CSI)
-               maxWeight = max(maxWeight,max(traces(i).CSI(k).weight(:)));
+               
+               thisWeight = max(traces(i).CSI(k).weight(:));
+               
+               if ~isempty(thisWeight)
+                   maxWeight = max(maxWeight,thisWeight);
+               end
+               
            end
         end
+
+        scansInfo = [];
         
         for i=1:length(yvec)
 %             figure(df)
             h4=subplot(1,2,1);
 %             subimage(bscanstore{i});
             if ~isnan(safeTopLimit(i)) && ~isnan(safeBottomLimit(i))
-              subimage(shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i));
+              thisBscan = shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i);
             else
-              subimage(shiftedScans(:,:,i));
+              thisBscan = shiftedScans(:,:,i);
             end
+            
+            subimage(thisBscan);
+            
+            thisScanInfo.bscan = thisBscan;
             
             set(h4,'visible','off')
             hold on
             
-%             xCSI = [];
-%             yCSI = [];
-%             wCSI = [];
+            allxCSI = [];
+            allyCSI = [];
+            allwCSI = [];
+            
             clr = 'rgymcb';
             for k = 1:numel(traces(i).CSI)
                 if ~(traces(i).CSI(k).keep), continue, end
@@ -128,7 +141,15 @@ for iter=1:length(dirlist)
                 
                 errorbar(xCSI,yCSI,wCSI / maxWeight * 10,['.' clr(mod(k,6) + 1)])
                 
+                allxCSI = [allxCSI; xCSI];
+                allyCSI = [allyCSI; yCSI];
+                allwCSI = [allwCSI; wCSI / maxWeight * 10];
+                
             end
+            
+            thisScanInfo.xCSI = allxCSI;
+            thisScanInfo.yCSI = allyCSI;
+            thisScanInfo.wCSI = allwCSI;
             
 %             [xCSI,ix,~] = unique(xCSI);
 %             yCSI = yCSI(ix);
@@ -142,6 +163,7 @@ for iter=1:length(dirlist)
 %             subplot(1,2,1), plot(traces(i).BM,'-m','LineWidth',2)
             if ~isempty(traces(i).RPEheight)
               subplot(1,2,1), plot(traces(i).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
+              thisScanInfo.RPE = traces(i).RPEheight;
             end
             
             hold off
@@ -166,6 +188,8 @@ for iter=1:length(dirlist)
             
             delete(h5)
             
+            scansInfo = [scansInfo thisScanInfo];
+            
             %         ff = figure();
             %         imshow(bscanstore{i},[],'Border','tight'); hold on
             %         plot(traces(i).BM,'-m','LineWidth',2)
@@ -176,6 +200,8 @@ for iter=1:length(dirlist)
             
             disp(i)
         end
+        
+        save(fullfile(directory,'Results','bScans.mat'), 'scansInfo')
         
         delete('~/aux.png')
         
