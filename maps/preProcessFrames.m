@@ -22,7 +22,7 @@ numframes = numel(bscanstore);
 nodes      = cell(numframes,1);
 EndHeights = nan(numframes,2);
 
-traces     = struct('RET',[],'RPE',[],'BM',[],'CSI',[],'nCSI',[],'usedCSI',[]);
+traces     = struct('RET',[],'RPE',[],'BM',[],'CSI',[],'nCSI',[],'usedCSI',[],'RETthickness',[]);
 traces(numframes).CSI = [];
 
 other      = struct('colshifts',[],'shiftsize',[],'smallsize',[],'bigsize',[]);
@@ -64,7 +64,7 @@ for frame = indToProcess
         traces(frame).RET = yRet;
         traces(frame).RPE = [];
         traces(frame).BM  = yTop;
-        traces(frame).RETthickness = yTop - yRet;
+        traces(frame).RETthickness = yTop(:) - yRet(:);
         
         other(frame).colshifts = colShifts;
         other(frame).shiftsize = maxShift;
