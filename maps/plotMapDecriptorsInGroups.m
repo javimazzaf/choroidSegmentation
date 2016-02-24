@@ -94,6 +94,15 @@ ylabel('P95 Thickness corrected for age [\mum]')
 print(hf,fullfile(dr,'P95ThicknessCorrectedForAge.png'),'-dpng')
 
 
+% Ratio Choroid to retina thickness
+hf = figure;
+boxplot(data.ratioChoroidToRetina(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 700])
+ylabel('T_Choroid / T_Retina')
+print(hf,fullfile(dr,'ratioChoroidToRetina.png'),'-dpng')
+
+
 % % Polar angle of plane fit
 % hf = figure;
 % meanAzimuth = cellfun(@(x) atan2d(sum(sind(data.azimuth(ismember(data.Group(:),x)))),...

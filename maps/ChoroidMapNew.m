@@ -113,6 +113,8 @@ for iter=1:length(dirlist)
     gridC = NaN(numel(yvec), numel(xvec));
     gridW = NaN(numel(yvec), numel(xvec)); % Weights
     
+    gridRetina = NaN(numel(yvec), numel(xvec));
+    
     for q = start:length(traces)
         
         if isempty(traces(q).RPEheight) || isempty(traces(q).CSI), continue, end
@@ -148,6 +150,13 @@ for iter=1:length(dirlist)
         gridC(q,xCSI') = (yCSI' - yTop) * ImageList(q).scaleY * 1000;
         gridW(q,xCSI') = wCSI';
         
+        RETthickness = traces(q).RETthickness  * ImageList(q).scaleY * 1000;
+        
+        if ~isempty(RETthickness)
+           gridRetina(q,:) = RETthickness';
+        end
+
+        
     end
     
     validMask = ~isnan(gridC(:));
@@ -163,9 +172,48 @@ for iter=1:length(dirlist)
     mapInfo = [gridx(validMask), gridy(validMask), gridC(validMask), gridW(validMask)];
     mapInfo = sortrows(mapInfo,[1,2]);
     
-%     Cmap    = interp2(data(:,1),data(:,2),data(:,3),qx,qy,'spline');
-%     Cmap    = interp2(gridx,gridy,gridC,qx,qy,'spline');
+    validRETMask = ~isnan(gridRetina(:));
+    mapRetina = [gridx(validRETMask), gridy(validRETMask), gridRetina(validRETMask)];
     
+    % Compute retina thickness map
+    Fret = scatteredInterpolant(mapRetina(:,1),mapRetina(:,2),mapRetina(:,3));
+    CretMap = Fret(qx,qy);
+    
+    newRetbscan  = imref2d(size(CretMap),[qx(1,1) qx(1,end)],[qy(1,1) qy(end,1)]);
+    
+    CretMapScaled = im2uint8(CretMap/max(CretMap(:)));
+    X             = grayslice(CretMapScaled,256);
+    CretMapRGB    = ind2rgb(X,jet(256));
+    CretMapHSV    = rgb2hsi(CretMapRGB);
+    
+    fundimRetHSV  = rgb2hsi(fundim);
+    
+    fundimRetHSV(Yover,Xover,1) = CretMapHSV(:,:,1);
+    fundimRetHSV(Yover,Xover,2) = CretMapHSV(:,:,2);
+    fundimRetHSV(:,:,3)=k;
+    fundimRetFinal=hsi2rgb(fundimRetHSV);
+    
+    fh = figure('Visible','off');
+    subplot(1,2,1);
+    imshow(fundimRetFinal,Rfund,colormap('jet'));
+    xlabel('X [mm]')
+    ylabel('Y [mm]')
+    title('Retina thickess overlay')
+    
+    subplot(1,2,2);
+    h3 = imshow(CretMap,newRetbscan,colormap('jet'));
+    set(h3,'cdatamapping','scaled');
+%     caxis([0 500])
+    colorbar;
+    
+    xlabel('X [mm]')
+    ylabel('Y [mm]')
+    title('Retina Thickness Map [\mum]')    
+
+    saveas(fh,fullfile(directory,'Results','ChoroidMapNewRetina.pdf'),'pdf');
+    close(fh)
+    
+    % Compute choroid map
     F = scatteredInterpolant(mapInfo(:,1),mapInfo(:,2),mapInfo(:,3));
     Cmap = F(qx,qy);
     
@@ -219,7 +267,7 @@ for iter=1:length(dirlist)
     %Testing Gabor
     save(fullfile(directory,'Results','ChoroidMapNew.mat'),'Cmap','Volume','fundim','fundimfinal',...
     'xvec','yvec','gridx','gridy','gridC','fscaleX','fscaleY','fwidth',...
-    'fheight','mapInfo');
+    'fheight','mapInfo','mapRetina');
     
     saveas(fh,fullfile(directory,'Results','ChoroidMapNew.pdf'),'pdf');
 

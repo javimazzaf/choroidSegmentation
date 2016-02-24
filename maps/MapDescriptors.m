@@ -28,6 +28,13 @@ for i=1:length(dirlist)
     load(fullfile(directory,'Results','ChoroidMapNew.mat'))
     load(fullfile(directory,'Data Files','ImageList.mat'))
     
+    % Compute retina descriptors
+    retThickness = mapRetina(:,3) * 3.9; % Provisory scaling since this correction was not made in the ChoroidMapNew
+    warning('This scaling of 3.9 has to be removed when the Maps are computed again.')
+    
+    meanRETthickness = nanmean(retThickness);
+    
+    % Compute choroid descriptors
     rawX          = mapInfo(:,1) * 1000;
     rawY          = mapInfo(:,2) * 1000;
     rawThickness  = mapInfo(:,3);
@@ -39,6 +46,8 @@ for i=1:length(dirlist)
     stdRawThickness  = sqrt(sum(rawThickness.^2 .* rawWeigth) / sum(rawWeigth) - meanRawThickness^2);
     q5RawThickness  = prctile(rawThickness,5);
     q95RawThickness = prctile(rawThickness,95);
+    
+    ratioChoroidToRetina = meanRawThickness / meanRETthickness;
     
     [sf, N] = fitPlane(rawX,rawY,rawThickness,rawWeigth);
     
@@ -58,12 +67,12 @@ for i=1:length(dirlist)
                  aredsT.D1.mean, aredsT.D1.SD, aredsT.D1.N, aredsT.D3.nasal.mean, aredsT.D3.nasal.SD, aredsT.D3.nasal.N, aredsT.D3.inferior.mean, aredsT.D3.inferior.SD, aredsT.D3.inferior.N,...
                  aredsT.D3.temporal.mean, aredsT.D3.temporal.SD, aredsT.D3.temporal.N, aredsT.D3.superior.mean, aredsT.D3.superior.SD, aredsT.D3.superior.N,aredsT.D6.nasal.mean,...
                  aredsT.D6.nasal.SD, aredsT.D6.nasal.N, aredsT.D6.inferior.mean, aredsT.D6.inferior.SD, aredsT.D6.inferior.N, aredsT.D6.temporal.mean, aredsT.D6.temporal.SD, aredsT.D6.temporal.N,...
-                 aredsT.D6.superior.mean, aredsT.D6.superior.SD, aredsT.D6.superior.N,...
+                 aredsT.D6.superior.mean, aredsT.D6.superior.SD, aredsT.D6.superior.N,ratioChoroidToRetina,...
                  'VariableNames',{'meanthick','maxthick','minthick','stdthick','azimuth','polar','q5thick','q95thick',...
                  'AREDS_D1Mean', 'AREDS_D1SD', 'AREDS_D1N','AREDS_D3nasalMean', 'AREDS_D3nasalSD', 'AREDS_D3nasalN','AREDS_D3inferiorMean', 'AREDS_D3inferiorSD', 'AREDS_D3inferiorN',...
                  'AREDS_D3temporalMean', 'AREDS_D3temporalSD', 'AREDS_D3temporalN', 'AREDS_D3superiorMean', 'AREDS_D3superiorSD', 'AREDS_D3superiorN','AREDS_D6nasalMean',...
                  'AREDS_D6nasalSD', 'AREDS_D6nasalN','AREDS_D6inferiorMean', 'AREDS_D6inferiorSD', 'AREDS_D6inferiorN','AREDS_D6temporalMean', 'AREDS_D6temporalSD', 'AREDS_D6temporalN',...
-                 'AREDS_D6superiorMean', 'AREDS_D6superiorSD', 'AREDS_D6superiorN'});
+                 'AREDS_D6superiorMean', 'AREDS_D6superiorSD', 'AREDS_D6superiorN', 'ratioChoroidToRetina'});
    
     info = [info, temp];
         
