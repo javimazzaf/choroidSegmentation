@@ -29,7 +29,7 @@ end
 %           'Uveitis';...
 %           'Precoce'};
 
-groups = {'Wet AMD'};
+% groups = {'Wet AMD'};
 
 %%% FOR INDIVIDUAL CONDITIONS
 % groups = {'Normal'};
@@ -42,7 +42,7 @@ groups = {'Wet AMD'};
 % groups = {'Bleb'};
 % groups = {'OHT'};
 % groups = {'Precoce'};
-% groups = {'Uveitis'};
+groups = {'Uveitis'};
 
 % groups = [];
 
