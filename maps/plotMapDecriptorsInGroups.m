@@ -98,8 +98,8 @@ print(hf,fullfile(dr,'P95ThicknessCorrectedForAge.png'),'-dpng')
 hf = figure;
 boxplot(data.ratioChoroidToRetina(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
 set(gca,'FontSize',14)
-ylim([0, 700])
-ylabel('T_Choroid / T_Retina')
+ylim([-0.1, 1.1])
+ylabel('T_{Choroid} / T_{Retina}')
 print(hf,fullfile(dr,'ratioChoroidToRetina.png'),'-dpng')
 
 
