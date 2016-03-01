@@ -29,8 +29,7 @@ for i=1:length(dirlist)
     load(fullfile(directory,'Data Files','ImageList.mat'))
     
     % Compute retina descriptors
-    retThickness = mapRetina(:,3) * 3.9; % Provisory scaling since this correction was not made in the ChoroidMapNew
-    warning('This scaling of 3.9 has to be removed when the Maps are computed again.')
+    retThickness = mapRetina(:,3);
     
     meanRETthickness = nanmean(retThickness);
     
