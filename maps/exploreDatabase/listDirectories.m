@@ -42,9 +42,9 @@ end
 % groups = {'Bleb'};
 % groups = {'OHT'};
 % groups = {'Precoce'};
-groups = {'Uveitis'};
+% groups = {'Uveitis'};
 
-% groups = [];
+groups = [];
 
 %%% FOR A SET OF STUDIES
 % studies   = {'Choroidal Mapping';...
