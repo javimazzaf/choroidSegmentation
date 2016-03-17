@@ -1,6 +1,6 @@
 function [desc1,desc2, ages] = ageMatch(descriptors1,descriptors2)
 
-   rng(1); % Initialize random generation to get repeatable results
+%    rng(1); % Initialize random generation to get repeatable results
 
    age1 = descriptors1.Age(:);
    age2 = descriptors2.Age(:);
@@ -26,8 +26,11 @@ function [desc1,desc2, ages] = ageMatch(descriptors1,descriptors2)
          set2 = descriptors2(mskAge2,:);
          
          % shuffle patients 
-         set1 = set1(randperm(size(set1,1)),:);
-         set2 = set2(randperm(size(set2,1)),:);
+         ix1  = randperm(size(set1,1));
+         set1 = set1(ix1,:);
+         
+         ix2  = randperm(size(set2,1));
+         set2 = set2(ix2,:);
          
          % Get equally sized subsets
          desc1 = [desc1; set1(1:nSubj,:)];

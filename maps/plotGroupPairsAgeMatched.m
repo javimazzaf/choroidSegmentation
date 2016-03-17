@@ -1,7 +1,5 @@
 function plotGroupPairsAgeMatched(dr,group1,group2)
 
-rng('default');
-
 load(fullfile(dr,'mapData.mat'),'descriptors')
 
 % allConditions = unique(descriptors.Group(:));
@@ -15,12 +13,19 @@ descriptors2 = descriptors(mskGroup2,:);
 [desc1,desc2, ages] = ageMatch(descriptors1,descriptors2);
 
 % Mean thickness
-% makePairedFigure([desc1.meanthick(:);desc2.meanthick(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'meanThickness','mean Thickness [\mum]',dr)
-% title(['N = ' num2str(size(desc1,1)) ' - Age1=' num2str(ages.set1.mean,'%2.0f') '(' num2str(ages.set1.std,'%2.0f') ') - Age2=' num2str(ages.set2.mean,'%2.0f') '(' num2str(ages.set2.std,'%2.0f') ')'])
+makePairedFigure([desc1.meanthick(:);desc2.meanthick(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'meanThickness','mean Thickness [\mum]',dr)
+title(['N = ' num2str(size(desc1,1)) ' - Age1=' num2str(ages.set1.mean,'%2.0f') '(' num2str(ages.set1.std,'%2.0f') ') - Age2=' num2str(ages.set2.mean,'%2.0f') '(' num2str(ages.set2.std,'%2.0f') ')'])
 
 % Ratio Choroid to retina thickness
-% makePairedFigure([desc1.ratioChoroidToRetina(:);desc2.ratioChoroidToRetina(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'ratioChoroidToRetina','T_{Choroid} / T_{Retina}',dr)
-% title(['N = ' num2str(size(desc1,1)) ' - Age1=' num2str(ages.set1.mean,'%2.0f') '(' num2str(ages.set1.std,'%2.0f') ') - Age2=' num2str(ages.set2.mean,'%2.0f') '(' num2str(ages.set2.std,'%2.0f') ')'])
+makePairedFigure([desc1.ratioChoroidToRetina(:);desc2.ratioChoroidToRetina(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'ratioChoroidToRetina','T_{Choroid} / T_{Retina}',dr)
+title(['N = ' num2str(size(desc1,1)) ' - Age1=' num2str(ages.set1.mean,'%2.0f') '(' num2str(ages.set1.std,'%2.0f') ') - Age2=' num2str(ages.set2.mean,'%2.0f') '(' num2str(ages.set2.std,'%2.0f') ')'])
+
+% Mean retina
+desc1.meanRetina = desc1.meanthick(:) ./ desc1.ratioChoroidToRetina(:);
+desc2.meanRetina = desc2.meanthick(:) ./ desc2.ratioChoroidToRetina(:);
+makePairedFigure([desc1.meanRetina(:);desc2.meanRetina(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'mean Retina','mean retina',dr)
+title(['N = ' num2str(size(desc1,1)) ' - Age1=' num2str(ages.set1.mean,'%2.0f') '(' num2str(ages.set1.std,'%2.0f') ') - Age2=' num2str(ages.set2.mean,'%2.0f') '(' num2str(ages.set2.std,'%2.0f') ')'])
+
 
 % Std thickness
 % makePairedFigure([desc1.stdthick(:);desc2.stdthick(:)],[desc1.Group(:);desc2.Group(:)],group1,group2,'SD','SD [\mum]',dr)
@@ -45,7 +50,7 @@ end
 function makePairedFigure(values,groups,grName1,grName2,paramName,yLabel,dr)
 
 hf = figure;
-boxplot(values,groups,'notch','on','labels',{grName1;grName2},'labelorientation', 'inline')
+boxplot(values,groups,'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',16)
 ylabel(yLabel)
 

@@ -74,6 +74,9 @@ masks.hasORMsk    = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs
 masks.hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','ChoroidMapNew.mat')));
 masks.hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','MapMovieNew.gif')));
 masks.hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
+masks.hasAnotMsk  = logical(cellfun(@isAnnotated,fullfile(bottomdirs,'Results','postProcessingAnnotations.mat')));
+masks.hasbScansMsk= logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','bScans.mat')));
+
 
 numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
 masks.hasImsMsk   = logical(numBscans >= 1);
@@ -93,13 +96,16 @@ todoDirs.compDCT     = dirlist(masks.hasFigMsk & ~masks.hasDCTMsk);
 todoDirs.compORM     = dirlist(masks.hasDCTMsk & ~masks.hasORMsk);
 todoDirs.compMap     = dirlist(masks.hasFrsMapNewMsk & ~masks.hasMapMsk);
 todoDirs.compMov     = dirlist(masks.hasMapMsk & ~masks.hasMovMsk);
+todoDirs.compAnot    = dirlist(masks.hasMovMsk & ~masks.hasAnotMsk);
+todoDirs.compBscans  = dirlist(masks.hasMapMsk & ~masks.hasbScansMsk);
 
 hasDirs.All         = dirlist;
 hasDirs.RawIm       = dirlist(masks.hasImsMsk);
 hasDirs.Imags       = dirlist(masks.hasImsMsk);
 hasDirs.Regis       = dirlist(masks.hasRegMsk);
 hasDirs.FirstMapNew = dirlist(masks.hasFrsMapNewMsk);
-
+hasDirs.Anot        = dirlist(masks.hasAnotMsk);
+hasDirs.bScans      = dirlist(masks.hasbScansMsk);
 
 hasDirs.Err         = dirlist(masks.hasErrMsk);
 hasDirs.Map         = dirlist(masks.hasMapMsk);
@@ -108,5 +114,27 @@ hasDirs.m192        = dirlist(masks.has192Msk);
 
 save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
 % save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','examDates');
+
+end
+
+function res = isAnnotated(fname)
+
+res = false;
+
+if ~exist(fname,'file')
+    return
+end
+
+load(fname,'annotations');
+
+if ~isfield(annotations,'skip')
+    return
+end
+
+if ~annotations.skip && (~isfield(annotations,'maculaCenter') || ~isfield(annotations,'onhCenter'))
+    return
+end
+
+res = true;
 
 end

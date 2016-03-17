@@ -13,6 +13,7 @@ conditions  = allConditions(mskCond);
 mskData = ismember(descriptors.Group(:),conditions) & ~ismember(descriptors.Group(:),'Other/No Group');
 
 data = descriptors(mskData,:);
+data = sortrows(data,'Group');
 
 % Populations
 hf = figure;
@@ -23,45 +24,45 @@ print(hf,fullfile(dr,'populations.png'),'-dpng')
 
 % Mean thickness
 hf = figure;
-boxplot(data.meanthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.meanthick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('mean Thickness [\mum]')
 print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
 
-% Mean thickness corrected for age
-hf = figure;
-meanThicknessCorrected = data.meanthick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
-boxplot(meanThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 400])
-ylabel('mean Thickness corrected for age [\mum]')
-print(hf,fullfile(dr,'meanThicknessCorrected.png'),'-dpng')
+% % Mean thickness corrected for age
+% hf = figure;
+% meanThicknessCorrected = data.meanthick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+% boxplot(meanThicknessCorrected,data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 400])
+% ylabel('mean Thickness corrected for age [\mum]')
+% print(hf,fullfile(dr,'meanThicknessCorrected.png'),'-dpng')
 
-% Min thickness
-hf = figure;
-boxplot(data.minthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
-ylim([0, 150])
-ylabel('min Thickness [\mum]')
-print(hf,fullfile(dr,'minThickness.png'),'-dpng')
-
-% Max thickness
-hf = figure;
-boxplot(data.maxthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
-ylim([0, 700])
-ylabel('max Thickness [\mum]')
-print(hf,fullfile(dr,'maxThickness.png'),'-dpng')
+% % Min thickness
+% hf = figure;
+% boxplot(data.minthick(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% ylim([0, 150])
+% ylabel('min Thickness [\mum]')
+% print(hf,fullfile(dr,'minThickness.png'),'-dpng')
+% 
+% % Max thickness
+% hf = figure;
+% boxplot(data.maxthick(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% ylim([0, 700])
+% ylabel('max Thickness [\mum]')
+% print(hf,fullfile(dr,'maxThickness.png'),'-dpng')
 
 % Std thickness
 hf = figure;
-boxplot(data.stdthick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.stdthick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 ylim([0, 100])
 ylabel('std Thickness [\mum]')
 print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
 
 % Q5 thickness
 hf = figure;
-boxplot(data.q5thick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.q5thick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('P5 Thickness [\mum]')
@@ -69,39 +70,47 @@ print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
 
 % Q95 thickness
 hf = figure;
-boxplot(data.q95thick(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.q95thick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylim([0, 700])
 ylabel('P95 Thickness [\mum]')
 print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
 
-% Q5 thickness Corrected
-hf = figure;
-q5ThicknessCorrected = data.q5thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
-boxplot(q5ThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 400])
-ylabel('P5 Thickness corrected for age [\mum]')
-print(hf,fullfile(dr,'P5ThicknessCorrectedForAge.png'),'-dpng')
-
-% Q95 thickness Corrected
-hf = figure;
-q95ThicknessCorrected = data.q95thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
-boxplot(q95ThicknessCorrected,data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 700])
-ylabel('P95 Thickness corrected for age [\mum]')
-print(hf,fullfile(dr,'P95ThicknessCorrectedForAge.png'),'-dpng')
+% % Q5 thickness Corrected
+% hf = figure;
+% q5ThicknessCorrected = data.q5thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+% boxplot(q5ThicknessCorrected,data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 400])
+% ylabel('P5 Thickness corrected for age [\mum]')
+% print(hf,fullfile(dr,'P5ThicknessCorrectedForAge.png'),'-dpng')
+% 
+% % Q95 thickness Corrected
+% hf = figure;
+% q95ThicknessCorrected = data.q95thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
+% boxplot(q95ThicknessCorrected,data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 700])
+% ylabel('P95 Thickness corrected for age [\mum]')
+% print(hf,fullfile(dr,'P95ThicknessCorrectedForAge.png'),'-dpng')
 
 
 % Ratio Choroid to retina thickness
 hf = figure;
-boxplot(data.ratioChoroidToRetina(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.ratioChoroidToRetina(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylim([-0.1, 1.1])
 ylabel('T_{Choroid} / T_{Retina}')
 print(hf,fullfile(dr,'ratioChoroidToRetina.png'),'-dpng')
 
+% Retina thickness
+data.meanRetina = data.meanthick(:) ./ data.ratioChoroidToRetina(:);
+
+hf = figure;
+boxplot(data.meanRetina(:),data.Group(:),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylabel('mean retina[\mum]')
+print(hf,fullfile(dr,'meanRetina.png'),'-dpng')
 
 % % Polar angle of plane fit
 % hf = figure;
@@ -178,7 +187,7 @@ print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
 
 % polar angle of plane fit
 hf = figure;
-boxplot(90-data.polar(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(90-data.polar(:),data.Group(:),'notch','on','labelorientation', 'inline')
 ylim([0, 3])
 ylabel('polar angle [deg]')
 title('Polar angle')
@@ -186,16 +195,20 @@ print(hf,fullfile(dr,'polar.png'),'-dpng')
 
 % Age
 hf = figure;
-boxplot(data.Age(:),data.Group(:),'notch','on','labels',conditions,'labelorientation', 'inline')
+boxplot(data.Age(:),data.Group(:),'notch','on','labelorientation', 'inline')
 legend(conditions)
 set(gca,'FontSize',14)
 ylabel('Age [years]')
 print(hf,fullfile(dr,'age.png'),'-dpng')
 
-% Correlation Thickness and Age
+% Correlation Choroid Thickness and Age
 hf = figure;
 FigureMaker(data.Age(:),data.meanthick(:),'Age [yr]','meanThickness [\mum]','d','poly1',false,[])
 % print(hf,fullfile(dr,'correlMeanThcknessVsAge.png'),'-dpng')
+
+% Correlation Retina Thickness and Age
+hf = figure;
+FigureMaker(data.Age(:),data.meanRetina(:),'Age [yr]','meanThickness [\mum]','d','poly1',false,[])
 
 % % Histogram of polar angle of plane fit
 % hf = figure;

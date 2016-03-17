@@ -65,6 +65,8 @@ disp(['Has Regis:          ' num2str(numel(has.Regis))])
 disp(['Has FirstMapNew:    ' num2str(numel(has.FirstMapNew))])
 disp(['Has Map:            ' num2str(numel(has.Map))])
 disp(['Has Mov:            ' num2str(numel(has.Mov))])
+disp(['Has Anot:           ' num2str(numel(has.Anot))])
+disp(['Has Bscans:         ' num2str(numel(has.bScans))])
 disp(['All:                ' num2str(numel(has.All))])
 
 % Describe number of frames per map
@@ -84,6 +86,9 @@ disp(['To Register:               (todo.register) '   num2str(numel(todo.registe
 disp(['To ChoroidMapFirstProcess: (todo.firstMapNew)' num2str(numel(todo.firstMapNew))]) 
 disp(['To ComputeMap:             (todo.compMap)  '   num2str(numel(todo.compMap))])
 disp(['To ComputeMov:             (todo.compMov)  '   num2str(numel(todo.compMov))])
+disp(['To ComputeAnot:            (todo.compAnot)  '   num2str(numel(todo.compAnot))])
+disp(['To ComputeBscans:          (todo.compBscans)  '   num2str(numel(todo.compBscans))])
+
 
 
 

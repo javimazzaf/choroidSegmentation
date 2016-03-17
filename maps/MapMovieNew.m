@@ -79,7 +79,12 @@ for iter=1:length(dirlist)
         ax2=subplot(1,2,1);
         
 %         subimage(bscanstore{1});
-        subimage(shiftedScans(safeTopLimit(1):safeBottomLimit(1),:,1)); 
+        
+        if ~isnan(safeTopLimit(1)) && ~isnan(safeBottomLimit(1))
+           subimage(shiftedScans(safeTopLimit(1):safeBottomLimit(1),:,1));
+        else
+           subimage(shiftedScans(:,:,1));
+        end
 
         pos1=get(ax1,'position');
         pos2=get(ax2,'position');
@@ -164,6 +169,8 @@ for iter=1:length(dirlist)
             if ~isempty(traces(i).RPEheight)
               subplot(1,2,1), plot(traces(i).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
               thisScanInfo.RPE = traces(i).RPEheight;
+            else
+              thisScanInfo.RPE = [];  
             end
             
             hold off
