@@ -6,7 +6,8 @@ allConditions = unique(descriptors.Group(:));
 
 populations = cellfun(@(x) sum(strcmp(descriptors.Group(:),x)), allConditions);
 
-mskCond   = (populations > 10) & ~ismember(allConditions,'Other/No Group');
+% mskCond   = (populations > 10) & ~ismember(allConditions,'Other/No Group');
+mskCond     = (populations >= 5) & ~ismember(allConditions,'Other/No Group');
 conditions  = allConditions(mskCond);
 % populations = populations(mskCond);
 
@@ -75,6 +76,39 @@ set(gca,'FontSize',14)
 ylim([0, 700])
 ylabel('P95 Thickness [\mum]')
 print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
+
+%% Center Macula values
+
+% Center Mean thickness
+hf = figure;
+boxplot(data.centerMean(:),data.Group(:),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 400])
+ylabel('center mean Thickness [\mum]')
+print(hf,fullfile(dr,'centerMeanThickness.png'),'-dpng')
+
+% Center Std thickness
+hf = figure;
+boxplot(data.centerStd(:),data.Group(:),'notch','on','labelorientation', 'inline')
+ylim([0, 100])
+ylabel('center std Thickness [\mum]')
+print(hf,fullfile(dr,'centerStdThickness.png'),'-dpng')
+
+% Center Q5 thickness
+hf = figure;
+boxplot(data.centerQ5(:),data.Group(:),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 400])
+ylabel('center P5 Thickness [\mum]')
+print(hf,fullfile(dr,'centerP5Thickness.png'),'-dpng')
+
+% Center Q95 thickness
+hf = figure;
+boxplot(data.centerQ95(:),data.Group(:),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([0, 700])
+ylabel('center P95 Thickness [\mum]')
+print(hf,fullfile(dr,'centerP95Thickness.png'),'-dpng')
 
 % % Q5 thickness Corrected
 % hf = figure;

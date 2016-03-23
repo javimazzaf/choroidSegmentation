@@ -1,4 +1,4 @@
-function [aredsT, fh] = getAREDSthickness(X,Y,thick,weights,eyeStr)
+function [aredsT, fh] = getAREDSthickness(X,Y,thick,weights,eyeStr, maculaCenter)
 % Measures the mean and SD of the thickness within the regions of the AREDS
 % grid.
 
@@ -10,12 +10,19 @@ else
     error('Eye string is wrong')
 end
 
-%Asumes the map is centered in the macula. 
-Xo = (max(X) + min(X)) / 2;
-Yo = (max(Y) + min(Y)) / 2;
+if exist('maculaCenter','var')
+    Xo = maculaCenter.x;
+    Yo = maculaCenter.y;
+else %Asumes the map is centered in the macula.
+    Xo = (max(X) + min(X)) / 2;
+    Yo = (max(Y) + min(Y)) / 2;
+end
 
 X = X - Xo;
 Y = Y - Yo;
+
+X = X * 1000;
+Y = Y * 1000;
 
 R   = sqrt(X.^2 + Y.^2); 
 ang = atan2(Y,X);
@@ -63,9 +70,9 @@ for dd = [3,6] %Radial region
                     mskA = (cs > 0) & (abs(ss) <= sin(pi/4));
                 end  
             case 'superior'
-                mskA = (ss < 0) & (abs(cs) <= cos(pi/4));   
+                mskA = (ss > 0) & (abs(cs) <= cos(pi/4));   
             case 'inferior'
-                mskA = (ss > 0) & (abs(cs) <= cos(pi/4)); 
+                mskA = (ss < 0) & (abs(cs) <= cos(pi/4)); 
         end
         
         msk = mskR & mskA; 
