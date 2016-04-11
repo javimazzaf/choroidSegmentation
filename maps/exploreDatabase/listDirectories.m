@@ -31,6 +31,12 @@ end
 
 % groups = {'Wet AMD'};
 
+groups = {'Early AMD';...
+          'Dry AMD';...
+          'Wet AMD'};
+
+
+
 %%% FOR INDIVIDUAL CONDITIONS
 % groups = {'Normal'};
 % groups = {'Early AMD'};
@@ -44,7 +50,7 @@ end
 % groups = {'Precoce'};
 % groups = {'Uveitis'};
 
-groups = [];
+% groups = [];
 
 %%% FOR A SET OF STUDIES
 % studies   = {'Choroidal Mapping';...

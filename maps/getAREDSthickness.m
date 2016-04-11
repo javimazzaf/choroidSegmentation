@@ -86,18 +86,8 @@ for dd = [3,6] %Radial region
          
     end
     
-    aredsT.(['D' num2str(dd)]) = radStruct;
-    
-    
+    aredsT.(['D' num2str(dd)]) = radStruct; 
     
 end
 
-
-end
-
-function [mn, sd] = maskMeanAndSd(value,weight,msk)
-%Computes weighted mean and standard deviation of "value" within msk
-
-  mn  = sum(value(msk) .* weight(msk)) / sum(weight(msk));
-  sd  = sqrt(sum(value(msk).^2 .* weight(msk)) / sum(weight(msk)) - mn^2);
 end

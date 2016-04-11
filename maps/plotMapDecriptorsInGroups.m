@@ -1,4 +1,4 @@
-function plotMapDecriptorsInGroups(dr)
+function plotMapDecriptorsInGroups(dr,conds)
 
 load(fullfile(dr,'mapData.mat'),'descriptors')
 
@@ -8,6 +8,13 @@ populations = cellfun(@(x) sum(strcmp(descriptors.Group(:),x)), allConditions);
 
 % mskCond   = (populations > 10) & ~ismember(allConditions,'Other/No Group');
 mskCond     = (populations >= 5) & ~ismember(allConditions,'Other/No Group');
+
+if ~isempty(conds)
+   mskCond     = mskCond & ismember(allConditions,conds); 
+end
+
+% conds = {'Normal';'OAG';'Uveitis'};
+
 conditions  = allConditions(mskCond);
 % populations = populations(mskCond);
 
@@ -110,6 +117,70 @@ ylim([0, 700])
 ylabel('center P95 Thickness [\mum]')
 print(hf,fullfile(dr,'centerP95Thickness.png'),'-dpng')
 
+%% Quadrant analyzes
+Nlim = 100;
+
+ns = data.nasalSuperiorMean(:);
+ns(data.nasalSuperiorN(:) < Nlim) = NaN;
+
+ni = data.nasalInferiorMean(:); 
+ni(data.nasalInferiorN(:) < Nlim) = NaN;
+
+ts = data.temporalSuperiorMean(:);
+ts(data.temporalSuperiorN(:) < Nlim) = NaN;
+
+ti = data.temporalInferiorMean(:);
+ti(data.temporalInferiorN(:) < Nlim) = NaN;
+
+nasal    = (ns + ni) / 2;
+temporal = (ts + ti) / 2;
+superior = (ts + ns) / 2;
+inferior = (ti + ni) / 2;
+
+% nasal Temporal Contrast
+nasalTemporalContrast    = (nasal - temporal)    ./ (nasal + temporal);
+msk = ~isnan(nasalTemporalContrast);
+
+hf = figure;
+boxplot(nasalTemporalContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([-1, 1])
+ylabel('nasalTemporalContrast')
+print(hf,fullfile(dr,'nasalTemporalContrast.png'),'-dpng')
+
+% Superior Inferior Contrast
+SuperiorInferiorContrast = (superior - inferior) ./ (superior + inferior);
+msk = ~isnan(SuperiorInferiorContrast);
+
+hf = figure;
+boxplot(SuperiorInferiorContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([-1, 1])
+ylabel('SuperiorInferiorContrast')
+print(hf,fullfile(dr,'SuperiorInferiorContrast.png'),'-dpng')
+
+% NasalSuperior TemporalInferior Contrast
+NsTiContrast = (ns - ti) ./ (ns + ti);
+msk = ~isnan(NsTiContrast);
+
+hf = figure;
+boxplot(NsTiContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([-1, 1])
+ylabel('NsTiContrast')
+print(hf,fullfile(dr,'NsTiContrast.png'),'-dpng')
+
+% NasalInferior TemporalSuperior Contrast
+NiTsContrast = (ni - ts) ./ (ni + ts);
+msk = ~isnan(NiTsContrast);
+
+hf = figure;
+boxplot(NiTsContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inline')
+set(gca,'FontSize',14)
+ylim([-1, 1])
+ylabel('NiTsContrast')
+print(hf,fullfile(dr,'NiTsContrast.png'),'-dpng')
+             
 % % Q5 thickness Corrected
 % hf = figure;
 % q5ThicknessCorrected = data.q5thick(:) + (data.Age(:) - min(data.Age(:))) * 1.462;
