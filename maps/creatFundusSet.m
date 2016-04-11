@@ -8,7 +8,7 @@ else
     dname = [filesep,'srv',filesep,'samba'];
 end
 
-targetDir = fullfile(dname,targetDir);
+targetDir = fullfile(dname,'share','SpectralisData',targetDir);
 
 if ~exist(targetDir,'dir'), mkdir(targetDir); end
 
