@@ -16,7 +16,12 @@ for k = 1:numel(dirlist)
     
     thisDir = dirlist{k};
     
-    load(fullfile(dname,thisDir,'Data Files','ImageList.mat'),'fundim');
+    imlistFile = fullfile(dname,thisDir,'Data Files','ImageList.mat');
+    if ~exist(imlistFile,'file'), 
+        continue, 
+    end
+    
+    load(imlistFile,'fundim');
     
     fname = encodeString(strrep(thisDir,'share/SpectralisData/Patients/',''));
     
