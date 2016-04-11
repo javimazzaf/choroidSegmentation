@@ -31,8 +31,14 @@ end
 
 end
 
+
 function fname = encodeString(fname)
+
+    patientName = regexp(fname,'(?<=.[0-9] ).*(?=/[[0-9]])','match');
+    
+    fname = strrep(fname, patientName, 'PN');
+
     fname = strrep(fname, filesep, '_');
-    fname = strrep(fname, ',', '#');
-    fname = strrep(fname, ' ', '%');
+%     fname = strrep(fname, ',', '#');
+    fname = strrep(fname, ' ', '');
 end
