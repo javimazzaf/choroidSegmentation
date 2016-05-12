@@ -114,6 +114,8 @@ dname = handles.dirlist{handles.currentIndex};
 set(handles.pathText,'String',dname);
 set(handles.indexText,'String',[num2str(handles.currentIndex,'%03.0f') ' of ' num2str(numel(handles.dirlist),'%03.0f')]);
 
+% loadcurrentPatientData(handles);
+
 if annotationsComplete(handles)
     set(handles.anotText,'String','Done');
     set(handles.anotText,'BackgroundColor','g');
@@ -565,3 +567,18 @@ if ~annotations.skip && (~isfield(annotations,'maculaCenter') || ~isfield(annota
 end
 
 complete = true;
+
+% function loadcurrentPatientData(handles)
+% 
+% dname = handles.dirlist{handles.currentIndex};
+% 
+% fname = fullfile(dname,'Data Files','VisitData.mat');
+% 
+% if ~exist(fname,'file'), return, end
+% 
+% load(fname,'visitdata')
+% 
+% disp(1)
+
+% set(handles.pathText,'String',dname);
+

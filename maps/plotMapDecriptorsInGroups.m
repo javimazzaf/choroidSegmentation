@@ -395,7 +395,7 @@ for k = [mxIx, setdiff(1:numel(conditions),mxIx)]
     polar(x/180*pi,hs(k,:),lns), hold on
 end
 
-% legend(conditions)
+legend(conditions)
 set(gca,'FontSize',14)
 print(hf,fullfile(dr,'AzimHistPolar.png'),'-dpng')
 
@@ -408,7 +408,7 @@ for k = [mxIxVector, setdiff(1:numel(conditions),mxIxVector)]
     compass(xPs(k),yPs(k),lns), hold on
 end
 
-% legend(conditions)
+legend(conditions)
 set(gca,'FontSize',14)
 print(hf,fullfile(dr,'AzimResult.png'),'-dpng')
 

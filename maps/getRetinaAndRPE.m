@@ -115,7 +115,7 @@ start = find(~isnan(top) & ~isnan(bottom) & ~isnan(retina),1,'first');
 fin   = find(~isnan(top) & ~isnan(bottom) & ~isnan(retina),1,'last');
 
 % Computes the absolut top limit of the region (halfway between retina and RPE)
-gapTop    = median(top - retina) / 2;
+gapTop = median(top - retina) / 2;
 topLim = round(min(top, retina + gapTop));
 
 % Computes the absolut bottom limit of the region (halfway between RPE and bottom of image)
