@@ -1,6 +1,8 @@
 Choroid map processing
 ----------------------”
 
+The user has to have writing rights on the directory holding the raw files.
+
 To prepare choroid maps, call the following functions in serial order:
 
 1 - convertSpectralis (batch)
