@@ -1,21 +1,16 @@
-function [messedup,error] = ChoroidMapFirstProcess(varargin)
+function [messedup,error] = choroidMapFirstProcess(varargin)
 % This function segments the retina interface, RPE, Bruchs membrane and the
 % coroid-sclera interface, in each frame in the array bscanstore in the
 % file RegisteredImages.mat for each directory in varargin{1}.
 
 % The current version is more robust to irregularities in the upper layers.
 
-if ispc
-    dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-    workersAvailable = Inf; %Uses parallel computing
-elseif ismac
-    dirlist = fullfile([filesep 'Volumes'],varargin{1});
-    workersAvailable = 0; %Uses 1 worker computing
-else
-    dirlist = fullfile(filesep,'srv','samba',varargin{1});
-    workersAvailable = Inf; %Uses 1 worker computing
-end
+dirlist = adaptToHMRpath(varargin{1});
 
+if ispc,      workersAvailable = Inf; %Uses parallel computing
+elseif ismac, workersAvailable = 0;   %Uses 1 worker computing
+else          workersAvailable = Inf; %Uses 1 worker computing
+end
 
 %Close parallel pool when the process exits the scope of this function
 if workersAvailable > 0

@@ -1,56 +1,36 @@
 function convertSpectralis(varargin)
 
-if length(varargin)==1
-    
-    if ispc
-        dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-    elseif ismac
-        dirlist = fullfile([filesep 'Volumes'],varargin{1});
-    else
-        dirlist = fullfile(filesep,'srv','samba',varargin{1});
-    end
-    
-else
-    
-    if ispc
-        load(fullfile([filesep filesep 'HMR-BRAIN'],'Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
-    elseif ismac
-        load(fullfile([filesep 'Volumes'],'Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist = fullfile([filesep 'Volumes'],dirlist);
-    else
-        load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
-    end
-    [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
-    dirlist=dirlist(~missraw);
-    
-end
+dirlist = adaptToHMRpath(varargin{1});
 
-for iter=1:length(dirlist)
-    folder = dirlist{iter};
-    if  isempty(dir(fullfile(folder,'Processed Images','*.tif')))
+for k = 1:numel(dirlist)
+    
+    folder = dirlist{k};
+
+    disp(logit(folder,['Initiating convertSpectralis on ' folder]))
+    
+    if ~exist(fullfile(folder,'RawImages'), 'dir')
+        mkdir(fullfile(folder,'RawImages'));
         
-        disp(logit(folder,['Initiating convertSpectralis on ' folder]))
+    end
+    
+    try
         
-        try
-        
-        if ~exist(fullfile(folder,'Processed Images'),'dir')
-           mkdir(fullfile(folder,'Processed Images'));
+        if ~exist(fullfile(folder,'ProcessedImages'),'dir')
+            mkdir(fullfile(folder,'ProcessedImages'));
         end
         
-        if ~exist(fullfile(folder,'Data Files'),'dir')
-           mkdir(fullfile(folder,'Data Files'));
+        if ~exist(fullfile(folder,'Processed Images Files'),'dir')
+            mkdir(fullfile(folder,'DataFiles'));
         end
         
-        x = dir(fullfile(folder,'Raw Images','*.xml'));
+        x = dir(fullfile(folder,'RawImages','*.xml'));
         
-        Heart = dir(fullfile(folder,'Raw Images','*.txt'));
+        Heart = dir(fullfile(folder,'RawImages','*.txt'));
         
         if ~isempty(Heart)
             
-            fileID=fopen(fullfile(folder,'Raw Images',Heart.name),'r');
-            fileID2=fopen(fullfile(folder,'Raw Images',[Heart.name '.txt']),'w');
+            fileID=fopen(fullfile(folder,'RawImages',Heart.name),'r');
+            fileID2=fopen(fullfile(folder,'RawImages',[Heart.name '.txt']),'w');
             
             while ~feof(fileID)
                 line=fgetl(fileID);
@@ -60,18 +40,18 @@ for iter=1:length(dirlist)
             fclose(fileID);
             fclose(fileID2);
             
-            delete(fullfile(folder,'Raw Images',Heart.name))
-            movefile(fullfile(folder,'Raw Images',[Heart.name '.txt']),fullfile(folder,'Raw Images',Heart.name));
+            delete(fullfile(folder,'RawImages',Heart.name))
+            movefile(fullfile(folder,'RawImages',[Heart.name '.txt']),fullfile(folder,'RawImages',Heart.name));
             
-            hrtdata=load(fullfile(folder,'Raw Images',Heart.name));
+            hrtdata=load(fullfile(folder,'RawImages',Heart.name));
             hrtindx=zeros(size(hrtdata,1),1);
             
         end
         
         try
-            [~,ImageList]=analyzeSpectralisXML(fullfile(folder,'Raw Images',x.name));
+            [~,ImageList]=analyzeSpectralisXML(fullfile(folder,'RawImages',x.name));
         catch exc
-            disp(logit(folder,['Error in ' fullfile(folder,'Raw Images',x.name) ' : ' exc.message]))
+            disp(logit(folder,['Error in ' fullfile(folder,'RawImages',x.name) ' : ' exc.message]))
             continue;
         end
         
@@ -81,22 +61,22 @@ for iter=1:length(dirlist)
         
         pause(.0002)
         
-        dircontent=dir(fullfile(folder,'Raw Images','*.tif'));
+        dircontent=dir(fullfile(folder,'RawImages','*.tif'));
         
         for i=1:size(ImageList,2);
             %         Processing_image=[i,size(ImageList,2)];
             no=[num2str(i-1,'%5.5d'),'.png'];
             try
-                imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
+                imtif=imread(fullfile(folder,'RawImages',ImageList(i).fileName));
             catch
                 ind=cell2mat(regexp(ImageList(i).fileName,{dircontent.name}));
                 disp(logit(folder,['convertSpectralis: fixed error in ' folder]))
                 ImageList(i).fileName=ImageList(i).fileName(ind:end);
-                imtif=imread(fullfile(folder,'Raw Images',ImageList(i).fileName));
+                imtif=imread(fullfile(folder,'RawImages',ImageList(i).fileName));
             end
-
+            
             imout=rgb2gray(imtif);
-            imwrite(imout,fullfile(folder,'Processed Images',no))
+            imwrite(imout,fullfile(folder,'ProcessedImages',no))
             
             imTime(i,1)=(ImageList(i).hour-tdif)+ImageList(i).minute*10^-2;
             imTime(i,2)=ImageList(i).second;
@@ -111,22 +91,20 @@ for iter=1:length(dirlist)
             end
         end
         fundus=ImageList(1).fundusfileName;
-        fundim=imread(fullfile(folder,'Raw Images',fundus));
-        save(fullfile(folder,'Data Files','ImageList.mat'),'ImageList','fundim');
+        fundim=imread(fullfile(folder,'RawImages',fundus));
+        save(fullfile(folder,'DataFiles','ImageList.mat'),'ImageList','fundim');
         if ~isempty(Heart)
             hrtdata(:,4)=hrtindx;
-            save(fullfile(folder,'Data Files','HeartInfo.mat'),'hrtdata');
+            save(fullfile(folder,'DataFiles','HeartInfo.mat'),'hrtdata');
         end
         
-        catch dirExc
-            disp(logit(folder,['Error (convertSpectralis) in folder ' folder ' : ' dirExc.message]))
-            continue
-        end
-        
-        disp(logit(folder,['Done convertSpectralis in folder ' folder]))
-    else
+    catch dirExc
+        disp(logit(folder,['Error (convertSpectralis) in folder ' folder ' : ' dirExc.message]))
         continue
     end
     
-    rmdir(fullfile(dirlist{iter},'Raw Images'),'s')
+    disp(logit(folder,['Done convertSpectralis in folder ' folder]))
+    
+    
+    rmdir(fullfile(dirlist{k},'RawImages'),'s')
 end

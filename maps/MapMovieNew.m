@@ -1,34 +1,9 @@
-function MapMovieNew(varargin)
-% Creates a movie showing the segmentation of individual bscans for every
-% position of the map. It is mostly for debbuging purposes.
+function mapMovieNew(varargin)
 
-if length(varargin)==1
-    if ispc
-        dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
-    elseif ismac
-        dirlist = fullfile([filesep 'Volumes'],varargin{1});
-    else
-        dirlist = fullfile(filesep,'srv','samba',varargin{1});
-    end
-else
-    if ispc
-        load(fullfile([filesep filesep 'HMR-BRAIN'],'share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
-    else
-        load(fullfile(filesep,'srv','samba','Share','SpectralisData','Code','Choroid Code','Directories','directories.mat'))
-        dirlist=fullfile(filesep,'srv','samba',strrep(dirlist,'\','/'));
-    end
-    [missdata,missraw,missprocessim,missregims,missresults]=CheckDirContents(dirlist);
-    FirstProcess=logical(cellfun(@exist,fullfile(dirlist,'Results','FirstProcessData.mat')));
-    Map=~cellfun(@isempty,regexp(dirlist,'Choroidal Mapping','match'));
-    dirlist=dirlist(FirstProcess&Map);
-    if isempty(dirlist)
-        errordlg('No diretories prerequisite data. Run ChoroidFirstProcess.m first')
-        return
-    end
-end
+dirlist = adaptToHMRpath(varargin{1});
 
 for iter=1:length(dirlist)
+    
     directory=dirlist{iter};
     
     disp(logit(directory,['Starting MapMovie:' directory]));

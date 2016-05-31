@@ -1,7 +1,7 @@
-% Simple function to write to a LOG file.
-% The file is created for each day, if it does not exist. Otherwise, info
-% is appended to the file. The inputs are the path and the text to append in a new
-% line.
+% function pathOut = adaptToHMRpath(pathIn)
+% 
+% Adapts the path of the patients directory structure, acording to the
+% current computer.
 
 % Copyright (C) 2016 Javier Mazzaferri <javier.mazzaferri@gmail.com>
 % Hopital Maisonneuve-Rosemont, 
@@ -21,27 +21,15 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-function outText = logit(dname,inText)
 
-try
-    
-    fname = fullfile(dname,['log' datestr(now,'yyyymmdd') '.txt']);
-    
-    fid = fopen(fname,'a');
-    
-    if fid == -1, return, end
-    
-    outText = sprintf('%s: \t %s \n',datestr(now,'HH:MM:SS.FFF'),inText);
-    
-    fprintf(fid,'%s',outText);
-    
-catch
-    
-    outText = '';
-    fclose(fid);
-    
+function pathOut = adaptToHMRpath(pathIn)
+
+if ispc
+    pathOut = fullfile([filesep filesep 'HMR-BRAIN'],pathIn);
+elseif ismac
+    pathOut = fullfile([filesep 'Volumes'],pathIn);
+else
+    pathOut = fullfile(filesep,'srv','samba',pathIn);
 end
-
-fclose(fid);
 
 end
