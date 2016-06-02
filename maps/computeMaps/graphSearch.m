@@ -1,9 +1,13 @@
-function [PathPts,usedNodes] = mapGraphSearchFirstPass(nodesMask,edgeness,alpha,wM,delColmax,delRowmax,maxJumpCol,...
+function [PathPts,usedNodes] = graphSearch(nodesMask,edgeness,alpha,wM,delColmax,delRowmax,maxJumpCol,...
     maxJumpRow,on1,on2,on3,on4,grad)
+
+% Previously: mapGraphSearchFirstPass
+
 % Computes the graph search for the nodes in "nodesMask" with weights
 % computed here using "edginess" image, and parameters alpha,wM,delColmax,
 % delRowmax,maxJumpCol,maxJumpRow,on1,on2,on3,on4
 
+parameters = loadParameters;
 
 [nRows,nCols] = size(nodesMask);
 
@@ -63,9 +67,9 @@ for indx = 2:numNodes-1
     delx=abs(cols(indx)-cols(connected));
     
     if on4
-        ConnectionAffinity=LinePenalty(indx,rows,cols,connected,nodesMask,edgeness);
+        ConnectionAffinity = linePenalty(indx,rows,cols,connected,edgeness);
     else
-        ConnectionAffinity=Inf;
+        ConnectionAffinity = Inf;
     end
     
     Euclid            = dely.^2 + delx.^2;
@@ -158,9 +162,9 @@ if isempty(path) || any(isinf(dist))
           meanWeights = [PathPts(objIx).meanWeight];
           heights     = [PathPts(objIx).meanHeight]; % disfavors segments at the bottom of the scan (originated on noise)
           
-          sumWeightRates  = getParameter('SEGMENT_SELECTION_SUMWEIGTH')  *  sumWeights  / sum(sumWeights);
-          meanWeightRates = getParameter('SEGMENT_SELECTION_MEANWEIGTH') *  meanWeights / sum(meanWeights);
-          heightRates     = getParameter('SEGMENT_SELECTION_HEIGHTS')    ./ heights     / sum(1./heights);
+          sumWeightRates  = parameters.segmentSelectionSumWeigth  *  sumWeights  / sum(sumWeights);
+          meanWeightRates = parameters.segmentSelectionMeanWeigth *  meanWeights / sum(meanWeights);
+          heightRates     = parameters.segmentSelectionHeights    ./ heights     / sum(1./heights);
           
           fullRate = sumWeightRates + meanWeightRates + heightRates;
           
@@ -176,13 +180,10 @@ if isempty(path) || any(isinf(dist))
           
 %        end
     end
-    
-    minMeanWeight = getParameter('MIN_MEAN_PATH_WEIGHT');
-    minSumWeight  = getParameter('MIN_SUM_PATH_WEIGTH');
      
     % Keep segments that do not overlap and remove unsignificant ones
     for k = 1:numel(PathPts)
-        if PathPts(k).meanWeight < minMeanWeight || PathPts(k).length < minSumWeight
+        if PathPts(k).meanWeight < parameters.minMeanPathWeight || PathPts(k).length < parameters.minSumPathWeigth
             PathPts(k).keep = 0;
         elseif all(count(logical(domains(k,:))) == 1)
             PathPts(k).keep = 1;

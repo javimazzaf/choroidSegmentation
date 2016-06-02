@@ -1,26 +1,27 @@
-function mapMovieNew(varargin)
+function choroidMovie(varargin)
+% Previously mapMovieNew
 
-dirlist = adaptToHMRpath(varargin{1});
+% dirlist = adaptToHMRpath(varargin{1});
+dirlist = varargin{1};
 
-for iter=1:length(dirlist)
+for q = 1:length(dirlist)
     
-    directory=dirlist{iter};
+    folder = dirlist{q};
     
-    disp(logit(directory,['Starting MapMovie:' directory]));
+    disp(logit(folder,['Starting MapMovie:' folder]));
     
     try
         
-        load(fullfile(directory,'Results','FirstProcessDataNew.mat')); %Get Traces
-%         load(fullfile(directory,'Data Files','RegisteredImages.mat')); %Get Frames
-        load(fullfile(directory,'Results','processedImages.mat'),'shiftedScans','safeTopLimit','safeBottomLimit'); %'avgScans'
+        load(fullfile(folder,'Results','segmentationResults.mat')); %Get Traces
+
+        load(fullfile(folder,'Results','flattenedBscans.mat'),'shiftedScans','safeTopLimit','safeBottomLimit'); %'avgScans'
         
         shiftedScans = uint8(shiftedScans / max(shiftedScans(:)) * 255);
         
-%         load(fullfile(directory,'Results','ChoroidMap.mat')); %Get Map
-        load(fullfile(directory,'Results','ChoroidMapNew.mat')); %Get Map 
+        load(fullfile(folder,'Results','ChoroidMap.mat')); %Get Map 
         
         df = figure('Visible','Off');
-%         df = figure();
+
         xlabel('Fundus X Position [mm]')
         ylabel('Fundux Y Position [mm]')
         title('Choroidal Thickness Map [\mum]')
@@ -53,8 +54,6 @@ for iter=1:length(dirlist)
         
         ax2=subplot(1,2,1);
         
-%         subimage(bscanstore{1});
-        
         if ~isnan(safeTopLimit(1)) && ~isnan(safeBottomLimit(1))
            subimage(shiftedScans(safeTopLimit(1):safeBottomLimit(1),:,1));
         else
@@ -65,21 +64,14 @@ for iter=1:length(dirlist)
         pos2=get(ax2,'position');
         set(ax1,'Position',[pos1(1) pos2(2) pos2(3) pos2(4)])
         
-%         filename=fullfile(directory,'Results','MapMovie.gif');
-        filename=fullfile(directory,'Results','MapMovieNew.gif');
-        
-%         df = gcf;
-        
-        %     if ~exist(fullfile(directory,'Results','singleFrames'),'dir')
-        %         mkdir(fullfile(directory,'Results','singleFrames'));
-        %     end
+        filename=fullfile(folder,'Results','choroidMovie.gif');
         
         % Compute absolute max weight
         maxWeight = -Inf;
-        for i=1:length(yvec)
-           for k = 1:numel(traces(i).CSI)
+        for p=1:length(yvec)
+           for k = 1:numel(traces(p).CSI)
                
-               thisWeight = max(traces(i).CSI(k).weight(:));
+               thisWeight = max(traces(p).CSI(k).weight(:));
                
                if ~isempty(thisWeight)
                    maxWeight = max(maxWeight,thisWeight);
@@ -90,14 +82,14 @@ for iter=1:length(dirlist)
 
         scansInfo = [];
         
-        for i=1:length(yvec)
-%             figure(df)
+        for p=1:length(yvec)
+
             h4=subplot(1,2,1);
-%             subimage(bscanstore{i});
-            if ~isnan(safeTopLimit(i)) && ~isnan(safeBottomLimit(i))
-              thisBscan = shiftedScans(safeTopLimit(i):safeBottomLimit(i),:,i);
+
+            if ~isnan(safeTopLimit(p)) && ~isnan(safeBottomLimit(p))
+              thisBscan = shiftedScans(safeTopLimit(p):safeBottomLimit(p),:,p);
             else
-              thisBscan = shiftedScans(:,:,i);
+              thisBscan = shiftedScans(:,:,p);
             end
             
             subimage(thisBscan);
@@ -112,12 +104,12 @@ for iter=1:length(dirlist)
             allwCSI = [];
             
             clr = 'rgymcb';
-            for k = 1:numel(traces(i).CSI)
-                if ~(traces(i).CSI(k).keep), continue, end
+            for k = 1:numel(traces(p).CSI)
+                if ~(traces(p).CSI(k).keep), continue, end
                 
-                xCSI = traces(i).CSI(k).x(:);
-                yCSI = traces(i).CSI(k).y(:);
-                wCSI = traces(i).CSI(k).weight(:);
+                xCSI = traces(p).CSI(k).x(:);
+                yCSI = traces(p).CSI(k).y(:);
+                wCSI = traces(p).CSI(k).weight(:);
                 
                 errorbar(xCSI,yCSI,wCSI / maxWeight * 10,['.' clr(mod(k,6) + 1)])
                 
@@ -131,19 +123,9 @@ for iter=1:length(dirlist)
             thisScanInfo.yCSI = allyCSI;
             thisScanInfo.wCSI = allwCSI;
             
-%             [xCSI,ix,~] = unique(xCSI);
-%             yCSI = yCSI(ix);
-%             wCSI = wCSI(ix);
-            
-            %         [~,iCSI] = interpCSI(xCSI,yCSI, numel(traces(i).BM));
-            %         plot(iCSI,'-r','LineWidth',2)
-            
-%             errorbar(xCSI,yCSI,wCSI / maxWeight * 10,'.r')
-            
-%             subplot(1,2,1), plot(traces(i).BM,'-m','LineWidth',2)
-            if ~isempty(traces(i).RPEheight)
-              subplot(1,2,1), plot(traces(i).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
-              thisScanInfo.RPE = traces(i).RPEheight;
+            if ~isempty(traces(p).RPEheight)
+              subplot(1,2,1), plot(traces(p).RPEheight * ones(1,size(shiftedScans,2)),'-m','LineWidth',2)
+              thisScanInfo.RPE = traces(p).RPEheight;
             else
               thisScanInfo.RPE = [];  
             end
@@ -152,17 +134,15 @@ for iter=1:length(dirlist)
             
             subplot(1,2,2)
             hold on
-            h5 = plot(xvec,repmat(yvec(i),length(xvec),1),'k--','linewidth',1.5);
+            h5 = plot(xvec,repmat(yvec(p),length(xvec),1),'k--','linewidth',1.5);
             hold off
             drawnow
-%             frame=getframe(df);
-%             im=frame2im(frame);
  
             print(df,'~/aux.png','-dpng')
             im = imread('~/aux.png');
             [imind,cm]=rgb2ind(im,256);
             
-            if i==1
+            if p==1
                 imwrite(imind,cm,filename,'gif','Loopcount',inf)
             else
                 imwrite(imind,cm,filename,'gif','Writemode','append')
@@ -172,32 +152,24 @@ for iter=1:length(dirlist)
             
             scansInfo = [scansInfo thisScanInfo];
             
-            %         ff = figure();
-            %         imshow(bscanstore{i},[],'Border','tight'); hold on
-            %         plot(traces(i).BM,'-m','LineWidth',2)
-            %         errorbar(xCSI,yCSI,wCSI * 10,'.r')
-            %         hold off
-            %         print(ff,fullfile(directory,'Results','singleFrames',['frame_' num2str(i) '.pdf']),'-dpdf')
-            %         close(ff);
-            
-            disp(i)
+            disp(p)
         end
         
-        save(fullfile(directory,'Results','bScans.mat'), 'scansInfo')
+        save(fullfile(folder,'Results','bScans.mat'), 'scansInfo')
         
         delete('~/aux.png')
         
     catch exception
-        errorString = ['Error MapMovie:' directory '. Message:' exception.message];
+        errorString = ['Error MapMovie:' folder '. Message:' exception.message];
         errorString = [errorString buildCallStack(exception)];
         
-        disp(logit(directory,errorString));
+        disp(logit(folder,errorString));
         
         close all
         continue
     end
     
-    disp(logit(directory,['Done MapMovie:' directory]));
+    disp(logit(folder,['Done MapMovie:' folder]));
     
     close all
 end

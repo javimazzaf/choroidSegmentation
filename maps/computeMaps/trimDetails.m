@@ -1,4 +1,4 @@
-function TrimDetails(varargin)
+function trimDetails(varargin)
 
 % dirlist = adaptToHMRpath(varargin{1});
 dirlist = varargin{1};

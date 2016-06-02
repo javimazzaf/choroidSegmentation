@@ -1,24 +1,21 @@
 function preProcessFrames(directory)
 
-% if ~ispc && ~ismac
-%     workersAvailable = Inf; 
-% else
-%     workersAvailable = 0; 
-% end
-
 savedir   = fullfile(directory,'Results');
+disp(logit(savedir, 'Starting preProcessFrames.'));
 
-varStruct = load(fullfile(directory,'Data Files','RegisteredImages.mat'),'bscanstore','skippedind','start');
+parameters = loadParameters;
+
+varStruct = load(fullfile(directory,'DataFiles','RegisteredImages.mat'),'bscanstore','skippedind','start');
 bscanstore = varStruct.bscanstore;
 skippedind = varStruct.skippedind;
 start      = varStruct.start;
 
-varStruct = load(fullfile(directory,'Data Files','ImageList.mat'),'ImageList');
+varStruct = load(fullfile(directory,'DataFiles','ImageList.mat'),'ImageList');
 ImageList = varStruct.ImageList;
 
 numframes = numel(bscanstore);
 
-%Initialize Variables
+% Initialize Variables
 nodes      = cell(numframes,1);
 EndHeights = nan(numframes,2);
 
@@ -30,10 +27,10 @@ other(numframes).colshifts = [];
 
 indToProcess = setdiff(start:numframes,skippedind);
 
-DeltaX = ImageList(start).scaleX;
-DeltaY = - diff([ImageList([start,start + 1]).startY]);
+DeltaX = ImageList{start, 'scaleX'};
+DeltaY = abs(diff([ImageList{[start,start + 1], 'startY'}]));
 
-SigmaFilterScans = max(1,ceil(getParameter('AVERAGING_SIZE') * DeltaX / DeltaY));
+SigmaFilterScans = max(1,ceil(parameters.averagingSize * DeltaX / DeltaY));
 
 interScansFilter = exp(-(-SigmaFilterScans:SigmaFilterScans).^2 / 2 / SigmaFilterScans^2);
 interScansFilter = interScansFilter / sum(interScansFilter);
@@ -75,8 +72,10 @@ for frame = indToProcess
         safeBottomLimit(frame) = min(size(shiftedScans,1),size(shiftedScans,1) + double(min(colShifts)));
         
         disp(frame)
-    catch
-        disp(logit(savedir,['Error frame:' num2str(frame)]));
+    catch exception
+        errString = ['Error preProcessFrames at frame:' num2str(frame) '. Message: ' exception.message] ;
+        errString = [errString buildCallStack(exception)];
+        disp(logit(savedir,errString));
     end
 end
 
@@ -109,11 +108,13 @@ for frame = indToProcess
         avgScans{frame} = nansum(allAux,3) / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
         disp(frame)
     catch
-        disp(logit(savedir,['Error frame:' num2str(frame)]));
+        disp(logit(savedir,['Error preProcessFrames at frame:' num2str(frame)]));
     end
 end
 
 RPEheight = posRPE - safeTopLimit + 1;
 
-save(fullfile(savedir,'FirstProcessDataNew.mat'),'nodes','traces','other','EndHeights');
-save(fullfile(savedir,'processedImages.mat'),'shiftedScans','avgScans','indToProcess','RPEheight','safeTopLimit','safeBottomLimit');
+save(fullfile(savedir,'segmentationResults.mat'),'nodes','traces','other','EndHeights');
+save(fullfile(savedir,'flattenedBscans.mat'),'shiftedScans','avgScans','indToProcess','RPEheight','safeTopLimit','safeBottomLimit');
+
+disp(logit(savedir, 'Done preProcessFrames.'));

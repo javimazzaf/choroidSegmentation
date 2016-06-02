@@ -1,6 +1,4 @@
-function Affinity = LinePenalty(indx,row,col,connected,points,texture)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function Affinity = linePenalty(indx,row,col,connected,texture)
 
 
 Affinity=zeros(length(connected),1);
@@ -11,13 +9,6 @@ Affinity=zeros(length(connected),1);
     row(connected),col(connected),...
     repmat(b,length(connected),1),...
     'uniformoutput',0);
-
-% figure(1)
-% imshow(imoverlay(texture,points))
-% hold all
-% for i=1:length(X)
-% plot(Y{i},X{i})
-% end
 
 
 for i=1:length(connected)

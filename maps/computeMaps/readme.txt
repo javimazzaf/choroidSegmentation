@@ -6,10 +6,10 @@ The user has to have writing rights on the directory holding the raw files.
 To prepare choroid maps, call the following functions in serial order:
 
 1 - convertSpectralis (batch)
-2 - TrimDetails (interactive)
-3 - MapPseudoRegistration (batch)
-4 - ChoroidMapFirstProcess (batch)
-5 - ChoroidMapNew (interactive)
-6 - MapMovieNew (batch)
+2 - trimDetails (interactive)
+3 - mapPseudoRegistration (batch)
+4 - retinaLayersSegmentation (batch)
+5 - choroidMap (batch)
+6 - choroidMovie (batch)
 
 

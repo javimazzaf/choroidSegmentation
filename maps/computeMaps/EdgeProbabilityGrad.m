@@ -1,6 +1,8 @@
 function padPb = EdgeProbabilityGrad(shiftbscan,scalesize,angles,rpeHeight)
 % Computes the edge probability
 
+parameters = loadParameters;
+
 sigma  = scalesize / 4;
 angles = angles + 90;
 
@@ -27,8 +29,8 @@ edg(edg < 0) = 0;
 
 padPb = zeros(size(edg));
 
-topRow = max(1, rpeHeight + getParameter('CHOROID_MIN_WIDTH'));
-botRow = min(size(padPb,1), topRow + getParameter('CHOROID_MAX_WIDTH') - 1);
+topRow = max(1, rpeHeight + parameters.choroidMinWidth); 
+botRow = min(size(padPb,1), topRow + parameters.choroidMaxWidth - 1); 
 
 padPb(topRow:botRow,:) = edg(topRow:botRow,:);  
 
@@ -38,6 +40,6 @@ padPb = padPb / max(padPb(:));
 
 padPb = padPb.^2;
 
-padPb(padPb <= getParameter('EDGINESS_THRESHOLD')) = 0;
+padPb(padPb <= parameters.edginessThreshold) = 0; 
 
 end
