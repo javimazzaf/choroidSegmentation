@@ -55,7 +55,7 @@ for k = 1:length(dirlist)
         close(fh)
         
         % Sort, check limits, and save to file
-        dlmwrite(fname,min(max(1,sort(col)),size(bscan,2)),'precision','%g','delimiter',',')
+        dlmwrite(fname,min(max(1,sort(col)),size(bscan,2))','precision','%g','delimiter',',')
         
         
     catch exception
