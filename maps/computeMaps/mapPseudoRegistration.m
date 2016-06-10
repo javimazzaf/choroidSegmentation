@@ -19,7 +19,7 @@ for k = 1:length(dirlist)
         numframes  = numel(pngList);
         bscanstore = cell(numframes,1);
         
-        cropLimits = dlmread(fullfile(folder, 'DataFiles', 'TrimInfo.txt'));
+        cropLimits = dlmread(fullfile(folder, 'DataFiles', 'TrimInfo.txt'),',');
         
         for frame = 1:numframes
             bscan = imread(fullfile(folder, 'ProcessedImages', pngList(frame).name));

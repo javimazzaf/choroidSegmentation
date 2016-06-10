@@ -138,8 +138,10 @@ for q = 1:length(dirlist)
             hold off
             drawnow
  
-            print(df,'~/aux.png','-dpng')
-            im = imread('~/aux.png');
+            auxfname = fullfile(folder,'Results','auxChoroidMovie.png');
+            
+            print(df,auxfname,'-dpng')
+            im = imread(auxfname);
             [imind,cm]=rgb2ind(im,256);
             
             if p==1
@@ -157,7 +159,7 @@ for q = 1:length(dirlist)
         
         save(fullfile(folder,'Results','bScans.mat'), 'scansInfo')
         
-        delete('~/aux.png')
+        delete(auxfname);
         
     catch exception
         errorString = ['Error MapMovie:' folder '. Message:' exception.message];

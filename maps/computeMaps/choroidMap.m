@@ -29,7 +29,7 @@ for iter = 1:numel(dirlist)
         
         %% BScan Info
         width  = ImageList{1, 'width'};
-        cropLimits = dlmread(fullfile(folder, 'DataFiles', 'TrimInfo.txt'));
+        cropLimits = dlmread(fullfile(folder, 'DataFiles', 'TrimInfo.txt'),',');
         
         xvec = linspace(ImageList{start,'startX'} + (cropLimits(1)-1)     * ImageList{start, 'scaleX'},...
             ImageList{start,'endX'}   - (width-cropLimits(2)) * ImageList{start, 'scaleX'},...

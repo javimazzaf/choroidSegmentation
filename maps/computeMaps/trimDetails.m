@@ -47,7 +47,7 @@ for k = 1:length(dirlist)
                 happy='Accept';
                 col=[1;size(bscan,2)];
             else
-                delete(fullfile(folder,'DataFiles','TrimInfo.txt'))
+                delete(fname)
                 return
             end
         end
@@ -55,7 +55,7 @@ for k = 1:length(dirlist)
         close(fh)
         
         % Sort, check limits, and save to file
-        dlmwrite(fullfile(folder,'DataFiles','TrimInfo.txt'),min(max(1,sort(col)),size(bscan,2)),'precision','%g')
+        dlmwrite(fname,min(max(1,sort(col)),size(bscan,2)),'precision','%g','delimiter',',')
         
         
     catch exception
