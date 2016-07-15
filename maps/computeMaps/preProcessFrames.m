@@ -30,7 +30,7 @@ indToProcess = setdiff(start:numframes,skippedind);
 DeltaX = ImageList{start, 'scaleX'};
 DeltaY = abs(diff([ImageList{[start,start + 1], 'startY'}]));
 
-SigmaFilterScans = max(1,ceil(parameters.averagingSize * DeltaX / DeltaY));
+SigmaFilterScans = max(1,ceil(parameters.averagingSizeX * DeltaX / DeltaY));
 
 interScansFilter = exp(-(-SigmaFilterScans:SigmaFilterScans).^2 / 2 / SigmaFilterScans^2);
 interScansFilter = interScansFilter / sum(interScansFilter);

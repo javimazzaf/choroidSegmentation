@@ -1,6 +1,7 @@
 function parameters = loadParameters
 
-parameters.averagingSize   = 5; % in pixels
+parameters.averagingSizeX  = 5; % in pixels
+parameters.averagingSizeZ  = 5; % in pixels
 parameters.choroidMinWidth = 15; % in pixels
 parameters.choroidMaxWidth = 150; % in pixels
 parameters.firstDerivativeThreshold  = 0.7;

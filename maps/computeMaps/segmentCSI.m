@@ -9,7 +9,8 @@ Infl2 = zeros(size(origShiftedBscan));
 
 shiftedBscan = origShiftedBscan / max(origShiftedBscan(:)) * 255;
 
-filteredBscan = imfilter(shiftedBscan,OrientedGaussian([3 3],0));
+% filteredBscan = imfilter(shiftedBscan,OrientedGaussian([3 3],0));
+filteredBscan = imfilter(shiftedBscan,OrientedGaussian([parameters.averagingSizeZ, parameters.averagingSizeX],0));
 colspacing    = 2;
 
 nCols = size(filteredBscan,2);
@@ -19,13 +20,11 @@ testGrad2 = [];
 
 for j = 1:nCols
     
-    filteredAscan = smooth(double(filteredBscan(:,j)),10);
+%     filteredAscan = smooth(double(filteredBscan(:,j)),10);
+    filteredAscan = double(filteredBscan(:,j));
     
-    grad  = gradient(filteredAscan);
-    grad2 = del2(    filteredAscan);
-    
-    testGrad  = [testGrad grad];
-    testGrad2 = [testGrad2 grad2];
+    grad  = gradient(filteredAscan); 
+    grad2 = del2(filteredAscan);
 
     z = (abs(grad2) < parameters.secondDerivativeThreshold) & (grad > parameters.firstDerivativeThreshold); %[JM]
     z(1:rpeHeight + parameters.choroidMinWidth) = 0;

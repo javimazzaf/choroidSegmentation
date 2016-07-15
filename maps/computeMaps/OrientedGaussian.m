@@ -13,6 +13,7 @@ c = -b;
 d = a;
 
 G = 1/(2*pi*sigma(1)*sigma(2))*exp(-(a*x+b*y).^2./(2*sigma(1)^2)-(c*x+d*y).^2./(2*sigma(2)^2));
+
 G(G<eps*max(G(:))) = 0;
 
 end
