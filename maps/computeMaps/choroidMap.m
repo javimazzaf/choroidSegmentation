@@ -101,7 +101,7 @@ for iter = 1:numel(dirlist)
         mapRetina    = [gridx(validRETMask), gridy(validRETMask), gridRetina(validRETMask)];
         
         % Compute retina thickness map
-        Fret = scatteredInterpolant(mapRetina(:,1),mapRetina(:,2),mapRetina(:,3));
+        Fret = scatteredInterpolant(mapRetina(:,1),mapRetina(:,2),mapRetina(:,3),'natural','nearest');
         CretMap = Fret(qx,qy);
         
         newRetbscan  = imref2d(size(CretMap),[qx(1,1) qx(1,end)],[qy(1,1) qy(end,1)]);
@@ -139,7 +139,7 @@ for iter = 1:numel(dirlist)
         close(fh)
         
         % Compute choroid map
-        F = scatteredInterpolant(mapInfo(:,1),mapInfo(:,2),mapInfo(:,3));
+        F = scatteredInterpolant(mapInfo(:,1),mapInfo(:,2),mapInfo(:,3),'natural','nearest');
         Cmap = F(qx,qy);
         
         newRbscan  = imref2d(size(Cmap),[qx(1,1) qx(1,end)],[qy(1,1) qy(end,1)]);

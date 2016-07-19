@@ -48,7 +48,7 @@ for frame = indToProcess
         
         bscan = double(bscanstore{frame});
         
-        [yRet,yTop] = getRetinaAndRPE(bscan,8);
+        [yRet,yTop] = getRetinaAndBM(bscan,8);
         
         %-% Flattening of Image According to BM
         
@@ -56,6 +56,11 @@ for frame = indToProcess
         maxShift  = double(max(abs(colShifts)));
         
         shiftedScans(:,:,frame) = imageFlattening(bscan,colShifts,maxShift);
+       
+%         fh = figure;
+%         imshow(shiftedScans(:,:,frame),[]), hold on
+%         plot(posRPE * ones(size(yTop)))
+%         close(fh)
         
         %-% Store Relevant Variables
         traces(frame).RET = yRet;
