@@ -246,31 +246,48 @@ function [xOut,traceOut] = findRPEbottom(imOri,invGrad,top, bottom)
 
 sz = size(invGrad);
 
-msk = logical(zeros(sz));
+msk = false(sz);
 
 % Find the start and end of all the traces together
 start = find(~isnan(top) & ~isnan(bottom),1,'first');
 fin   = find(~isnan(top) & ~isnan(bottom),1,'last');
 
-% Computes the centroid of the RPE between top and bottom using image
-% intensity.
+top(1:start) = top(start);
+top(fin:end) = top(fin);
+bottom(1:start) = bottom(start);
+bottom(fin:end) = bottom(fin);
+% Computes RPE msk
 
-topLim = NaN(size(top));
-
-for k = start:fin
-      topLim(k) = round(sum(imOri(top(k):bottom(k),k) .* (top(k):bottom(k))') / sum(imOri(top(k):bottom(k),k)));
+for k = 1:numel(top)
+      msk(top(k):bottom(k),k) = true;
 end
 
-topLim(1:start) = topLim(start);
-topLim(fin:end) = topLim(fin);
+wInt = imOri(msk);
+wInt = (wInt - min(wInt)) / (max(wInt) - min(wInt)); 
 
-% Computes the absolut bottom limit of the region (halfway between RPE and bottom of image)
+wMatrix = zeros(size(msk));
+wMatrix(msk) = wInt;
+
+[aC,bC,aIm,bIm,imind,edges,num] = ConnectivityMatrix(msk,8);
+[xRPE,yRPE] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,wMatrix);
+
+xRPE = round(xRPE);
+yRPE = round(yRPE);
+
+ix = sub2ind(size(imOri),yRPE,xRPE);
+wRPE = imOri(ix);
+
+% Refine BM
+yRPE = eliminateJumps(yRPE, wRPE);
+
+% Estimates the bottom edge of the RPE
 rpeThickness = nanmedian(bottom - top);
 
-botLim = round(min(sz(1), topLim + rpeThickness));
+botLim = round(min(sz(1), yRPE + rpeThickness));
+msk(:) = false;
 
-for k = 1:numel(topLim)
-      msk(topLim(k):botLim(k),k) = true;
+for k = 1:numel(yRPE)
+      msk(yRPE(k):botLim(k),k) = true;
 end
 
 wGrad = invGrad(msk);
@@ -280,11 +297,13 @@ wMatrix = zeros(size(msk));
 wMatrix(msk) = wGrad;
 
 [aC,bC,aIm,bIm,imind,edges,num] = ConnectivityMatrix(msk,8);
-[xBM,yBM] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,wMatrix);
+[xBot,yBot] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,wMatrix);
 
-% Expected bottom RPE trace. 
+% Estimated distance to BM
 
-expTrace = round(topLim + nanmedian(yBM' - topLim(xBM))); 
+estDistBM = nanmedian(yBot' - yRPE(xBot));
+xOut = 1:numel(yRPE);
+traceOut = yRPE + estDistBM;
 
 % [x,y] = meshgrid(1:sz(2),1:sz(1));
 % x = x(msk);
@@ -304,12 +323,7 @@ expTrace = round(topLim + nanmedian(yBM' - topLim(xBM)));
 % wMatrix(msk) = weight;
 % [xBM,yBM] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,wMatrix);
 
-xOut = 1:numel(expTrace);
-ix = sub2ind(size(imOri),expTrace,xOut);
-wBM = invGrad(ix);
 
-% Refine BM
-traceOut = eliminateJumps(expTrace, wBM);
 
 
 end
