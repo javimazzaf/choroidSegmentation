@@ -36,7 +36,16 @@ padPb(topRow:botRow,:) = edg(topRow:botRow,:);
 
 padPb(1,:) = 0;
 
-padPb = padPb / max(padPb(:));
+% padPb = padPb / max(padPb(:));
+
+% assigns the maximal edge probability to the 99.99 percentile of the
+% pixels excluding a 15 pixels frame. It saturates the probability over
+% this value.
+
+aux = padPb(15:end-15,15:end-15);
+topPbValue = prctile(aux(:),99.99);
+
+padPb = min(1,padPb / topPbValue);
 
 padPb = padPb.^2;
 

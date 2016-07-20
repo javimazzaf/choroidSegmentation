@@ -7,7 +7,8 @@ OG = EdgeProbabilityGrad(origShiftedBscan,parameters.scalesize,parameters.angles
 %-% Inflection Points
 Infl2 = zeros(size(origShiftedBscan));
 
-shiftedBscan = origShiftedBscan / max(origShiftedBscan(:)) * 255;
+% shiftedBscan = origShiftedBscan / max(origShiftedBscan(:)) * 255;
+shiftedBscan = min(255, origShiftedBscan / prctile(origShiftedBscan(:),99) * 255);
 
 % filteredBscan = imfilter(shiftedBscan,OrientedGaussian([3 3],0));
 filteredBscan = imfilter(shiftedBscan,OrientedGaussian([parameters.averagingSizeZ, parameters.averagingSizeX],0));
@@ -50,6 +51,8 @@ edg = edgeness(origShiftedBscan,parameters.scalesize/4,parameters.angles+90);
 
 %-% Find CSI
 [CSI, ~] = findCSI(nodes,OG);
+
+if ~isstruct(CSI), return, end
 
 for k = 1:numel(CSI)
 

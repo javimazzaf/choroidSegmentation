@@ -1,5 +1,7 @@
 function [ret,bm] = getRetinaAndBM(im, bits)
 
+sz = size(im);
+
 im = im / (2^bits-1);
 
 imF = imfilter(im,fspecial('gaussian',[1 10],5));
@@ -49,7 +51,7 @@ for k = 1:size(imStep,2)
 end
 
 % Remove outliers
-yFirst  = eliminateJumps(yFirst,wFirst);
+yFirst  = eliminateJumps(yFirst,wFirst,sz);
 
 % Refine RPE
 RPEthickness = yThird - ySecond;
@@ -64,8 +66,8 @@ wSecond(rpeMskWrong) = NaN;
 yThird(rpeMskWrong)  = NaN;
 wThird(rpeMskWrong) = NaN;
 
-ySecond = eliminateJumps(ySecond,wSecond);
-yThird  = eliminateJumps(yThird,wThird);
+ySecond = eliminateJumps(ySecond,wSecond,sz);
+yThird  = eliminateJumps(yThird,wThird,sz);
 
 [xBM,yBM] = findRPEbottom(imF,imStepPrecise,ySecond, yThird);
 
@@ -202,7 +204,7 @@ outWeigth(~msk) = 0.1 * outWeigth(~msk);
 
 end
 
-function traceOut = eliminateJumps(traceIn, weights)
+function traceOut = eliminateJumps(traceIn, weights,sz)
 
 len = length(traceIn);
 
@@ -236,9 +238,17 @@ x = x(valid);
 traceIn = traceIn(valid);
 
 % traceOut = interp1(x,traceIn,1:numel(msk));
-traceOut = interp1(x,traceIn,1:len,'linear','extrap');
+traceOut = interp1(x,traceIn,1:len,'linear');
+
+% Extrapolate using the nearest neighbour
+start = find(~isnan(traceOut),1,'first');
+fin   = find(~isnan(traceOut),1,'last');
+
+traceOut(1:start) = traceOut(start);
+traceOut(fin+1:end) = traceOut(fin);
 
 traceOut = round(traceOut);
+traceOut = max(1,min(sz(1),traceOut)); % Coerce to image limits
 
 end
 
@@ -278,7 +288,7 @@ ix = sub2ind(size(imOri),yRPE,xRPE);
 wRPE = imOri(ix);
 
 % Refine BM
-yRPE = eliminateJumps(yRPE, wRPE);
+yRPE = eliminateJumps(yRPE, wRPE,sz);
 
 % Estimates the bottom edge of the RPE
 rpeThickness = nanmedian(bottom - top);
