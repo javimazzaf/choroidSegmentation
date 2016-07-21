@@ -105,7 +105,7 @@ if isempty(path) || any(isinf(dist))
     paths = getPossiblePath(connectMatrix);
     
     if isempty(paths)
-        PathPts=NaN;
+        PathPts   = [];
         usedNodes = [];
         return
     end
