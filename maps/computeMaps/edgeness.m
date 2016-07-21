@@ -1,4 +1,4 @@
-function edg = edgeness(inImage,scales,angs)
+function [edg,lap] = edgeness(inImage,scales,angs)
 
 % Pad image to avoid edge effects
 maxKernelSize = max(scales) * 6;
@@ -47,3 +47,4 @@ yrot = - x * sind(ang) + y * cosd(ang);
 gf = exp(- (xrot.^2 + yrot.^2) / 2 / width^2) .* sin(2 * pi * xrot / sz);
 
 end
+

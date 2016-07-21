@@ -16,22 +16,32 @@ colspacing    = 2;
 
 nCols = size(filteredBscan,2);
 
-testGrad = [];
-testGrad2 = [];
+LOG = lapofgaus(shiftedBscan,max(parameters.scalesize));
+
+% firstDerThresh = graythresh(OG);
+% 
+% aux = LOG;
+% aux(OG < firstDerThresh) = NaN;
+% secondDerThresh = nanmax(nanmin(aux));
 
 for j = 1:nCols
     
 %     filteredAscan = smooth(double(filteredBscan(:,j)),10);
-    filteredAscan = double(filteredBscan(:,j));
+%     filteredAscan = double(filteredBscan(:,j));
     
-    grad  = gradient(filteredAscan); 
-    grad2 = del2(filteredAscan);
+    grad  = OG(:,j);
+    grad2 = LOG(:,j);
+%     grad  = gradient(filteredAscan); 
+%     grad2 = del2(filteredAscan);
 
     z = (abs(grad2) < parameters.secondDerivativeThreshold) & (grad > parameters.firstDerivativeThreshold); %[JM]
+    
     z(1:rpeHeight + parameters.choroidMinWidth) = 0;
     
     Infl2(z,j) = 1;
 end
+
+
 
 Infl2 = bwmorph(Infl2,'clean');
 Infl2 = imfill(Infl2,'holes');
