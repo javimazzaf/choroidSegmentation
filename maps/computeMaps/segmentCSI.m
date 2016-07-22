@@ -31,17 +31,7 @@ for j = 1:nCols
     z(1:rpeHeight + parameters.choroidMinWidth) = 0;
     
     Infl2(z,j) = 1;
-    
-    testGrad  = [testGrad grad];
-    testGrad2 = [testGrad2 grad2];   
-    
-    testGrad(1:rpeHeight + parameters.choroidMinWidth,j)  = NaN;
-    testGrad2(1:rpeHeight + parameters.choroidMinWidth,j) = NaN;
-   
 end
-
-testGrad(testGrad < 0)   = NaN;
-testGrad2(testGrad2 < 0) = NaN;
 
 Infl2 = bwmorph(Infl2,'clean');
 Infl2 = imfill(Infl2,'holes');

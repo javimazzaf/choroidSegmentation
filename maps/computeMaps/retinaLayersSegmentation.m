@@ -47,8 +47,7 @@ for k = 1:numel(dirlist)
         end
 
 %         parfor (frame = indToProcess, workersAvailable)
-%         for frame = indToProcess 
-        for frame = 44     
+        for frame = indToProcess 
 
             try
                 
