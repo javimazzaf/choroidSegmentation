@@ -5,13 +5,13 @@ maxKernelSize = max(scales) * 6;
 padSize = maxKernelSize / 2;
 padIm =padarray(inImage,[padSize padSize],'both','replicate');
 
-angFilt = zeros([size(padIm),numel(angs)]);
-
+% angFilt = zeros([size(padIm),numel(angs)]);
+aux = [];
 for a = 1:numel(angs)
     
     ang   = angs(a);
     
-    aux = 0;
+%     aux = 0;
     
     for s = 1:numel(scales)
         
@@ -21,15 +21,19 @@ for a = 1:numel(angs)
    
         grad = filter2(gf,padIm,'same');
         
-        aux = aux + grad;
+%         aux = aux + grad;
+        aux = cat(3,aux,grad); 
         
     end
     
-    angFilt(:,:,a) = aux;
+%     aux = nanmax(aux,[],3);
+    
+%     angFilt(:,:,a) = aux;
     
 end
 
-edg = max(angFilt,[],3);
+edg = nanmax(aux,[],3);
+% edg = max(angFilt,[],3);
 
 % Undo padding
 edg = edg(padSize+1:end-padSize,padSize+1:end-padSize);
