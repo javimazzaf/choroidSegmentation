@@ -11,6 +11,9 @@ else
 end
 
 for k = 1:numel(dirlist)
+    
+    disp(exist(fullfile(dirlist{k},'Results'),'dir'))
+    
     if exist(fullfile(dirlist{k},'Results'),'dir')
         try
             
