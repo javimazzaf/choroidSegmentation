@@ -13,6 +13,7 @@ end
 for k = 1:numel(dirlist)
     if exist(fullfile(dirlist{k},'Results'),'dir')
         try
+            
             if ~exist(fullfile(dirlist{k},'Results'),'dir')
                 disp(['Skipping: ' fullfile(dirlist{k},'Results')])
             end
