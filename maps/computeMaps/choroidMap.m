@@ -1,7 +1,7 @@
 function choroidMap(varargin)
 
-% dirlist = adaptToHMRpath(varargin{1});
-dirlist = varargin{1};
+dirlist = adaptToHMRpath(varargin{1});
+% dirlist = varargin{1};
 
 for iter = 1:numel(dirlist)
     

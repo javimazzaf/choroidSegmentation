@@ -7,8 +7,8 @@ function retinaLayersSegmentation(varargin)
 % file RegisteredImages.mat for each directory in varargin{1}.
 
 
-% dirlist = adaptToHMRpath(varargin{1});
-dirlist = varargin{1};
+dirlist = adaptToHMRpath(varargin{1});
+% dirlist = varargin{1};
 
 if     ispc,  workersAvailable = Inf; %Uses parallel computing
 elseif ismac, workersAvailable = 0;   %Uses 1 worker computing

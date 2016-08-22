@@ -1,8 +1,8 @@
 function mapPseudoRegistration(varargin)
 
-% dirlist = adaptToHMRpath(varargin{1});
+dirlist = adaptToHMRpath(varargin{1});
 
-dirlist = varargin{1};
+% dirlist = varargin{1};
 
 for k = 1:length(dirlist)
     
