@@ -12,21 +12,19 @@ end
 
 for k = 1:numel(dirlist)
     
-    disp(exist(fullfile(dirlist{k},'Results'),'dir'))
-    
     if exist(fullfile(dirlist{k},'Results'),'dir')
-        try
-            
-            if ~exist(fullfile(dirlist{k},'Results'),'dir')
-                disp(['Skipping: ' fullfile(dirlist{k},'Results')])
-            end
-            
+        try         
             rmdir(fullfile(dirlist{k},'Results'),'s')
             disp(['Removing: ' fullfile(dirlist{k},'Results')])
         catch
             disp('skipped')
         end
     end
+    
+%     if exist(fullfile(dirlist{k},'Data Files','RegisteredImages.mat'),'file')
+%         
+%     end
+
 end
 
 
