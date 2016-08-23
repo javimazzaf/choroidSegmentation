@@ -64,7 +64,7 @@ bottomdirs=[onhDirs;otherDirs];
 
 % Get masks for  directories that are on a specific step of the processing
 masks.hasRawMsk   = logical(cellfun(@(aux) exist(aux,'dir'), fullfile(bottomdirs,'Raw Images')));
-masks.hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Data Files','RegisteredImages.mat')));
+masks.hasRegMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'DataFiles','RegisteredImages.mat')));
 masks.hasFrsMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessData.mat')));
 masks.hasFrsMapNewMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'FirstProcessDataNew.mat')));
 masks.hasPosMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results',   'PostProcessData.mat')));
@@ -78,7 +78,7 @@ masks.hasAnotMsk  = logical(cellfun(@isAnnotated,fullfile(bottomdirs,'Results','
 masks.hasbScansMsk= logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','bScans.mat')));
 
 
-numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'Processed Images'));
+numBscans   = cellfun(@(pth) numel(dir(fullfile(pth,'*.png'))) ,fullfile(bottomdirs,'ProcessedImages'));
 masks.hasImsMsk   = logical(numBscans >= 1);
 
 masks.has192Msk   = numBscans > 185 & numBscans < 195;
