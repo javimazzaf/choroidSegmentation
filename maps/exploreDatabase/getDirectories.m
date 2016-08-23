@@ -112,7 +112,7 @@ hasDirs.Map         = dirlist(masks.hasMapMsk);
 hasDirs.Mov         = dirlist(masks.hasMovMsk);
 hasDirs.m192        = dirlist(masks.has192Msk);
 
-save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
+% save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs');
 % save(fullfile(topdir,'share','SpectralisData','javier','code','allDirectories.mat'),'dirlist','todoDirs','hasDirs','examDates');
 
 end
