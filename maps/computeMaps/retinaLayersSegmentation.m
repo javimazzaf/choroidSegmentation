@@ -46,8 +46,8 @@ for k = 1:numel(dirlist)
             EndHeights = varStruct.EndHeights;
         end
 
-%         parfor (frame = indToProcess, workersAvailable)
-        for frame = indToProcess 
+        parfor (frame = indToProcess, workersAvailable)
+%         for frame = indToProcess 
 
             try
                 
