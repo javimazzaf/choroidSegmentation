@@ -42,8 +42,8 @@ posRPE   = round(size(bscanstore{1},1) / 3);
 safeTopLimit    = NaN(1,max(indToProcess));
 safeBottomLimit = NaN(1,max(indToProcess));
 
-parfor frame = indToProcess
-% for frame = indToProcess
+% parfor frame = indToProcess
+for frame = indToProcess
     try
         
         bscan = double(bscanstore{frame});

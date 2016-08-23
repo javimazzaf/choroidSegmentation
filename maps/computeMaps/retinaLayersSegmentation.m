@@ -21,14 +21,16 @@ if workersAvailable > 0
 end
 
 % Iterate over subjects
-for k = 1:numel(dirlist)
+nDirs = numel(dirlist);
+
+for k = 1:nDirs
     try
         folder = dirlist{k};
         
         savedir = fullfile(folder,'Results');
         if ~exist(savedir,'dir'), mkdir(savedir), end
         
-        disp(logit(folder,['Starting retinaLayersSegmentation: ' folder]))
+        disp(logit(folder,['Starting retinaLayersSegmentation: ' num2str(k) ' of ' num2str(nDirs) ' - ' folder]))
         
         if ~exist(fullfile(savedir,'flattenedBscans.mat'),'file')
             preProcessFrames(folder); 
