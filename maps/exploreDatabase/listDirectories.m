@@ -87,12 +87,12 @@ disp(['  ~50 : ' num2str(num50) 9 '(' num2str(num50 * 100 / total,'%2.1f') '%)']
 disp(['  ~0  : ' num2str(num0) 9 '(' num2str(num0 * 100 / total,'%2.1f') '%)']);
 disp('----------------------------------')
 
-disp(['To ConvertSpectralis:      (todo.convert)  '   num2str(numel(todo.convert))])
-disp(['To Register:               (todo.register) '   num2str(numel(todo.register))])
-disp(['To ChoroidMapFirstProcess: (todo.firstMapNew)' num2str(numel(todo.firstMapNew))]) 
-disp(['To ComputeMap:             (todo.compMap)  '   num2str(numel(todo.compMap))])
-disp(['To ComputeMov:             (todo.compMov)  '   num2str(numel(todo.compMov))])
-disp(['To ComputeAnot:            (todo.compAnot)  '   num2str(numel(todo.compAnot))])
+disp(['To ConvertSpectralis:      (todo.convert)  '      num2str(numel(todo.convert))])
+disp(['To Register:               (todo.register) '      num2str(numel(todo.register))])
+disp(['To Segment:                (todo.segment)'        num2str(numel(todo.segment))]) 
+disp(['To ComputeMap:             (todo.compMap)  '      num2str(numel(todo.compMap))])
+disp(['To ComputeMov:             (todo.compMov)  '      num2str(numel(todo.compMov))])
+disp(['To ComputeAnot:            (todo.compAnot)  '     num2str(numel(todo.compAnot))])
 disp(['To ComputeBscans:          (todo.compBscans)  '   num2str(numel(todo.compBscans))])
 
 
