@@ -11,10 +11,10 @@ for k = 1:numel(dirlist)
     disp(logit(folder,'Initiating convertSpectralis'))
     
     % Move raw images and xml spectralis file to RawImages
-    if ~exist(fullfile(folder,'RawImages'), 'dir')
-        mkdir(fullfile(folder,'RawImages'));
-        movefile(fullfile(folder,'*.tif'),fullfile(folder,'RawImages'),'f')
-        movefile(fullfile(folder,'*.xml'),fullfile(folder,'RawImages'),'f')
+    if ~exist(fullfile(folder,'Raw Images'), 'dir')
+        mkdir(fullfile(folder,'Raw Images'));
+        movefile(fullfile(folder,'*.tif'),fullfile(folder,'Raw Images'),'f')
+        movefile(fullfile(folder,'*.xml'),fullfile(folder,'Raw Images'),'f')
     end
     
     try
@@ -29,13 +29,13 @@ for k = 1:numel(dirlist)
             mkdir(fullfile(folder,'DataFiles'));
         end
         
-        xmlFile = dir(fullfile(folder,'RawImages','*.xml'));
+        xmlFile = dir(fullfile(folder,'Raw Images','*.xml'));
 
-        [~,ImageList] = analyzeSpectralisXML(fullfile(folder,'RawImages',xmlFile.name));
+        [~,ImageList] = analyzeSpectralisXML(fullfile(folder,'Raw Images',xmlFile.name));
 
         for q = 1:size(ImageList,1)
             
-            imtif = imread(fullfile(folder,'RawImages',char(ImageList{q,'fileName'})));
+            imtif = imread(fullfile(folder,'Raw Images',char(ImageList{q,'fileName'})));
             
             imout = rgb2gray(imtif);
             
@@ -43,7 +43,7 @@ for k = 1:numel(dirlist)
             
         end
         
-        fundusIm = imread(fullfile(folder,'RawImages',char(ImageList{1,'fundusfileName'})));
+        fundusIm = imread(fullfile(folder,'Raw Images',char(ImageList{1,'fundusfileName'})));
         
         save(fullfile(folder,'DataFiles','ImageList.mat'),'ImageList','fundusIm');
         
