@@ -68,7 +68,7 @@ reproducibility = '';
 disp(['Has RawIm:          ' num2str(numel(has.RawIm))])
 disp(['Has Imags:          ' num2str(numel(has.Imags))])
 disp(['Has Regis:          ' num2str(numel(has.Regis))])
-disp(['Has FirstMapNew:    ' num2str(numel(has.FirstMapNew))])
+disp(['Has Segmentation:   ' num2str(numel(has.Segmentation))])
 disp(['Has Map:            ' num2str(numel(has.Map))])
 disp(['Has Mov:            ' num2str(numel(has.Mov))])
 disp(['Has Anot:           ' num2str(numel(has.Anot))])
