@@ -119,6 +119,7 @@ for iter = 1:numel(dirlist)
         fundimRetFinal=hsi2rgb(fundimRetHSV);
         
         fh = figure('Visible','off');
+        axes('Visible','off');
         subplot(1,2,1);
         imshow(fundimRetFinal,Rfund,colormap('jet'));
         xlabel('X [mm]')
@@ -157,6 +158,7 @@ for iter = 1:numel(dirlist)
         fundimfinal=hsi2rgb(fundimHSV);
         
         fh = figure('Visible','off');
+        axes('Visible','off');
         subplot(1,2,1);
         imshow(fundimfinal,Rfund,colormap('jet'));
 

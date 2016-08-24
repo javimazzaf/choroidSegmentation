@@ -20,7 +20,7 @@ for d = 1:length(dirlist)
             disp(logit(folder,'  - ImageList.mat do not exist: Skipping'))
         end
         
-        load(fullfile(folder, 'DataFiles','ImageList.mat'), 'ImageList');
+        load(fullfile(folder, 'DataFiles','ImageList.mat'), 'ImageList','fundusIm');
         
         if istable('ImageList')
             disp(logit(folder,'  - ImageList is already a Table: Skipping'))
@@ -66,7 +66,7 @@ for d = 1:length(dirlist)
         movefile(fullfile(folder, 'DataFiles','ImageList.mat'),fullfile(folder, 'DataFiles','ImageListOld.mat'),'f');
         
         ImageList = timeSeries;
-        save(fullfile(folder, 'DataFiles','ImageList.mat'),'ImageList');
+        save(fullfile(folder, 'DataFiles','ImageList.mat'),'ImageList','fundusIm');
         
         
     catch exception
