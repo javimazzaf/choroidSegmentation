@@ -24,7 +24,20 @@ for d = 1:length(dirlist)
             continue
         end
         
-        load(fullfile(folder, 'DataFiles','ImageListOld.mat'), 'ImageList','fundusIm');
+        vars = load(fullfile(folder, 'DataFiles','ImageListOld.mat'));
+        
+        if isfield(vars,'fundim')
+         fundusIm = vars.fundim;   
+        end
+        
+        if isfield(vars,'fundusIm')
+         fundusIm = vars.fundusIm;   
+        end        
+   
+        if isfield(vars,'ImageList')
+         ImageList = vars.ImageList;   
+        end        
+        
         %load the Table-version of ImageList
         load(fullfile(folder, 'DataFiles','ImageList.mat'), 'ImageList');
         
