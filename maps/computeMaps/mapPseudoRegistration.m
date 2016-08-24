@@ -32,7 +32,7 @@ for k = 1:length(dirlist)
         
     catch exception
         
-        errorString = ['Error in mapPseudoRegistration. Message:' exception.message buildCallStack(exception)];
+        errorString = ['Error in mapPseudoRegistration. In' folder ' Message:' exception.message buildCallStack(exception)];
         disp(logit(folder,errorString));
         continue
         
