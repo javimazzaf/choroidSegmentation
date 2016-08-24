@@ -120,8 +120,7 @@ for iter = 1:numel(dirlist)
         
         fh = figure('Visible','off');
         axes('Visible','off');
-        subplot(1,2,1);
-        imshow(fundimRetFinal,Rfund,colormap('jet'));
+        subplot(1,2,1), imshow(fundimRetFinal,Rfund,colormap('jet'));
         xlabel('X [mm]')
         ylabel('Y [mm]')
         title('Retina thickess overlay')

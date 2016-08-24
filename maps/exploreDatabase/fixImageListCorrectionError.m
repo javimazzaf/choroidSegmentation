@@ -54,6 +54,8 @@ for d = 1:length(dirlist)
         
     end
     
+end
+    
     disp(logit(folder,['Done fixImageListCorrectionError on ' num2str(count) ' directories']))
     
 end
