@@ -1,6 +1,6 @@
 % Select directories that are ready for each particular step of the
 % processing, or that have specific information
-function [todoDirs, hasDirs, numBscans, masks] = getDirectories(topdir,groups,studies,reprod)
+function [todoDirs, hasDirs, numBscans, masks, dbase] = getDirectories(topdir,groups,studies,reprod)
 
 databasedir=fullfile(topdir,'share','SpectralisData');
 
@@ -75,6 +75,7 @@ masks.hasMapMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs
 masks.hasMovMsk   = logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','choroidMovie.gif')));
 masks.hasErrMsk   = logical(cellfun(@(aux) exist(aux,'dir') ,fullfile(bottomdirs,'Error Folder')));
 masks.hasAnotMsk  = logical(cellfun(@isAnnotated,fullfile(bottomdirs,'Results','postProcessingAnnotations.mat')));
+masks.hasSkipMsk  = logical(cellfun(@isSkipped,fullfile(bottomdirs,'Results','postProcessingAnnotations.mat')));
 masks.hasbScansMsk= logical(cellfun(@(aux) exist(aux,'file'),fullfile(bottomdirs,'Results','bScans.mat')));
 
 
@@ -105,6 +106,7 @@ hasDirs.Imags       = dirlist(masks.hasImsMsk);
 hasDirs.Regis       = dirlist(masks.hasRegMsk);
 hasDirs.Segmentation = dirlist(masks.hasSegmentationMsk);
 hasDirs.Anot        = dirlist(masks.hasAnotMsk);
+hasDirs.Skipped     = dirlist(masks.hasSkipMsk);
 hasDirs.bScans      = dirlist(masks.hasbScansMsk);
 
 hasDirs.Err         = dirlist(masks.hasErrMsk);
@@ -136,5 +138,23 @@ if ~annotations.skip && (~isfield(annotations,'maculaCenter') || ~isfield(annota
 end
 
 res = true;
+
+end
+
+function res = isSkipped(fname)
+
+res = false;
+
+if ~exist(fname,'file')
+    return
+end
+
+load(fname,'annotations');
+
+if ~isfield(annotations,'skip')
+    return
+end
+
+res = logical(annotations.skip);
 
 end

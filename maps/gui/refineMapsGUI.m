@@ -22,7 +22,7 @@ function varargout = refineMapsGUI(varargin)
 
 % Edit the above text to modify the response to help refineMapsGUI
 
-% Last Modified by GUIDE v2.5 11-Mar-2016 12:07:47
+% Last Modified by GUIDE v2.5 26-Aug-2016 10:58:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -156,11 +156,11 @@ if ~isfield(handles,'choroidMap')
     
     dname = handles.dirlist{handles.currentIndex};
     
-    load(fullfile(dname,'Results','ChoroidMapNew.mat'),'Cmap','fundim',...
+    load(fullfile(dname,'Results','ChoroidMap.mat'),'Cmap','fundimfinal',...
         'fscaleX','fscaleY','fwidth','fheight','xvec','yvec','mapInfo',...
         'mapRetina');
     
-    Rfund = imref2d(size(fundim),[0 fwidth*fscaleX],[0 fheight*fscaleY]);
+    Rfund = imref2d(size(fundimfinal),[0 fwidth*fscaleX],[0 fheight*fscaleY]);
     fxvec = linspace(Rfund.XWorldLimits(1),Rfund.XWorldLimits(end),Rfund.ImageSize(1));
     fyvec = linspace(Rfund.YWorldLimits(1),Rfund.YWorldLimits(end),Rfund.ImageSize(2));
     
@@ -346,11 +346,14 @@ if ~isfield(handles,'retinaMap') || ~isfield(handles.retinaMap,'Rfund') ||...
     
     dname = handles.dirlist{handles.currentIndex};
     
-    load(fullfile(dname,'Results','ChoroidMapNew.mat'),'fundim',...
+    load(fullfile(dname,'Results','ChoroidMap.mat'),'fundimfinal',...
         'fscaleX','fscaleY','fwidth','fheight','xvec','yvec',...
         'mapRetina');
     
-    Rfund = imref2d(size(fundim),[0 fwidth*fscaleX],[0 fheight*fscaleY]);
+    load(fullfile(dname,'DataFiles','ImageList.mat'),'fundusIm');
+    
+%     Rfund = imref2d(size(fundimfinal),[0 fwidth*fscaleX],[0 fheight*fscaleY]);
+    Rfund = imref2d(size(fundusIm(:,:,1)),[0 fwidth*fscaleX],[0 fheight*fscaleY]); 
     fxvec = linspace(Rfund.XWorldLimits(1),Rfund.XWorldLimits(end),Rfund.ImageSize(1));
     fyvec = linspace(Rfund.YWorldLimits(1),Rfund.YWorldLimits(end),Rfund.ImageSize(2));
     
@@ -363,22 +366,27 @@ if ~isfield(handles,'retinaMap') || ~isfield(handles.retinaMap,'Rfund') ||...
     [qx,qy] = meshgrid(fxvec(Xover), fyvec(Yover));
     
     % Compute choroid map
-    F = scatteredInterpolant(mapRetina(:,1),mapRetina(:,2),mapRetina(:,3));
+    F = scatteredInterpolant(mapRetina(:,1),mapRetina(:,2),mapRetina(:,3),'natural','nearest');
     handles.retinaMap.Cmap = F(qx,qy);
     
     handles.retinaMap.newRbscan  = imref2d(size(handles.retinaMap.Cmap),[qx(1,1) qx(1,end)],[qy(1,1) qy(end,1)]);
     
     % Combine with fundus:
-    CMapScaled = im2uint8(handles.retinaMap.Cmap/max(handles.retinaMap.Cmap(:)));
+    mn = prctile(handles.retinaMap.Cmap(:),1);
+    mx = prctile(handles.retinaMap.Cmap(:),99);
+    CMapScaled = im2uint8(min(1,max(0,(handles.retinaMap.Cmap - mn) / (mx - mn))));
     X          = grayslice(CMapScaled,256);
     CMapRGB    = ind2rgb(X,jet(256));
     CMapHSV    = rgb2hsi(CMapRGB);
-    
-    fundimHSV  = rgb2hsi(fundim);
+    fundimHSV  = rgb2hsi(ind2rgb(grayslice(im2uint8(fundusIm(:,:,1)),256),gray(256)));
     
     fundimHSV(Yover,Xover,1) = CMapHSV(:,:,1);
     fundimHSV(Yover,Xover,2) = CMapHSV(:,:,2);
-    fundimHSV(:,:,3) = intrans(fundim(:,:,1),'stretch',mean2(im2double(fundim(:,:,1))),2);
+%     fundimHSV(:,:,3) = fundusIm(:,:,1);
+    fundim = fundusIm(:,:,1);
+    fundim = intrans(fundim,'stretch',mean2(im2double(fundim)),2);
+    fundimHSV(:,:,3) = fundim;
+%     fundimHSV(:,:,3) = intrans(fundusIm(:,:,1),'stretch',mean2(im2double(fundusIm(:,:,1))),2) + 1/256;
     handles.retinaMap.fundFinal = hsi2rgb(fundimHSV);
     
 end
@@ -392,7 +400,7 @@ ylabel('Y [mm]')
 
 if isfield(handles.retinaMap,'maculaCenter')
    hold on
-   plot(handles.retinaMap.maculaCenter.x,handles.retinaMap.maculaCenter.y,'ob','MarkerSize',5)
+   plot(handles.retinaMap.maculaCenter.x,handles.retinaMap.maculaCenter.y,'og','MarkerSize',5)
    hold off
 end
 
@@ -492,6 +500,8 @@ end
 
 annotations.skip = get(handles.skipCheckbox,'Value');
 
+annotations.skipCause = get(get(handles.skipCauseGroup,'SelectedObject'), 'Tag');
+
 save(fname,'annotations'); 
 
 
@@ -535,7 +545,16 @@ else
     set(handles.yOnhText,'String','Y = ')
 end
 
-set(handles.skipCheckbox,'Value',annotations.skip);
+set(handles.skipCheckbox,'Value',annotations.skip); 
+
+if isfield(annotations,'skipCause')
+   set(getfield(handles, annotations.skipCause),'Value',true); 
+else
+   set(getfield(handles, 'noneRadio'),'Value',true);  
+end
+
+
+
 
 
 % --- Executes on button press in skipCheckbox.
@@ -581,4 +600,3 @@ complete = true;
 % disp(1)
 
 % set(handles.pathText,'String',dname);
-

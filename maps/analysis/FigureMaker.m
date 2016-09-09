@@ -33,9 +33,4 @@ right=right(end);
 
 text(right,top,annot,'horizontalalignment','right','verticalalignment','top','FontSize',18)
 
-
-
-
-
-
 end

@@ -4,6 +4,8 @@ ft = fittype('poly11');
 
 fo = fitoptions('poly11');
 
+w = max(0,w); % Eliminate points with negative weight 
+
 % fo.Normal = 'on';
 fo.Weights = w;
 

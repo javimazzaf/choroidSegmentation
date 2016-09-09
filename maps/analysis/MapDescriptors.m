@@ -1,4 +1,7 @@
-function [desc] = MapDescriptors(dirlist,fileName)
+function [desc] = MapDescriptors(dirlist)
+% function [desc] = MapDescriptors(dirlist,fileName)
+
+fileName = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160830/mapData.mat';
 
 if ispc
     dirlist = fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
@@ -21,43 +24,54 @@ for i=1:length(dirlist)
     
     info = GetStudyInfo(directory, dbase);
     
-    if ~exist(fullfile(directory,'Results','ChoroidMapNew.mat'),'file')
+    if ~exist(fullfile(directory,'Results','ChoroidMap.mat'),'file')
+        disp(['File does not exist: ' fullfile(directory,'Results','ChoroidMap.mat')])
         continue
     end
     
-    load(fullfile(directory,'Results','ChoroidMapNew.mat'))
-    load(fullfile(directory,'Data Files','ImageList.mat'))
+    load(fullfile(directory,'Results','ChoroidMap.mat'))
+    load(fullfile(directory,'DataFiles','ImageList.mat'))
     load(fullfile(directory,'Results','postProcessingAnnotations.mat'), 'annotations')
     
-    if ~isfield(annotations,'skip')         || annotations.skip                  ||...
-       ~isfield(annotations,'maculaCenter') || ~isfield(annotations,'onhCenter')     
+    if ~isfield(annotations,'skip') 
+        disp(['Skipping: (Skip field)' directory])
         continue
     end
+    
+    if logical(annotations.skip)  
+        disp(['Skipping (Marked as skipped): ' directory])
+        continue
+    end   
+    
+    if ~isfield(annotations,'maculaCenter')
+        disp(['Skipping(No maculaCenter): ' directory])
+        continue
+    end      
      
-    % Compute retina descriptors
-    retThickness = mapRetina(:,3);
+    % Center retinal map on Macula
+    mapRetina = centerToMacula(mapRetina, annotations.maculaCenter);
     
-    meanRETthickness = nanmean(retThickness);
+    % Compute retinal thickness
+    meanRETthickness = nanmean(mapRetina(:,3));
     
-    % Compute choroid descriptors centered on Macula
-    centerCh = computeChoroidDescriptors(mapInfo, annotations.maculaCenter); 
+    % Center choroid map on Macula
+    [mapInfo, mapRadius] = centerToMacula(mapInfo, annotations.maculaCenter); 
+    mapInfo(:,[1,2]) = mapInfo(:,[1,2]) * 1000; %Change to microns
     
     % Compute choroid descriptors
-    rawX          = mapInfo(:,1) * 1000;
-    rawY          = mapInfo(:,2) * 1000;
     rawThickness  = mapInfo(:,3);
     rawWeigth     = mapInfo(:,4);
 
-    meanRawThickness = sum(rawThickness .* rawWeigth) / sum(rawWeigth);
-    maxRawThickness  = max(rawThickness);
-    minRawThickness  = min(rawThickness);
-    stdRawThickness  = sqrt(sum(rawThickness.^2 .* rawWeigth) / sum(rawWeigth) - meanRawThickness^2);
-    q5RawThickness  = prctile(rawThickness,5);
-    q95RawThickness = prctile(rawThickness,95);
+    meanThickness = sum(rawThickness .* rawWeigth) / sum(rawWeigth);
+    maxThickness  = max(rawThickness);
+    minThickness  = min(rawThickness);
+    stdThickness  = sqrt(sum(rawThickness.^2 .* rawWeigth) / sum(rawWeigth) - meanThickness^2);
+    q5Thickness   = prctile(rawThickness,5);
+    q95Thickness  = prctile(rawThickness,95); 
     
-    ratioChoroidToRetina = meanRawThickness / meanRETthickness;
+    ratioChoroidToRetina = meanThickness / meanRETthickness;
     
-    [sf, N] = fitPlane(rawX,rawY,rawThickness,rawWeigth);
+    [sf, N] = fitPlane(mapInfo(:,1),mapInfo(:,2),mapInfo(:,3),mapInfo(:,4));
     
     EyeStr = regexp(dirlist{i},'O[SD]','match');
     
@@ -69,33 +83,41 @@ for i=1:length(dirlist)
     azimuth = azimuth * 180 / pi; 
     polar   = polar * 180 / pi;
     
-    [aredsT, fhAREDS] = getAREDSthickness(mapInfo(:,1),mapInfo(:,2),rawThickness,rawWeigth,EyeStr,annotations.maculaCenter);
+    [aredsT, fhAREDS] = getAREDSthickness(mapInfo(:,1),mapInfo(:,2),rawThickness,rawWeigth,EyeStr);
     
-    [Quad, fhQuad]    = getQuadrantThickness(mapInfo(:,1),mapInfo(:,2),rawThickness,rawWeigth,EyeStr,annotations.maculaCenter);
+    [Quad, fhQuad]    = getQuadrantThickness(mapInfo(:,1),mapInfo(:,2),rawThickness,rawWeigth,EyeStr);
     
-    temp = table(meanRawThickness, maxRawThickness, minRawThickness, stdRawThickness, azimuth, polar, q5RawThickness, q95RawThickness, ...
+    [NTSI, fh]        = getNTSIThickness(mapInfo(:,1),mapInfo(:,2),rawThickness,rawWeigth,EyeStr);
+    
+    temp = table(mapRadius, meanThickness, maxThickness, minThickness, stdThickness, azimuth, polar, q5Thickness, q95Thickness, ...
                  aredsT.D1.mean, aredsT.D1.SD, aredsT.D1.N, aredsT.D3.nasal.mean, aredsT.D3.nasal.SD, aredsT.D3.nasal.N, aredsT.D3.inferior.mean, aredsT.D3.inferior.SD, aredsT.D3.inferior.N,...
                  aredsT.D3.temporal.mean, aredsT.D3.temporal.SD, aredsT.D3.temporal.N, aredsT.D3.superior.mean, aredsT.D3.superior.SD, aredsT.D3.superior.N,aredsT.D6.nasal.mean,...
                  aredsT.D6.nasal.SD, aredsT.D6.nasal.N, aredsT.D6.inferior.mean, aredsT.D6.inferior.SD, aredsT.D6.inferior.N, aredsT.D6.temporal.mean, aredsT.D6.temporal.SD, aredsT.D6.temporal.N,...
                  aredsT.D6.superior.mean, aredsT.D6.superior.SD, aredsT.D6.superior.N,ratioChoroidToRetina,...
-                 centerCh.mean, centerCh.max, centerCh.min, centerCh.std, centerCh.q5, centerCh.q95,...
                  Quad.nasalSuperior.mean,    Quad.nasalSuperior.SD,    Quad.nasalSuperior.N,...
                  Quad.nasalInferior.mean,    Quad.nasalInferior.SD,    Quad.nasalInferior.N,...    
                  Quad.temporalSuperior.mean, Quad.temporalSuperior.SD, Quad.temporalSuperior.N,...
                  Quad.temporalInferior.mean, Quad.temporalInferior.SD, Quad.temporalInferior.N,...
-                 'VariableNames',{'meanthick','maxthick','minthick','stdthick','azimuth','polar','q5thick','q95thick',...
+                 NTSI.nasal.mean,       NTSI.nasal.SD,       NTSI.nasal.N,...
+                 NTSI.temporal.mean,    NTSI.temporal.SD,    NTSI.temporal.N,...
+                 NTSI.superior.mean,    NTSI.superior.SD,    NTSI.superior.N,...
+                 NTSI.inferior.mean,    NTSI.inferior.SD,    NTSI.inferior.N,...
+                 'VariableNames',{'mapRadius','meanthick','maxthick','minthick','stdthick','azimuth','polar','q5thick','q95thick',...
                  'AREDS_D1Mean', 'AREDS_D1SD', 'AREDS_D1N','AREDS_D3nasalMean', 'AREDS_D3nasalSD', 'AREDS_D3nasalN','AREDS_D3inferiorMean', 'AREDS_D3inferiorSD', 'AREDS_D3inferiorN',...
                  'AREDS_D3temporalMean', 'AREDS_D3temporalSD', 'AREDS_D3temporalN', 'AREDS_D3superiorMean', 'AREDS_D3superiorSD', 'AREDS_D3superiorN','AREDS_D6nasalMean',...
                  'AREDS_D6nasalSD', 'AREDS_D6nasalN','AREDS_D6inferiorMean', 'AREDS_D6inferiorSD', 'AREDS_D6inferiorN','AREDS_D6temporalMean', 'AREDS_D6temporalSD', 'AREDS_D6temporalN',...
                  'AREDS_D6superiorMean', 'AREDS_D6superiorSD', 'AREDS_D6superiorN', 'ratioChoroidToRetina',...
-                 'centerMean', 'centerMax', 'centerMin', 'centerStd', 'centerQ5', 'centerQ95',...
                  'nasalSuperiorMean',    'nasalSuperiorSD',    'nasalSuperiorN',... 
                  'nasalInferiorMean',    'nasalInferiorSD',    'nasalInferiorN',...    
                  'temporalSuperiorMean', 'temporalSuperiorSD', 'temporalSuperiorN',... 
-                 'temporalInferiorMean', 'temporalInferiorSD', 'temporalInferiorN'});
+                 'temporalInferiorMean', 'temporalInferiorSD', 'temporalInferiorN',...
+                 'nasalMean',            'nasalSD',            'nasalN',...
+                 'temporalMean',         'temporalSD',         'temporalN',...
+                 'superiorMean',         'superiorSD',         'superiorN',...
+                 'inferiorMean',         'inferiorSD',         'inferiorN'});
            
              
-    info = [info, temp];
+    info = [info(:,[1:9,27:end]), temp];
         
     desc = [desc;info];
     
@@ -115,7 +137,7 @@ save(fileName,'descriptors')
 
 end
 
-function choiroidDesc = computeChoroidDescriptors(mapInfo, maculaCenter)
+function [smallMapInfo, optRadius] = centerToMacula(mapInfo, maculaCenter)
 
     optRadius = min([max(mapInfo(:,1)) - maculaCenter.x  ,...
                      maculaCenter.x - min(mapInfo(:,1))  ,...
@@ -126,19 +148,10 @@ function choiroidDesc = computeChoroidDescriptors(mapInfo, maculaCenter)
     
     msk = r2 <= optRadius^2;
             
-    smallMapInfo = mapInfo(msk,:);
+    smallMapInfo = mapInfo(msk,:); 
     
-%     rawX          = smallMapInfo(:,1) * 1000;
-%     rawY          = smallMapInfo(:,2) * 1000;
-    rawThickness  = smallMapInfo(:,3);
-    rawWeigth     = smallMapInfo(:,4);
-
-    choiroidDesc.mean = sum(rawThickness .* rawWeigth) / sum(rawWeigth);
-    choiroidDesc.max  = max(rawThickness);
-    choiroidDesc.min  = min(rawThickness);
-    choiroidDesc.std  = sqrt(sum(rawThickness.^2 .* rawWeigth) / sum(rawWeigth) - choiroidDesc.mean^2);
-    choiroidDesc.q5   = prctile(rawThickness,5);
-    choiroidDesc.q95  = prctile(rawThickness,95);  
+    smallMapInfo(:,1) = smallMapInfo(:,1) - maculaCenter.x; 
+    smallMapInfo(:,2) = smallMapInfo(:,2) - maculaCenter.y; 
 
 end
 

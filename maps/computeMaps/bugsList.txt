@@ -1,0 +1,16 @@
+Bugs list:
+
+graphSearch.m
+Line 186
+++++++++++++++++++++++++++++++++ 
+if PathPts(k).meanWeight < parameters.minMeanPathWeight || PathPts(k).length < parameters.minSumPathWeigth
+            PathPts(k).keep = 0;
+++++++++++++++++++++++++++++++++
+
+PathPts(k).length is the number of nodes in the path
+parameters.minSumPathWeigth is 0.5, that cannot be a number of nodes. 
+
+It is harmless, but equals not setting a limit to minimal the number of nodes
+
+
+----------------------------------------------------------------------------

@@ -1,19 +1,25 @@
-function plotMapDecriptorsInGroups(dr,conds)
+function plotMapDecriptorsInGroups
+% function plotMapDecriptorsInGroups(dr,conds)
+
+% conds = {'Normal';'OAG';'Uveitis'};
+conds = [];
+
+dr = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160829/';
 
 load(fullfile(dr,'mapData.mat'),'descriptors')
 
+descriptors = regroupConditions(descriptors);
+
 allConditions = unique(descriptors.Group(:));
 
-populations = cellfun(@(x) sum(strcmp(descriptors.Group(:),x)), allConditions);
+% populations = cellfun(@(x) sum(strcmp(descriptors.Group(:),x)), allConditions);
+populations = cellfun(@(x) sum(ismember(descriptors.Group(:),x)), allConditions);
 
-% mskCond   = (populations > 10) & ~ismember(allConditions,'Other/No Group');
 mskCond     = (populations >= 5) & ~ismember(allConditions,'Other/No Group');
 
 if ~isempty(conds)
    mskCond     = mskCond & ismember(allConditions,conds); 
 end
-
-% conds = {'Normal';'OAG';'Uveitis'};
 
 conditions  = allConditions(mskCond);
 % populations = populations(mskCond);
@@ -84,38 +90,38 @@ ylim([0, 700])
 ylabel('P95 Thickness [\mum]')
 print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
 
-%% Center Macula values
-
-% Center Mean thickness
-hf = figure;
-boxplot(data.centerMean(:),data.Group(:),'notch','on','labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 400])
-ylabel('center mean Thickness [\mum]')
-print(hf,fullfile(dr,'centerMeanThickness.png'),'-dpng')
-
-% Center Std thickness
-hf = figure;
-boxplot(data.centerStd(:),data.Group(:),'notch','on','labelorientation', 'inline')
-ylim([0, 100])
-ylabel('center std Thickness [\mum]')
-print(hf,fullfile(dr,'centerStdThickness.png'),'-dpng')
-
-% Center Q5 thickness
-hf = figure;
-boxplot(data.centerQ5(:),data.Group(:),'notch','on','labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 400])
-ylabel('center P5 Thickness [\mum]')
-print(hf,fullfile(dr,'centerP5Thickness.png'),'-dpng')
-
-% Center Q95 thickness
-hf = figure;
-boxplot(data.centerQ95(:),data.Group(:),'notch','on','labelorientation', 'inline')
-set(gca,'FontSize',14)
-ylim([0, 700])
-ylabel('center P95 Thickness [\mum]')
-print(hf,fullfile(dr,'centerP95Thickness.png'),'-dpng')
+% %% Center Macula values
+% 
+% % Center Mean thickness
+% hf = figure;
+% boxplot(data.centerMean(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 400])
+% ylabel('center mean Thickness [\mum]')
+% print(hf,fullfile(dr,'centerMeanThickness.png'),'-dpng')
+% 
+% % Center Std thickness
+% hf = figure;
+% boxplot(data.centerStd(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% ylim([0, 100])
+% ylabel('center std Thickness [\mum]')
+% print(hf,fullfile(dr,'centerStdThickness.png'),'-dpng')
+% 
+% % Center Q5 thickness
+% hf = figure;
+% boxplot(data.centerQ5(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 400])
+% ylabel('center P5 Thickness [\mum]')
+% print(hf,fullfile(dr,'centerP5Thickness.png'),'-dpng')
+% 
+% % Center Q95 thickness
+% hf = figure;
+% boxplot(data.centerQ95(:),data.Group(:),'notch','on','labelorientation', 'inline')
+% set(gca,'FontSize',14)
+% ylim([0, 700])
+% ylabel('center P95 Thickness [\mum]')
+% print(hf,fullfile(dr,'centerP95Thickness.png'),'-dpng')
 
 %% Quadrant analyzes
 Nlim = 100;
@@ -411,5 +417,26 @@ end
 legend(conditions)
 set(gca,'FontSize',14)
 print(hf,fullfile(dr,'AzimResult.png'),'-dpng')
+
+end
+
+function descriptors = regroupConditions(descriptors)
+
+
+
+% Regroup conditions to bigger groups: 'Normal';'AMD';'OAG';'Uveitis';'Other'};
+allGroups = descriptors{:,'Group'};
+
+allGroups(ismember(allGroups,'Bleb'))        = repmat({'OAG'},sum(ismember(allGroups,'Bleb')),1);
+allGroups(ismember(allGroups,'OAG Precoce')) = repmat({'OAG'},sum(ismember(allGroups,'OAG Precoce')),1);
+allGroups(ismember(allGroups,'OAG Suspect')) = repmat({'OAG'},sum(ismember(allGroups,'OAG Suspect')),1);
+allGroups(ismember(allGroups,'OHT'))         = repmat({'OAG'},sum(ismember(allGroups,'OHT')),1);
+
+allGroups(ismember(allGroups,'Early AMD')) = repmat({'AMD'},sum(ismember(allGroups,'Early AMD')),1);
+allGroups(ismember(allGroups,'Wet AMD'))   = repmat({'AMD'},sum(ismember(allGroups,'Wet AMD')),1);
+
+allGroups(ismember(allGroups,'Geographic Atrophy')) = repmat({'Other/No Group'},sum(ismember(allGroups,'Geographic Atrophy')),1);
+
+descriptors{:,'Group'} = allGroups;
 
 end
