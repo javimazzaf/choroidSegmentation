@@ -62,10 +62,12 @@ if isempty(varargin{1})
 end
 
 % Complete the path according to the current computer
-if ispc,       dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
- elseif ismac, dirlist = fullfile([filesep 'Volumes'],varargin{1});
- else          dirlist = fullfile(filesep,'srv','samba',varargin{1}); 
-end
+% if ispc,       dirlist = fullfile([filesep filesep 'HMR-BRAIN'],varargin{1});
+%  elseif ismac, dirlist = fullfile([filesep 'Volumes'],varargin{1});
+%  else          dirlist = fullfile(filesep,'srv','samba',varargin{1}); 
+% end
+
+dirlist = varargin{1};
 
 handles.dirlist = dirlist;
 

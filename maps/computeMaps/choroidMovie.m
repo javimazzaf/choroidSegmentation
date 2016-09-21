@@ -1,8 +1,8 @@
 function choroidMovie(varargin)
 % Previously mapMovieNew
 
-dirlist = adaptToHMRpath(varargin{1});
-% dirlist = varargin{1};
+% dirlist = adaptToHMRpath(varargin{1});
+dirlist = varargin{1};
 
 for q = 1:length(dirlist)
     

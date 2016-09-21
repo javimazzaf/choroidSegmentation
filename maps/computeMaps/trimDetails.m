@@ -1,7 +1,7 @@
 function trimDetails(varargin)
 
-dirlist = adaptToHMRpath(varargin{1});
-% dirlist = varargin{1};
+% dirlist = adaptToHMRpath(varargin{1});
+dirlist = varargin{1};
 
 for k = 1:length(dirlist)
     
@@ -35,7 +35,13 @@ for k = 1:length(dirlist)
         while strcmp(happy,'Redo')
             imshow(bscan)
             title('Please Select Left and Right Columns To Trim Off Entire Movie')
-            trim = questdlg('Do you want to trim the image series?','Trim Dialog','Yes','No','Cancel','Yes');
+            
+            if nargin >= 2 && strcmp(lower(varargin{2}),'notrim')
+                trim = 'No';
+            else
+                trim = questdlg('Do you want to trim the image series?','Trim Dialog','Yes','No','Cancel','Yes');
+            end
+            
             if strcmp('Yes',trim)
                 [col,~] = ginput(2);
                 hold on

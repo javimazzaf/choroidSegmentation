@@ -1,7 +1,11 @@
-function [desc] = MapDescriptors(dirlist)
+function [desc] = MapDescriptors(dirlist,varargin)
 % function [desc] = MapDescriptors(dirlist,fileName)
 
-fileName = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160830/mapData.mat';
+if nargin < 2
+   fileName = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160830/mapData.mat';
+else
+   fileName = varargin{1}; 
+end
 
 if ispc
     dirlist = fullfile([filesep filesep 'HMR-BRAIN'],dirlist);
