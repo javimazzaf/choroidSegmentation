@@ -1,0 +1,5 @@
+1 - borrar funciones que no se usan
+2 - homogenizar nombres de funciones
+3 - aprolijar funciones agregando comentarios
+4 - generar help de cada función
+5 - Hacer código más eficiente
