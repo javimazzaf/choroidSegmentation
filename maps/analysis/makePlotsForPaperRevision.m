@@ -1,4 +1,4 @@
-function makePlotsForPaper
+function makePlotsForPaperRevision
 
 conds = [];
 
@@ -146,6 +146,14 @@ xlim(yl)
 [slope,R2,pVal,hf] = corrFigureMaker(data.Age(:),data.meanthick(:));
 print(hf,fullfile(dr,'correlMeanThcknessVsAge.pdf'),'-dpdf')
 writetable(array2table([slope,R2,pVal],'VariableNames',{'slope','R2','pVal'}),fullfile(dr,'correlMeanThcknessVsAge.txt'));
+
+% Repeat correlation only for normal subjects
+mskNormal = ismember(data.Group(:),'Normal');
+[slopeN,R2N,pValN,hfN] = corrFigureMaker(data.Age(mskNormal),data.meanthick(mskNormal));
+print(hfN,fullfile(dr,'correlMeanThcknessVsAgeNormals.pdf'),'-dpdf')
+writetable(array2table([slopeN,R2N,pValN],'VariableNames',{'slope','R2','pVal'}),fullfile(dr,'correlMeanThcknessVsAgeNormals.txt'));
+
+
 
 % Azimuth angle cumulative histogram
 hf = figure;

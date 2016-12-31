@@ -4,7 +4,8 @@ function plotMapDecriptorsInGroups
 % conds = {'Normal';'OAG';'Uveitis'};
 conds = [];
 
-dr = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160829/';
+% dr = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160829/';
+dr = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160830/';
 
 load(fullfile(dr,'mapData.mat'),'descriptors')
 
@@ -34,7 +35,7 @@ hf = figure;
 bar(populations(mskCond))
 set(gca,'XTickLabels',conditions)
 ylabel('N patients')
-print(hf,fullfile(dr,'populations.png'),'-dpng')
+% print(hf,fullfile(dr,'populations.png'),'-dpng')
 
 % Mean thickness
 hf = figure;
@@ -42,7 +43,7 @@ boxplot(data.meanthick(:),data.Group(:),'notch','on','labelorientation', 'inline
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('mean Thickness [\mum]')
-print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'meanThickness.png'),'-dpng')
 
 % % Mean thickness corrected for age
 % hf = figure;
@@ -72,7 +73,7 @@ hf = figure;
 boxplot(data.stdthick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 ylim([0, 100])
 ylabel('std Thickness [\mum]')
-print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
+% print(hf,fullfile(dr,'stdThickness.png'),'-dpng')
 
 % Q5 thickness
 hf = figure;
@@ -80,7 +81,7 @@ boxplot(data.q5thick(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylim([0, 400])
 ylabel('P5 Thickness [\mum]')
-print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
+% print(hf,fullfile(dr,'P5Thickness.png'),'-dpng')
 
 % Q95 thickness
 hf = figure;
@@ -88,7 +89,7 @@ boxplot(data.q95thick(:),data.Group(:),'notch','on','labelorientation', 'inline'
 set(gca,'FontSize',14)
 ylim([0, 700])
 ylabel('P95 Thickness [\mum]')
-print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
+% print(hf,fullfile(dr,'P95Thickness.png'),'-dpng')
 
 % %% Center Macula values
 % 
@@ -152,7 +153,7 @@ boxplot(nasalTemporalContrast(msk),data.Group(msk),'notch','on','labelorientatio
 set(gca,'FontSize',14)
 ylim([-1, 1])
 ylabel('nasalTemporalContrast')
-print(hf,fullfile(dr,'nasalTemporalContrast.png'),'-dpng')
+% print(hf,fullfile(dr,'nasalTemporalContrast.png'),'-dpng')
 
 % Superior Inferior Contrast
 SuperiorInferiorContrast = (superior - inferior) ./ (superior + inferior);
@@ -163,7 +164,7 @@ boxplot(SuperiorInferiorContrast(msk),data.Group(msk),'notch','on','labelorienta
 set(gca,'FontSize',14)
 ylim([-1, 1])
 ylabel('SuperiorInferiorContrast')
-print(hf,fullfile(dr,'SuperiorInferiorContrast.png'),'-dpng')
+% print(hf,fullfile(dr,'SuperiorInferiorContrast.png'),'-dpng')
 
 % NasalSuperior TemporalInferior Contrast
 NsTiContrast = (ns - ti) ./ (ns + ti);
@@ -174,7 +175,7 @@ boxplot(NsTiContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inli
 set(gca,'FontSize',14)
 ylim([-1, 1])
 ylabel('NsTiContrast')
-print(hf,fullfile(dr,'NsTiContrast.png'),'-dpng')
+% print(hf,fullfile(dr,'NsTiContrast.png'),'-dpng')
 
 % NasalInferior TemporalSuperior Contrast
 NiTsContrast = (ni - ts) ./ (ni + ts);
@@ -185,7 +186,7 @@ boxplot(NiTsContrast(msk),data.Group(msk),'notch','on','labelorientation', 'inli
 set(gca,'FontSize',14)
 ylim([-1, 1])
 ylabel('NiTsContrast')
-print(hf,fullfile(dr,'NiTsContrast.png'),'-dpng')
+% print(hf,fullfile(dr,'NiTsContrast.png'),'-dpng')
              
 % % Q5 thickness Corrected
 % hf = figure;
@@ -212,7 +213,7 @@ boxplot(data.ratioChoroidToRetina(:),data.Group(:),'notch','on','labelorientatio
 set(gca,'FontSize',14)
 ylim([-0.1, 1.1])
 ylabel('T_{Choroid} / T_{Retina}')
-print(hf,fullfile(dr,'ratioChoroidToRetina.png'),'-dpng')
+% print(hf,fullfile(dr,'ratioChoroidToRetina.png'),'-dpng')
 
 % Retina thickness
 data.meanRetina = data.meanthick(:) ./ data.ratioChoroidToRetina(:);
@@ -221,7 +222,7 @@ hf = figure;
 boxplot(data.meanRetina(:),data.Group(:),'notch','on','labelorientation', 'inline')
 set(gca,'FontSize',14)
 ylabel('mean retina[\mum]')
-print(hf,fullfile(dr,'meanRetina.png'),'-dpng')
+% print(hf,fullfile(dr,'meanRetina.png'),'-dpng')
 
 % % Polar angle of plane fit
 % hf = figure;
@@ -247,7 +248,7 @@ end
 
 % legend(conditions)
 title('Azimuth Scatter')
-print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
+% print(hf,fullfile(dr,'scatterAzimuth.png'),'-dpng')
 
 % % Histogram of azimuth of plane fit
 % hf = figure;
@@ -302,7 +303,7 @@ boxplot(90-data.polar(:),data.Group(:),'notch','on','labelorientation', 'inline'
 ylim([0, 3])
 ylabel('polar angle [deg]')
 title('Polar angle')
-print(hf,fullfile(dr,'polar.png'),'-dpng')
+% print(hf,fullfile(dr,'polar.png'),'-dpng')
 
 % Age
 hf = figure;
@@ -310,7 +311,7 @@ boxplot(data.Age(:),data.Group(:),'notch','on','labelorientation', 'inline')
 legend(conditions)
 set(gca,'FontSize',14)
 ylabel('Age [years]')
-print(hf,fullfile(dr,'age.png'),'-dpng')
+% print(hf,fullfile(dr,'age.png'),'-dpng')
 
 % Correlation Choroid Thickness and Age
 hf = figure;

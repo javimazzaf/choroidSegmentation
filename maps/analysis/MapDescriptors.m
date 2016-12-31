@@ -2,7 +2,7 @@ function [desc] = MapDescriptors(dirlist,varargin)
 % function [desc] = MapDescriptors(dirlist,fileName)
 
 if nargin < 2
-   fileName = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160830/mapData.mat';
+   fileName = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/choroidMaps/20160921/mapData.mat';
 else
    fileName = varargin{1}; 
 end

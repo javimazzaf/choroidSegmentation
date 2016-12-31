@@ -2,11 +2,11 @@ function successAssessment
 
 outDir = '/Users/javimazzaf/Documents/work/proyectos/ophthalmology/manuscript/performanceAssessment/';
 
-if ~exist(fullfile(outDir,'bScanStats.mat'),'file')
+if ~exist(fullfile(outDir,'bScanStatsNew.mat'),'file')
     computeSuccessAssessment(outDir)
 end
 
-load(fullfile(outDir,'bScanStats.mat'), 'has', 'numBscans', 'masks', 'goodTraces','newDB','msk','skipped','skipCause')
+load(fullfile(outDir,'bScanStatsNew.mat'), 'has', 'numBscans', 'masks', 'goodTraces','newDB','msk','skipped','skipCause','bmErrors')
 
 %Eclude nonMacula and badImaging
 skipCause(cellfun(@isempty, skipCause)) = repmat({'none'},sum(cellfun(@isempty, skipCause)),1);%Write none where the skipcause is empty
@@ -14,6 +14,7 @@ allMapsMask = ~ismember(skipCause,{'badImagingRadio';'notMaculaRadio'});
 
 numBscans  = numBscans(allMapsMask);
 goodTraces = goodTraces(allMapsMask);
+bmErrors   = bmErrors(allMapsMask);
 newDB      = newDB(allMapsMask,:);
 msk        = msk(allMapsMask);
 skipped    = skipped(allMapsMask);
@@ -33,6 +34,7 @@ valid = ~skipped;
 
 gTraces = goodTraces(valid);
 nTraces = numBscans(valid);
+bmTraces = bmErrors(valid);
 
 percent = gTraces ./ nTraces * 100;
 
@@ -129,6 +131,7 @@ numBscans = numBscans(ix);
 dirList = fullfile(topdir,has.Map);
 
 goodTraces = zeros(size(dirList));
+bmErrors   = zeros(size(dirList));
 skipped    = logical(zeros(size(dirList)));
 skipCause  = cell(size(dirList));
 
@@ -172,6 +175,10 @@ for k = 1:numel(dirList)
     % Loop through B-Scans
     for q = 1:length(traces)
         
+        if isempty(traces(q).BM)
+            bmErrors(k) = bmErrors(k) + 1;
+        end
+        
         if isempty(traces(q).CSI), continue, end
         
         CSI = traces(q).CSI;
@@ -193,7 +200,7 @@ end
 
 % newDB = newDB(msk,:);
 
-save(fullfile(outDir,'bScanStats.mat'), 'has', 'numBscans', 'masks', 'goodTraces','newDB','msk','skipped','skipCause')
+save(fullfile(outDir,'bScanStatsNew.mat'), 'has', 'numBscans', 'masks', 'goodTraces','newDB','msk','skipped','skipCause','bmErrors')
 
 
 
