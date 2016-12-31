@@ -10,7 +10,7 @@ if PathPts(k).meanWeight < parameters.minMeanPathWeight || PathPts(k).length < p
 PathPts(k).length is the number of nodes in the path
 parameters.minSumPathWeigth is 0.5, that cannot be a number of nodes. 
 
-It is harmless, but equals not setting a limit to minimal the number of nodes
+It is harmless, but it is the same as not setting a limit to minimal the number of nodes
 
 
 ----------------------------------------------------------------------------

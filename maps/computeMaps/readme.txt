@@ -12,4 +12,7 @@ To prepare choroid maps, call the following functions in serial order:
 5 - choroidMap (batch)
 6 - choroidMovie (batch)
 
+each function takes as parameters a cell array of strings, each containing 
+the path of one experiment data.
+
 
