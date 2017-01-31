@@ -3,7 +3,7 @@
 % is appended to the file. The inputs are the path and the text to append in a new
 % line.
 
-% Copyright (C) 2016 Javier Mazzaferri <javier.mazzaferri@gmail.com>
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
 % Hopital Maisonneuve-Rosemont, 
 % Centre de Recherche
 % www.biophotonics.ca

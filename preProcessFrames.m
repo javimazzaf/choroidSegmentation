@@ -1,3 +1,21 @@
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 function preProcessFrames(directory)
 
 savedir   = fullfile(directory,'Results');
@@ -56,11 +74,6 @@ for frame = indToProcess
         maxShift  = double(max(abs(colShifts)));
         
         shiftedScans(:,:,frame) = imageFlattening(bscan,colShifts,maxShift);
-       
-%         fh = figure;
-%         imshow(shiftedScans(:,:,frame),[]), hold on
-%         plot(posRPE * ones(size(yTop)))
-%         close(fh)
         
         %-% Store Relevant Variables
         traces(frame).RET = yRet;
@@ -83,9 +96,6 @@ for frame = indToProcess
         disp(logit(savedir,errString));
     end
 end
-
-% safeTopLimit    = max(1,absMaxShift);
-% safeBottomLimit = min(size(shiftedScans,1),size(shiftedScans,1) + absMinShift);
 
 avgScans     = cell(1,size(shiftedScans,3));
 

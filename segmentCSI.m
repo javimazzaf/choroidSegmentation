@@ -1,3 +1,21 @@
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 function CSI = segmentCSI(origShiftedBscan,rpeHeight)
 
 parameters = loadParameters;
@@ -7,10 +25,8 @@ OG = EdgeProbabilityGrad(origShiftedBscan,parameters.scalesize,parameters.angles
 %-% Inflection Points
 Infl2 = zeros(size(origShiftedBscan));
 
-% shiftedBscan = origShiftedBscan / max(origShiftedBscan(:)) * 255;
 shiftedBscan = min(255, origShiftedBscan / prctile(origShiftedBscan(:),99) * 255);
 
-% filteredBscan = imfilter(shiftedBscan,OrientedGaussian([3 3],0));
 filteredBscan = imfilter(shiftedBscan,OrientedGaussian([parameters.averagingSizeZ, parameters.averagingSizeX],0));
 colspacing    = 2;
 
@@ -21,7 +37,6 @@ testGrad2 = [];
 
 for j = 1:nCols
     
-%     filteredAscan = smooth(double(filteredBscan(:,j)),10);
     filteredAscan = double(filteredBscan(:,j));
     
     grad  = gradient(filteredAscan); 

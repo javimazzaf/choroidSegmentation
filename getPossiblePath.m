@@ -1,3 +1,21 @@
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 function [paths] = getPossiblePath(connectMatrix)
 
 ix = 1:size(connectMatrix,2);
@@ -13,7 +31,6 @@ connectMatrix(:,~msk) = [];
 
 % Gets the connected graphs
 [nGraphs,graphMask] = graphconncomp(connectMatrix,'Directed',false);
-
 
 graphMeanWeight = zeros(1,nGraphs);
 
@@ -47,19 +64,8 @@ for k = 1:nGraphs
     path.weight = weightNode;
     
     paths = [paths path];
-%     
-%     
-%     notLoopMatrix = connectMatrix;
-%     
-%     notLoopMatrix(logical(eye(size(notLoopMatrix)))) = 0; %Diag to 0
-%     
-%     thisWeights = notLoopMatrix(thisMask,thisMask); %Elements of this graph
-%     
-%     graphMeanWeight(k) = nanmean(thisWeights(:));
     
 end
-
-% FALTA ORDERNAR LOS NODOS DE IZQIOERDA A DERECHA EN CADA SUBGRUPO, y ELEGIR LOLS SEGMENTOS CON MAS PESO.
 
 path = [];     
 

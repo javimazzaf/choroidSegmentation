@@ -1,18 +1,98 @@
-Choroid map processing
-----------------------”
+Open-source algorithm for automatic choroid segmentation of OCT volume reconstructions
+--------------------------------------------------------------------------------------
 
-The user needs writing permission on the directory holding the raw files.
+In this file you will find the description of a piece of software for the
+automatic choroid segmentation of the OCT volume scans. This is the matlab
+implementation of the algorith described in detail in the paper:
 
-To build choroid maps, call the following functions in serial order:
+Open-source algorithm for automatic choroid segmentation of OCT volume reconstructions
+Javier Mazzaferri, Luke Beaton, Gisèle Hounye, Diane N. Sayah & Santiago Costantino,
+Scientific Reports, in press 2017.
 
-1 - convertSpectralis (no interactive)
-2 - trimDetails (interactive)
-3 - mapPseudoRegistration (batch)
-4 - retinaLayersSegmentation (batch)
-5 - choroidMap (batch)
-6 - choroidMovie (batch)
+Directory structure
+-------------------
 
-each function takes as parameters a cell array of strings, each containing 
-the path of one experiment data.
+The software is organized in a set of functions (See section <Processing>) 
+that have to be executed in a predefined order. The functions take 
+as parameter a cell-array of strings, each one containing the absolute path
+to the base directory (VOLUMEDIR) of a particular OCT volume scan. 
+
+At start, each VOLUMEDIR must be populated with a directory labeled 
+"RawImages", with the list of images containing all Bscans of the OCT volume.
+An image of the fundus can be stored directly under VOLUMEDIR.
+
+During the process the information is organized under this directory as in 
+the following structure:
+
+VOLUMEDIR/
+    DataFiles: Intermediate data generated in the process
+    ProcessedImages: Sorted set of source images in png format for each Bscan
+    RawImages: Contains the raw Bscans (and the .xml file, for Spectralis *)   
+    Results: The results of the segmentation in different formats
+
+* If your data does not come from a Heilderberg Spectralis OCT, you will 
+need to set manually some parameters. See the begining of the function 
+prepareVolumeGeneric.    
+
+Processing
+----------
+
+The user needs to set writing permission on VOLUMEDIR.
+
+To build choroid maps, call the following functions in this order:
+
+1 - prepareVolumeGeneric (or prepareVolumeSpectralis)
+2 - trimDetails
+3 - mapPseudoRegistration
+4 - retinaLayersSegmentation
+5 - choroidMap
+6 - choroidMovie
+
+Each function takes as parameters a cell array of strings, each containing 
+the path of one experiment data. For example, to process data on
+directories VOL1, VOL2, and VOL3, located under the /home directory execute
+the following commands on the matlab command window:
+
+>> addpath(genpath('CODEDIR'))
+>> dataDirs = {'/home/VOL1','/home/VOL2','/home/VOL3'};
+>> prepareVolumeGeneric(dataDirs);
+>> trimDetails(dataDirs);
+>> mapPseudoRegistration(dataDirs);
+>> retinaLayersSegmentation(dataDirs);
+>> choroidMap(dataDirs);
+>> choroidMovie(dataDirs);
+
+CODEDIR is the path to this matlab code.
+
+Description of functions
+------------------------
+prepareVolumeGeneric: Generates the file imageList.mat containing 
+metainformation of each B-scan. Some parameters has to be set manually if 
+the OCT volume data does not come from a Heidelberg Spectralis OCT. 
+If you hava data generated with a Heidelberg Spectralis OCT, export all
+Bscans and the .xml file the RawImages folder, and run the function 
+prepareVolumeSpectralis, instead.
+
+trimDetails: This function is the only intective function. It allows the 
+user to set the starting and ending columns withing the Bscans, where to 
+start and end looking for the choroid. This is done to avoid parts of 
+bscans where the choroid is not clearly visible.
+
+mapPseudoRegistration: This function rearrages the Bscans to ease processing.
+
+retinaLayersSegmentation: This does the segmentation of the retinal layers 
+and the choroid. It stores the information in segmentationResults.mat.
+
+choroidMap: creates the 2D map of the choroid. Stores the result in 
+ChoroidMap.mat file, and generates the figure ChoroidMap.pdf. 
+
+choroidMovie: creates an animated gif file, showing a sequence of all the 
+segmented Bscans, along with the corresponding line in the 2D map.
+
+The script loadParameters.m set several parameteres of the process.
+   
+
+
+
 
 

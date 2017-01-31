@@ -1,14 +1,26 @@
-function retinaLayersSegmentation(varargin)
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-% Previously called choroidMapFirstProcess
+function retinaLayersSegmentation(dirlist)
 
 % This function segments the retina interface, RPE, Bruchs membrane and the
 % coroid-sclera interface, in each frame in the array bscanstore in the
 % file RegisteredImages.mat for each directory in varargin{1}.
-
-
-% dirlist = adaptToHMRpath(varargin{1});
-dirlist = varargin{1};
 
 if     ispc,  workersAvailable = Inf; %Uses parallel computing
 elseif ismac, workersAvailable = 0;   %Uses 1 worker computing

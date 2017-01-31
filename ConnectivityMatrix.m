@@ -1,3 +1,21 @@
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 function [aC,bC,aIm,bIm,imind,edges,num] = ConnectivityMatrix(region,connectivity)
 
 [m,n]  = size(region);
@@ -23,7 +41,7 @@ if connectivity==4
     down=imind+1;
     imhood=[up right down];
     
-    keep=[(rem(imind-1,m)~=0) imind+m<=(m*n) (rem(imind+1,m)~=1)]; %[(n-2)*2] + [(n-1)*(m-2)*3]+[2*2+1*2]+(m-2)*2 %[top,bot]+[middle]+[corners]
+    keep=[(rem(imind-1,m)~=0) imind+m<=(m*n) (rem(imind+1,m)~=1)]; 
     keep=reshape((ismember(imhood,imind)&keep)',size(imind,1)*3,1);
     imhood=reshape(imhood',size(imhood,1)*size(imhood,2),1);
     
@@ -48,7 +66,6 @@ elseif connectivity==8
             (rem(imind + m + 1, m) ~= 1),...    % Right-down pix is not in first row
             (rem(imind + 1, m)     ~=1)];       % Down pix is not first row
         
-        %[(n-2)*2] + [(n-1)*(m-2)*3]+[2*2+1*2]+(m-2)*2 %[top,bot]+[middle]+[corners]
     keep   = ismember(imhood,imind) & keep; % Keep only real pixels and kept ones
     keep   = reshape(keep',numel(keep),1);  
     imhood = reshape(imhood',numel(imhood),1);
@@ -75,24 +92,6 @@ aC = [ones(startlength,1);aC;region(endedge,n)];
 bC = [region(startedge,1);bC;repmat(num,endlength,1)];
 
 edges = [startedge endedge];
-% as=unique(aimind);
-% for i=1:length(as)
-%     ind=find(aimind==as(i));
-%     con=bimind(ind);
-%     k=zeros(size(region));
-%     k(con)=1;
-%     j=zeros(size(region));
-%     j(as(i))=.5;
-%     [row,col]=ind2sub(size(region),as(i));
-%     ups=max(1,row-10);
-%     downs=min(row+10,m);
-%     rights=min(col+10,n);
-%     lefts=max(1,col-10);
-%     figure(1)
-%     h=imshow(imoverlay(imoverlay(region,k,[1 0 0]),j,[0 1 0]));
-%     xlim([lefts-0.5 rights]);
-%     ylim([ups downs])
-% end
 
 end
 

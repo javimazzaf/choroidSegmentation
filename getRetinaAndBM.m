@@ -1,3 +1,21 @@
+% Copyright (C) 2017, Javier Mazzaferri, Luke Beaton, Santiago Costantino 
+% Hopital Maisonneuve-Rosemont, 
+% Centre de Recherche
+% www.biophotonics.ca
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 function [ret,bm] = getRetinaAndBM(im, bits)
 
 sz = size(im);
@@ -38,8 +56,6 @@ for k = 1:size(imStep,2)
     ySecond(k) = locs(2);
     wSecond(k) = pks(2);
     
-    
-%     [pks,locs] = findpeaks(imStepPrecise(:,k),'SortStr','descend','MinPeakDistance',11);
     [pks,locs] = findpeaks(imStepInv(:,k),'SortStr','descend','MinPeakDistance',11);
     
     ix = find(locs > ySecond(k),1,'first');
@@ -71,26 +87,6 @@ yThird  = eliminateJumps(yThird,wThird,sz);
 
 [xBM,yBM] = findRPEbottom(imF,imStepPrecise,ySecond, yThird);
 
-% % Use graph-based segmentation to trace the RPE
-% [rpeMask,rpeWeigth] = makeRPEmask(imF, imF, ySecond, yThird, yFirst);
-% % [rpeMask,rpeWeigth] = makeRPEmask(imF, ySecond, yThird, yFirst);
-% [aC,bC,aIm,bIm,imind,edges,num] = ConnectivityMatrix(rpeMask,8);
-% [xRPE,yRPE] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,rpeWeigth);
-% 
-% % Use graph-based segmentation to trace the RPE bottom limit with higher
-% % precision
-% [rpeBotMask,rpeBotWeigth] = makeRPEmask(imF, imStepPrecise, ySecond, yThird, yFirst);
-% % [rpeMask,rpeWeigth] = makeRPEmask(imF, ySecond, yThird, yFirst);
-% [aC,bC,aIm,bIm,imind,edges,num] = ConnectivityMatrix(rpeBotMask,8);
-% [xBotRPE,yBotRPE] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,rpeBotWeigth);
-% 
-% % Eliminate points that are too far apart from the RPE
-% dev = abs(yBotRPE - yRPE);
-% mskValid = dev <= max(nanmedian(dev) * 3,1);
-% xBotRPE = xBotRPE(mskValid);
-% yBotRPE = yBotRPE(mskValid);
-
-
 % Compute a convex-hull below the RPE bottom limit to estimate the Bruch's
 % membrane
 DT = DelaunayTri(xBM(:),yBM(:));
@@ -103,12 +99,6 @@ CHcurve = round(CHcurve(1:size(imStep,2)));
 % Set results
 ret = yFirst;  % First retina layer
 bm  = CHcurve; % Estimation of Bruch's membrane
-% 
-% hf = figure;
-% imshow(im,[]), hold on
-% % plot(xBM,yBM);
-% plot(bm)
-% close(hf)
 
 end
 
@@ -122,7 +112,6 @@ endedge=edges(:,2);
 startlength=length(find(startedge));
 endlength=length(find(endedge));
 
-% DL = - imfilter(bscan,[-1;1],'symmetric');
 DL = bscan;
 DL(DL<0)=0;
 DL=mat2gray(DL);
@@ -164,8 +153,6 @@ fin   = find(~isnan(top) & ~isnan(bottom) & ~isnan(retina),1,'last');
 rpeThickness = nanmedian(bottom - top);
 
 % Computes the absolut top limit of the region (halfway between retina and RPE)
-% gapTop = nanmedian(top - retina) / 2;
-% topLim = round(min(top, retina + gapTop));
 topLim = NaN(size(top));
 
 for k = start:fin
@@ -173,31 +160,20 @@ for k = start:fin
 end
 
 % Computes the absolut bottom limit of the region (halfway between RPE and bottom of image)
-% gapBot = nanmedian(sz(1) - bottom) / 2;
-% botLim = round(max(sz(1) - gapBot, bottom));
 botLim = round(min(sz(1), bottom + rpeThickness / 2));
 
 for k = start:fin
       msk(topLim(k):botLim(k),k) = true;
-%     msk(topLim(k):botLim(k),k) = true;
-%     outWeigth([1:top(k),bottom(k):end],k) = 0.1 * outWeigth([1:top(k),bottom(k):end],k);
 end
 
 % Fill up gaps at start and end
 if start ~= 1
     msk(topLim(start):botLim(start),1  :start) = true; 
-    
-%     rng = [1:top(start),bottom(start):sz(1)];
-%     outWeigth(rng,1:start) = 0.1 * outWeigth(rng,1:start);
 end
 
 
 if fin ~= sz(2)
     msk(topLim(fin):botLim(fin),fin:end)   = true; 
-    
-%     rng = [1:top(fin),bottom(fin):sz(1)];
-%     outWeigth(rng,fin:end) = 0.1 * outWeigth(rng,fin:end);
-    
 end
 
 outWeigth(~msk) = 0.1 * outWeigth(~msk); 
@@ -209,8 +185,6 @@ function traceOut = eliminateJumps(traceIn, weights,sz)
 len = length(traceIn);
 
 msk = ~isnan(traceIn);
-
-% plot(traceIn), hold on
 
 x = 1:numel(traceIn);
 x = x(msk);
@@ -226,8 +200,6 @@ fitobject = fit(x(:),traceIn(:),'poly5',fitOptions);
 
 yfit = feval(fitobject,x);
 
-% plot(yfit)
-
 dev = abs(traceIn(:) - yfit(:));
 
 threshold = 5 * median(dev);
@@ -237,7 +209,6 @@ valid = abs(traceIn(:) - yfit(:)) < threshold;
 x = x(valid);
 traceIn = traceIn(valid);
 
-% traceOut = interp1(x,traceIn,1:numel(msk));
 traceOut = interp1(x,traceIn,1:len,'linear');
 
 % Extrapolate using the nearest neighbour
@@ -314,26 +285,5 @@ wMatrix(msk) = wGrad;
 estDistBM = nanmedian(yBot' - yRPE(xBot));
 xOut = 1:numel(yRPE);
 traceOut = yRPE + estDistBM;
-
-% [x,y] = meshgrid(1:sz(2),1:sz(1));
-% x = x(msk);
-% y = y(msk);
-% 
-% d = NaN(size(x));
-% 
-% for k = 1:numel(x)
-%     d(k) = y(k) - expTrace(x(k));    
-% end
-% 
-% 
-% wDist = gaussmf(d,[rpeThickness/2,0]);
-% fact = 0.75;
-% weight = fact * wGrad + (1 - fact) * wDist;
-% 
-% wMatrix(msk) = weight;
-% [xBM,yBM] = traceGraph(aC,bC,aIm,bIm,imind,num,edges,wMatrix);
-
-
-
 
 end
