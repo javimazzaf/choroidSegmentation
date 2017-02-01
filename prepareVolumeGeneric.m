@@ -28,24 +28,33 @@ xWidth = 6;   % width of the Bscan in mm
 yWidth = 6;   % width in direction perpendicular to Bscans in mm
 zWidth = 2;   % height of Bscans in mm
 
-xNpix = 512;  % Horizontal pixels of Bscans
-yNpix = 128;  % Number of Bscans
-zNpix = 1024; % Vertical pixels of Bscans
+xNpix = 496;  % Horizontal pixels of Bscans
+% yNpix is determined inside the dirlist Loop, depending on the number of
+% images in RawImages directory
+zNpix = 512;  % Vertical pixels of Bscans
 
 numAvg  = 20; % number of images averaged to obtain each Bscan
 quality = 20; % Spectralis quality factor. Set it to 20 if you do not know. 
 
 % *** END OF MANUAL PARAMETERES ***
 
-xStep = xWidth / xNpix;
-yStep = yWidth / yNpix;
-zStep = zWidth / zNpix;
 
-col = zeros([yNpix,1]);
+xStep = xWidth / xNpix;
+% yStep is determined inside the dirlist Loop
+zStep = zWidth / zNpix;
 
 for dr = 1:numel(dirlist)
     
     folder = dirlist{dr};
+    
+    % Number of Bscans is set to the number of tif images
+    fnames = dir(fullfile(folder,'RawImages','*.tif'));
+    fnames = sort({fnames(:).name});
+    yNpix = numel(fnames);
+    
+    yStep = yWidth / yNpix;
+    
+    col = zeros([yNpix,1]);
     
     ImageList = table(col,col,col,col,col,col,col,col,col,col,col,col,col,col,...
         'VariableNames',{'fwidth' 'fheight' 'fscaleX' 'fscaleY' 'width'...
@@ -83,6 +92,21 @@ for dr = 1:numel(dirlist)
     
     if ~exist(fullfile(folder,'DataFiles'),'dir')
         mkdir(fullfile(folder,'DataFiles'));
+    end
+    
+    % Create images target directory
+    if ~exist(fullfile(folder,'ProcessedImages'),'dir')
+        mkdir(fullfile(folder,'ProcessedImages'));
+    end
+    
+    for q = 1:size(ImageList,1)
+        
+        imtif = imread(fullfile(folder,'RawImages',fnames{q}));
+        
+        imout = rgb2gray(imtif);
+        
+        imwrite(imout,fullfile(folder,'ProcessedImages',[num2str(q-1,'%5.5d'),'.png']))
+        
     end
     
     save(fullfile(folder,'DataFiles','ImageList.mat'),'ImageList','fundusIm');

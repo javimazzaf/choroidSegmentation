@@ -29,7 +29,7 @@ function g = intrans(f, varargin)
 %  different class is specified for the 'log' option.
 
 %  Verify the correct number of inputs.
-error(nargchk(2, 4, nargin))
+narginchk(2, 4)
 
 %  Store the class of the input for use later.
 classin = class(f);

@@ -22,7 +22,7 @@ for q = 1:length(dirlist)
     
     folder = dirlist{q};
     
-    disp(logit(folder,['Starting MapMovie:' folder]));
+    dispInline('init',logit(folder,['Starting choroidMovie:' folder]));
     
     try
         
@@ -168,7 +168,7 @@ for q = 1:length(dirlist)
             
             scansInfo = [scansInfo thisScanInfo];
             
-            disp(p)
+            dispInline('update',logit(folder,['choroidMovie. processing Frame: ' num2str(p)]));
         end
         
         save(fullfile(folder,'Results','bScans.mat'), 'scansInfo')
@@ -176,16 +176,16 @@ for q = 1:length(dirlist)
         delete(auxfname);
         
     catch exception
-        errorString = ['Error MapMovie:' folder '. Message:' exception.message];
+        errorString = ['Error choroidMovie:' folder '. Message:' exception.message];
         errorString = [errorString buildCallStack(exception)];
         
-        disp(logit(folder,errorString));
+        dispInline('end',logit(folder,errorString));
         
         close all
         continue
     end
     
-    disp(logit(folder,['Done MapMovie:' folder]));
+    dispInline('end',logit(folder,['Done choroidMovie:' folder]));
     
     close all
 end

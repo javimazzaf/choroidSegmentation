@@ -19,7 +19,7 @@
 function preProcessFrames(directory)
 
 savedir   = fullfile(directory,'Results');
-disp(logit(savedir, 'Starting preProcessFrames.'));
+disp(logit(directory, 'Starting preProcessFrames.'))
 
 parameters = loadParameters;
 
@@ -60,6 +60,8 @@ posRPE   = round(size(bscanstore{1},1) / 3);
 safeTopLimit    = NaN(1,max(indToProcess));
 safeBottomLimit = NaN(1,max(indToProcess));
 
+dispInline('init',logit(directory,'preProcessFrames. Starting flattening'));
+
 % parfor frame = indToProcess
 for frame = indToProcess
     try
@@ -89,15 +91,19 @@ for frame = indToProcess
         safeTopLimit(frame)    = max(1,double(max(colShifts)));
         safeBottomLimit(frame) = min(size(shiftedScans,1),size(shiftedScans,1) + double(min(colShifts)));
         
-        disp(frame)
+        dispInline('update',logit(directory,['preProcessFrames. Flattening Frame: ' num2str(frame)]));
     catch exception
         errString = ['Error preProcessFrames at frame:' num2str(frame) '. Message: ' exception.message] ;
         errString = [errString buildCallStack(exception)];
-        disp(logit(savedir,errString));
+        dispInline('end',logit(directory,errString));
     end
 end
 
+dispInline('end',logit(directory,'preProcessFrames. Done flattening'));
+
 avgScans     = cell(1,size(shiftedScans,3));
+
+dispInline('init',logit(directory,'preProcessFrames. Starting smoothing'));
 
 for frame = indToProcess
     try
@@ -121,15 +127,17 @@ for frame = indToProcess
         
         % Compute weighted average
         avgScans{frame} = nansum(allAux,3) / sum(interScansFilter((startFrame:lastFrame) - frame + SigmaFilterScans + 1));
-        disp(frame)
+        dispInline('update',logit(directory,['preProcessFrames. Smoothing Frame: ' num2str(frame)]));
     catch
-        disp(logit(savedir,['Error preProcessFrames at frame:' num2str(frame)]));
+        dispInline('end',logit(directory,['Error preProcessFrames at frame:' num2str(frame)]));
     end
 end
+
+dispInline('end',logit(directory,'preProcessFrames. Done smoothing'));
 
 RPEheight = posRPE - safeTopLimit + 1;
 
 save(fullfile(savedir,'segmentationResults.mat'),'nodes','traces','other','EndHeights');
 save(fullfile(savedir,'flattenedBscans.mat'),'shiftedScans','avgScans','indToProcess','RPEheight','safeTopLimit','safeBottomLimit');
 
-disp(logit(savedir, 'Done preProcessFrames.'));
+disp(logit(directory, 'Done preProcessFrames.'));
