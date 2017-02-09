@@ -6,8 +6,8 @@ automatic choroid segmentation of the OCT volume scans. This is the matlab
 implementation of the algorith described in detail in the paper:
 
 Open-source algorithm for automatic choroid segmentation of OCT volume reconstructions
-Javier Mazzaferri, Luke Beaton, Gisèle Hounye, Diane N. Sayah & Santiago Costantino,
-Scientific Reports, in press 2017.
+Javier Mazzaferri, Luke Beaton, Gisèle Hounye, Diane N. Sayah, and Santiago Costantino, 
+Scientific Reports 7. Article Number 42112, (2017). doi:10.1038/srep42112
 
 Directory structure
 -------------------
