@@ -64,11 +64,6 @@ if isempty(studyNode)
     error('No study data in XML file.')
 end
 
-% Check XML files
-if size(studyNode.Children, 2) < 14;
-    error('This case is not implemented after the changes in this file. Implement it when this error mesage comes out. (JM)')
-end
-
 seriesNodes = studyNode.Children(strcmp({studyNode.Children(:).Name},'Series'));
 
 if isempty(seriesNodes)

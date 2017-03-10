@@ -22,7 +22,7 @@ for k = 1:numel(dirlist)
     
     folder = dirlist{k};
 
-    disp(logit(folder,'Initiating convertSpectralis'))
+    disp(logit(folder,'Initiating prepareVolumeSpectralis'))
     
     % Move RawImages and xml spectralis file to RawImages
     if ~exist(fullfile(folder,'RawImages'), 'dir')
@@ -63,12 +63,12 @@ for k = 1:numel(dirlist)
         
     catch exception
         
-        errorString = ['Error in convertSpectralis. Message:' exception.message buildCallStack(exception)];
+        errorString = ['Error in prepareVolumeSpectralis. Message:' exception.message buildCallStack(exception)];
         disp(logit(folder,errorString));
         continue
         
     end
     
-    disp(logit(folder,'Done convertSpectralis'))
+    disp(logit(folder,'Done prepareVolumeSpectralis'))
 
 end
