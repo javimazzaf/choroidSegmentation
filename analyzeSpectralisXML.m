@@ -39,6 +39,10 @@ function [patientData, timeSeries]=analyzeSpectralisXML(fileName)
 % I simplified the function, and changed timeSeries to be table instead of
 % a struct array.
 
+% JM (20180601):
+% I modified the file so it is compatible with version 6.6.2.0 of the
+% Spectralis software
+
 patientData = [];
 timeSeries  = [];
 
@@ -60,91 +64,140 @@ patientData.BirthDate = patientNode.Children(strcmp({patientNode.Children(:).Nam
 patientData.Sex       = patientNode.Children(strcmp({patientNode.Children(:).Name},'Sex'       )).Children(1).Data;
 
 studyNode = patientNode.Children(strcmp({patientNode.Children(:).Name},'Study'));
-if isempty(studyNode)
-    error('No study data in XML file.')
-end
+if isempty(studyNode), error('No study data in XML file.'), end
 
 seriesNodes = studyNode.Children(strcmp({studyNode.Children(:).Name},'Series'));
+if isempty(seriesNodes), error('No series data in XML file.'), end
 
-if isempty(seriesNodes)
-    error('No series data in XML file.')
-end
+imagesNodes = seriesNodes.Children(strcmp({seriesNodes.Children(:).Name},'Image'));
+if isempty(imagesNodes), error('No Image data in XML file.'), end
 
-col = zeros([numel(seriesNodes),1]);
-colc = cell([numel(seriesNodes),1]);
+
+fundusInfo = getFundusInformation(imagesNodes);
+if isempty(fundusInfo), error('No fundus information found in XML file.'), end
+
+imagesNodes = getOCTnodes(imagesNodes);
+
+col  = zeros([numel(imagesNodes),1]);
+colc = cell([numel(imagesNodes),1]);
 
 timeSeries = table(col,col,col,col,col,colc,col,col,col,col,col,col,col,col,col,col,col,col,col,col,colc,colc,...
       'VariableNames',{'id' 'fwidth' 'fheight' 'fscaleX' 'fscaleY' 'fundusfileName'...
                        'hour ' 'minute' 'second' 'UTC' 'width' 'height' 'scaleX'...
                        'scaleY' 'numAvg' 'quality' 'startX' 'startY' 'endX' 'endY'...
                        'filePath' 'fileName'});
-
-for k = 1:numel(seriesNodes)
+            
+% Loops through OCT image nodes                   
+for k = 1:numel(imagesNodes)
     
-    thisSeriesNodes = seriesNodes(k).Children;
+    thisImageNodes = imagesNodes(k).Children;
     
-    timeSeries{k,'id'} = str2num(thisSeriesNodes(strcmp({thisSeriesNodes(:).Name},'ID')).Children.Data);
+    %Fill fundus info (It is the same for all Bscans)
+    timeSeries{k,'fwidth'}  = str2double(fundusInfo.width);
+    timeSeries{k,'fheight'} = str2double(fundusInfo.height);
+    timeSeries{k,'fscaleX'} = str2double(fundusInfo.scaleX);
+    timeSeries{k,'fscaleY'} = str2double(fundusInfo.scaleY);
+    timeSeries{k,'fundusfileName'} = {fundusInfo.fileName};
     
-    % fundus = 1, oct = 2;
-    imageNodes = thisSeriesNodes(strcmp({thisSeriesNodes(:).Name},'Image'));
-    
-    % Parse Fundus image Information
-    funImageNodes = imageNodes(1).Children;
-    
-    % Scale Information
-    foacNodes = funImageNodes(strcmp({funImageNodes(:).Name},'OphthalmicAcquisitionContext')).Children;
-    timeSeries{k,'fwidth'}  = str2num(foacNodes(strcmp({foacNodes(:).Name},'Width')).Children.Data);
-    timeSeries{k,'fheight'} = str2num(foacNodes(strcmp({foacNodes(:).Name},'Height')).Children.Data);
-    timeSeries{k,'fscaleX'} = str2num(foacNodes(strcmp({foacNodes(:).Name},'ScaleX')).Children.Data);
-    timeSeries{k,'fscaleY'} = str2num(foacNodes(strcmp({foacNodes(:).Name},'ScaleY')).Children.Data);
-    
-    % File name Information
-    fImageDataNodes   = funImageNodes(strcmp({funImageNodes(:).Name},'ImageData')).Children;
-    fundusfileName    = fImageDataNodes(strcmp({fImageDataNodes(:).Name},'ExamURL')).Children.Data;
-    timeSeries{k,'fundusfileName'} = {fundusfileName(find(fundusfileName == '\',1,'Last')+1:end)};
-    
-    % Parse OCT image Information
-    octImageNodes = imageNodes(2).Children;
+    timeSeries{k,'id'} = str2double(thisImageNodes(strcmp({thisImageNodes(:).Name},'ID')).Children.Data);
     
     % Acquisition time information
-    acqNodes  = octImageNodes(strcmp({octImageNodes(:).Name},'AcquisitionTime')).Children;
+    acqNodes  = thisImageNodes(strcmp({thisImageNodes(:).Name},'AcquisitionTime')).Children;
     timeNodes = acqNodes(strcmp({acqNodes(:).Name},'Time')).Children;
-    timeSeries{k,'hour'}   = str2num(timeNodes(strcmp({timeNodes(:).Name},'Hour')).Children.Data);
-    timeSeries{k,'minute'} = str2num(timeNodes(strcmp({timeNodes(:).Name},'Minute')).Children.Data);
-    timeSeries{k,'second'} = str2num(timeNodes(strcmp({timeNodes(:).Name},'Second')).Children.Data);
-    timeSeries{k,'UTC'}    = str2num(timeNodes(strcmp({timeNodes(:).Name},'UTCBias')).Children.Data);
+    timeSeries{k,'hour'}   = str2double(timeNodes(strcmp({timeNodes(:).Name},'Hour')).Children.Data);
+    timeSeries{k,'minute'} = str2double(timeNodes(strcmp({timeNodes(:).Name},'Minute')).Children.Data);
+    timeSeries{k,'second'} = str2double(timeNodes(strcmp({timeNodes(:).Name},'Second')).Children.Data);
+    timeSeries{k,'UTC'}    = str2double(timeNodes(strcmp({timeNodes(:).Name},'UTCBias')).Children.Data);
     
     % Image scale information
-    oacNodes = octImageNodes(strcmp({octImageNodes(:).Name},'OphthalmicAcquisitionContext')).Children;
-    timeSeries{k,'width'}  = str2num(oacNodes(strcmp({oacNodes(:).Name},'Width')).Children.Data);
-    timeSeries{k,'height'} = str2num(oacNodes(strcmp({oacNodes(:).Name},'Height')).Children.Data);
-    timeSeries{k,'scaleX'} = str2num(oacNodes(strcmp({oacNodes(:).Name},'ScaleX')).Children.Data);
-    timeSeries{k,'scaleY'} = str2num(oacNodes(strcmp({oacNodes(:).Name},'ScaleY')).Children.Data);
+    oacNodes = thisImageNodes(strcmp({thisImageNodes(:).Name},'OphthalmicAcquisitionContext')).Children;
+    timeSeries{k,'width'}  = str2double(oacNodes(strcmp({oacNodes(:).Name},'Width')).Children.Data);
+    timeSeries{k,'height'} = str2double(oacNodes(strcmp({oacNodes(:).Name},'Height')).Children.Data);
+    timeSeries{k,'scaleX'} = str2double(oacNodes(strcmp({oacNodes(:).Name},'ScaleX')).Children.Data);
+    timeSeries{k,'scaleY'} = str2double(oacNodes(strcmp({oacNodes(:).Name},'ScaleY')).Children.Data);
     
     % Averaging and Image quality information
-    timeSeries{k,'numAvg'} = str2num(oacNodes(strcmp({oacNodes(:).Name},'NumAve')).Children.Data);
-    timeSeries{k,'quality'}= str2num(oacNodes(strcmp({oacNodes(:).Name},'ImageQuality')).Children.Data);
+    timeSeries{k,'numAvg'} = str2double(oacNodes(strcmp({oacNodes(:).Name},'NumAve')).Children.Data);
+    timeSeries{k,'quality'}= str2double(oacNodes(strcmp({oacNodes(:).Name},'ImageQuality')).Children.Data);
     
     % Scan coordinates information
     startNodes = oacNodes(strcmp({oacNodes(:).Name},'Start')).Children;
     sCoorNodes = startNodes(strcmp({startNodes(:).Name},'Coord')).Children;
-    timeSeries{k,'startX'} = str2num(sCoorNodes(strcmp({sCoorNodes(:).Name},'X')).Children.Data);
-    timeSeries{k,'startY'} = str2num(sCoorNodes(strcmp({sCoorNodes(:).Name},'Y')).Children.Data);
+    timeSeries{k,'startX'} = str2double(sCoorNodes(strcmp({sCoorNodes(:).Name},'X')).Children.Data);
+    timeSeries{k,'startY'} = str2double(sCoorNodes(strcmp({sCoorNodes(:).Name},'Y')).Children.Data);
     
     endNodes   = oacNodes(strcmp({oacNodes(:).Name},'End')).Children;
     eCoorNodes = endNodes(strcmp({endNodes(:).Name},'Coord')).Children;
-    timeSeries{k,'endX'}   = str2num(eCoorNodes(strcmp({eCoorNodes(:).Name},'X')).Children.Data);
-    timeSeries{k,'endY'}   = str2num(eCoorNodes(strcmp({eCoorNodes(:).Name},'Y')).Children.Data);
+    timeSeries{k,'endX'}   = str2double(eCoorNodes(strcmp({eCoorNodes(:).Name},'X')).Children.Data);
+    timeSeries{k,'endY'}   = str2double(eCoorNodes(strcmp({eCoorNodes(:).Name},'Y')).Children.Data);
     
     % File name information
-    imageDataNodes   = octImageNodes(strcmp({octImageNodes(:).Name},'ImageData')).Children;
+    imageDataNodes   = thisImageNodes(strcmp({thisImageNodes(:).Name},'ImageData')).Children;
     octfileName = imageDataNodes(strcmp({imageDataNodes(:).Name},'ExamURL')).Children.Data;
     timeSeries{k,'filePath'} = {octfileName};
     timeSeries{k,'fileName'} = {octfileName(find(octfileName == '\',1,'Last')+1:end)};
-     
+    
 end
 
+end
+
+
+% *** This function looks for fundus information in the imagesNodes and ***
+% returns a structure with the information
+function fundusInfo = getFundusInformation(imagesNodes)
+
+fundusInfo = [];
+
+for k = 1:numel(imagesNodes)
     
+    thisImageNodes = imagesNodes(k).Children;
+    
+    % Get Image type: LOCALIZER (fundus)
+    imageTypeNode = thisImageNodes(strcmp({thisImageNodes(:).Name},'ImageType')).Children;
+    imageType     = imageTypeNode(strcmp({imageTypeNode(:).Name},'Type')).Children.Data;
+    
+    if strcmp(imageType,'LOCALIZER')
+        
+        % Scale Information
+        foacNodes = thisImageNodes(strcmp({thisImageNodes(:).Name},'OphthalmicAcquisitionContext')).Children;
+        fundusInfo.width  = foacNodes(strcmp({foacNodes(:).Name},'Width')).Children.Data;
+        fundusInfo.height = foacNodes(strcmp({foacNodes(:).Name},'Height')).Children.Data;
+        fundusInfo.scaleX = foacNodes(strcmp({foacNodes(:).Name},'ScaleX')).Children.Data;
+        fundusInfo.scaleY = foacNodes(strcmp({foacNodes(:).Name},'ScaleY')).Children.Data;
+        
+        % File name Information
+        fImageDataNodes   = thisImageNodes(strcmp({thisImageNodes(:).Name},'ImageData')).Children;
+        fundusfileName    = fImageDataNodes(strcmp({fImageDataNodes(:).Name},'ExamURL')).Children.Data;
+        fundusInfo.fileName    = fundusfileName(find(fundusfileName == '\',1,'Last')+1:end);
+        
+        break
+    end
+end
+
+end
+
+% *** This function KEEPS the nodes that are OCT images ***
+function outNodes = getOCTnodes(inNodes)
+
+   msk = arrayfun(@isOCT,inNodes);
+   outNodes = inNodes(msk);
+
+end
+
+% *** This function checks if thisNode is an OCT image ***
+function res = isOCT(thisNode)
+
+    innerNodes = thisNode.Children;
+
+    imageTypeNode = innerNodes(strcmp({innerNodes(:).Name},'ImageType')).Children;
+    imageType     = imageTypeNode(strcmp({imageTypeNode(:).Name},'Type')).Children.Data;
+
+    res = strcmp(imageType,'OCT');
+    
+end
+
+
+
 
 
 
